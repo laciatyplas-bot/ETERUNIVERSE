@@ -1,251 +1,261 @@
 <!doctype html>
 <html lang="pl">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MAPA ETERNIVERSE v13.0 — 9 Bram Uniwersum</title>
-  <meta name="description" content="Pełna, żywa mapa 9 Bram Eterniverse z księgami i realtime sync."/>
-  <meta name="theme-color" content="#D9A441"/>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MAPA ETERNIVERSE — ARCHITEKT</title>
   <style>
-    :root {
-      --teal: #28D3C6; --gold: #D9A441; --green: #12C65B; --purple: #9B6BFF; --orange: #FFB14B;
-      --red: #FF6B6B; --pink: #FF9FF3; --blue: #5DADE2; --indigo: #667eea;
+    :root{
+      --bg:#050814; --card:#0A1727; --card-soft:#0D1C30; --text:#E9F4FF;
+      --muted:#9BA9C8; --border:#20324A; --gold:#D9A441; --teal:#28D3C6;
+      --green:#12C65B; --orange:#FFB14B; --red:#FF6B6B; --gray:#8B8FA0;
     }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      background: #000 url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?ixlib=rb-4.0.3&auto=format&fit=crop&w=2112&q=80') center/cover fixed;
-      color: white; font-family: 'Inter', system-ui, sans-serif; overflow: hidden; height: 100vh;
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      background: radial-gradient(circle at top, #15223A 0%, #050814 55%, #01030A 100%);
+      color:var(--text); font-family: system-ui, sans-serif; min-height:100vh;
     }
+    .wrap{ max-width:1200px; margin:0 auto; padding:32px 16px 40px; }
+    header{ margin-bottom:24px; }
+    h1{ font-size:32px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); }
+    .subtitle{ margin-top:8px; color:var(--muted); font-size:14px; }
+    .toolbar{ display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; align-items:center; }
+    .search input{ width:220px; padding:9px 12px; border-radius:10px; border:1px solid var(--border); background:#050B16; color:var(--text); font-size:13px; }
+    .toolbar select, .toolbar button{ border-radius:10px; border:1px solid var(--border); padding:9px 12px; font-size:13px; background:#050B16; color:var(--text); cursor:pointer; }
+    .toolbar button.main{ background:var(--gold); color:#02030A; font-weight:700; border:none; }
+    
+    .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; margin-top:20px; }
+    .brama-card{ background:var(--card); border-radius:14px; border:1px solid var(--border); padding:14px; display:flex; flex-direction:column; min-height:220px; }
+    .brama-header{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
+    .brama-title{ font-size:14px; font-weight:700; color:white; }
+    .brama-sub{ font-size:10px; text-transform:uppercase; color:var(--muted); margin-top:4px; line-height:1.4; }
+    .badge{ font-size:9px; padding:3px 8px; border-radius:999px; background:rgba(217,164,65,0.1); color:var(--gold); text-transform:uppercase; border:1px solid rgba(217,164,65,0.2); }
+    
+    .books{ margin-top:10px; border-top:1px solid rgba(255,255,255,0.06); padding-top:8px; display:flex; flex-direction:column; gap:8px; }
+    .book{ background:var(--card-soft); border-radius:10px; padding:8px; border:1px solid rgba(255,255,255,0.04); display:flex; gap:10px; align-items:center; cursor:pointer; transition: 0.2s; }
+    .book:hover { border-color: var(--gold); background: #0F2138; }
+    .book-cover-thumb{ width:32px; height:44px; border-radius:4px; flex-shrink:0; background:#050814; background-size:cover; background-position:center; border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:8px; color:var(--gray); }
+    .book-main{ flex:1; min-width:0; }
+    .book-title{ font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+    .status-tag{ font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; }
 
-    .controls { position: fixed; top: 20px; left: 20px; z-index: 1000; display: flex; gap: 12px; flex-wrap: wrap; }
-    .btn { background: rgba(255,255,255,0.12); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.25); color: white; padding: 12px 20px; border-radius: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-    .btn:hover { background: rgba(255,255,255,0.22); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+    .modal-backdrop{ position:fixed;inset:0;background:rgba(0,0,0,0.9); display:none;align-items:center;justify-content:center;z-index:2000; padding:20px; }
+    .modal{ background:#0A1727; border-radius:20px; border:1px solid var(--gold); padding:24px; max-width:400px; width:100%; }
+    .modal h2{ font-size:18px; color:var(--gold); margin-bottom:15px; }
+    .modal label{ display:block; font-size:11px; color:var(--muted); margin:10px 0 4px; }
+    .modal input, .modal select{ width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); background:#050B16; color:white; }
+    .modal-actions{ display:flex; flex-direction:column; gap:10px; margin-top:20px; }
+    .btn-save{ background:var(--gold); color:black; font-weight:bold; border:none; padding:12px; border-radius:10px; cursor:pointer; }
+    .btn-del{ background:none; border:1px solid var(--red); color:var(--red); padding:10px; border-radius:10px; font-size:12px; cursor:pointer; }
+.audio-btn{
+  font-size:9px;
+  padding:3px 8px;
+  border-radius:999px;
+  border:1px solid rgba(40,211,198,0.4);
+  color:var(--teal);
+  background:rgba(40,211,198,0.1);
+  cursor:pointer;
+  margin-left:6px;
+}
 
-    .cloud-status { position: fixed; top: 70px; right: 20px; background: rgba(40,211,198,0.2); color: var(--teal); padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; border: 1px solid var(--teal); z-index: 900; backdrop-filter: blur(8px); display: flex; align-items: center; gap: 8px; }
+.audio-panel{
+  margin-top:6px;
+  padding:6px;
+  border-radius:8px;
+  background:#050B16;
+  border:1px solid rgba(255,255,255,0.06);
+  display:none;
+  flex-direction:column;
+  gap:4px;
+}
 
-    #mapCanvas { width: 100vw; height: 100vh; cursor: grab; }
-    #mapCanvas:active { cursor: grabbing; }
+.audio-item{
+  font-size:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:6px;
+}
 
-    .info-panel {
-      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(8,18,28,0.97); backdrop-filter: blur(24px);
-      border: 1px solid rgba(255,255,255,0.2); border-radius: 24px; padding: 36px; max-width: 700px; max-height: 85vh; overflow-y: auto;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.8); z-index: 2000; display: none;
-    }
-    .info-title { font-size: 32px; font-weight: 800; margin-bottom: 12px; text-align: center; background: linear-gradient(90deg, var(--gold), white); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .info-sub { font-size: 18px; color: rgba(255,255,255,0.7); margin-bottom: 32px; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
-    .books-list { list-style: none; }
-    .book-item { padding: 16px; background: rgba(255,255,255,0.06); border-radius: 14px; margin-bottom: 14px; border-left: 4px solid var(--teal); }
-    .book-title { font-weight: 700; font-size: 17px; margin-bottom: 8px; }
-    .book-status { font-size: 13px; padding: 6px 12px; border-radius: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-    .status-published { background: var(--green); color: #000; }
-    .status-writing { background: var(--teal); color: #000; }
-    .status-ready { background: var(--gold); color: #000; }
-    .status-draft { background: var(--orange); color: #000; }
-    .status-idea { background: #666; color: white; }
-    .close-info { position: absolute; top: 20px; right: 24px; font-size: 32px; cursor: pointer; color: #aaa; transition: color 0.3s; }
-    .close-info:hover { color: white; }
+.audio-item a{
+  color:var(--gold);
+  text-decoration:none;
+  font-size:10px;
+}
   </style>
 </head>
 <body>
-
-<div class="cloud-status" id="cloudStatus">
-  <div class="cloud-dot"></div>
-  <span id="cloudText">Ładowanie uniwersum...</span>
+<div class="wrap">
+  <header>
+    <h1>MAPA ETERNIVERSE</h1>
+    <div class="subtitle">System Archiwizacji Woli — Maciej Maciuszek</div>
+    <div class="toolbar">
+      <input type="text" id="searchInput" placeholder="Szukaj projektu...">
+      <select id="gateFilter"><option value="all">Wszystkie bramy</option></select>
+      <button class="main" onclick="openM()">+ NOWA KSIĘGA</button>
+    </div>
+  </header>
+  <main><section class="grid" id="gatesGrid"></section></main>
 </div>
 
-<div class="controls">
-  <button class="btn" id="forceSync">☁ Synchronizuj</button>
-  <button class="btn" id="newBook">📖 Nowa księga</button>
-  <button class="btn" id="centerMap">🎯 Wyśrodkuj</button>
+<div class="modal-backdrop" id="addModal">
+  <div class="modal">
+    <h2 id="mHead">Zarządzaj Księgą</h2>
+    <label>Brama</label><select id="mGate"></select>
+    <label>Tytuł projektu</label><input id="mTitle">
+    <label>Status</label>
+    <select id="mStatus">
+      <option value="IDEA">IDEA</option>
+      <option value="W TRAKCIE">W TRAKCIE</option>
+      <option value="GOTOWE">GOTOWE</option>
+      <option value="WYDANE">WYDANE</option>
+    </select>
+    <label>Link do okładki (Canva/Wattpad)</label><input id="mCover">
+    <div class="modal-actions">
+      <button class="btn-save" onclick="save()">ZAPISZ ZMIANY</button>
+      <button id="mDel" class="btn-del" style="display:none;" onclick="del()">USUŃ PROJEKT</button>
+      <button onclick="closeM()" style="background:none; border:none; color:white;">Anuluj</button>
+    </div>
+  </div>
 </div>
-
-<div class="info-panel" id="infoPanel">
-  <span class="close-info" id="closeInfo">×</span>
-  <div class="info-title" id="infoTitle">BRAMA 1 — INTERSEEKER</div>
-  <div class="info-sub" id="infoSub">Psychika · Trauma · Cień · Archetyp</div>
-  <ul class="books-list" id="booksList"></ul>
-</div>
-
-<canvas id="mapCanvas"></canvas>
 
 <script>
-  // ===== FIREBASE CONFIG (ZMIEŃ NA SWOJE) =====
-  const firebaseConfig = { /* Twoje dane z Firebase Console */ };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-  const universeRef = db.ref('eterniverse/universe');
+  const KEY = 'ETER_FINAL_MAP_DATA';
+  let editContext = null;
 
-  // ===== PEŁNE DANE 9 BRAM — na podstawie Twojego oryginalnego JSON =====
-  const ORIGINAL_BRAMY = [
-    { id: 1, name: "BRAMA 1 — INTERSEEKER", sub: "Psychika · Trauma · Cień · Archetyp", color: "#28D3C6" },
-    { id: 2, name: "BRAMA 2 — ETERSEEKER", sub: "Wola · Pole · Architektura rzeczywistości", color: "#D9A441" },
-    { id: 3, name: "BRAMA 3 — OBFITOSEEKER", sub: "Materia · Transformacja · Obfitość", color: "#12C65B" },
-    { id: 4, name: "BRAMA 4 — THE KNOT", sub: "Technologia · Splątanie · Protokół", color: "#9B6BFF" },
-    { id: 5, name: "BRAMA 5 — QUANTUM KNOT", sub: "Kwanta · Entropia · Nowe trajektorie", color: "#FFB14B" },
-    { id: 6, name: "BRAMA 6 — PUSTKASEEKER", sub: "Cisza · Nicość · Źródło", color: "#FF6B6B", books: [] },
-    { id: 7, name: "BRAMA 7 — JEDNOSEEKER", sub: "Jedność · Nie-dualność · Absolut", color: "#FF9FF3", books: [] },
-    { id: 8, name: "BRAMA 8 — WIECZNOSEEKER", sub: "Czas · Wieczność · Poza linią", color: "#5DADE2", books: [] },
-    { id: 9, name: "BRAMA 9 — ARCHITEKT", sub: "Twórca · Manifest · Wolna Wola", color: "#667eea", books: [] }
+  function load(){
+    const s = localStorage.getItem(KEY);
+    return s ? JSON.parse(s) : null;
+  }
+
+window.DATA = load() || [
+    {id:1, name:"BRAMA I — INTERSEEKER", sub:"Psychika · Cień · Trauma", tag:"CORE / PSYCHE", books:[
+      {title:"InterSeeker – Atlas Wewnętrzny", status:"WYDANE", cover:""},
+      {title:"ShadowSeeker – Anatomia Cienia", status:"GOTOWE", cover:""},
+      {title:"MemorySeeker – Archeologia Wspomnień", status:"W TRAKCIE", cover:""}
+    ]},
+    {id:2, name:"BRAMA II — CUSTOS", sub:"Strażnik · Rdzeń · Początek", tag:"CORE / ORIGIN", books:[
+      {title:"Geneza: Pierwszy Rezonans", status:"GOTOWE", cover:""},
+      {title:"Custos: Kodeks Głębi", status:"IDEA", cover:""}
+    ]},
+    {id:3, name:"BRAMA III — ETERSEEKER", sub:"Wola · Pole · Protokół", tag:"CORE / FIELD", books:[
+      {title:"EterSeeker – Tom Zero", status:"W TRAKCIE", cover:""},
+      {title:"Architektura Woli", status:"IDEA", cover:""}
+    ]},
+    {id:4, name:"BRAMA IV — ARCHETYPY", sub:"Konstrukcja · Role · Przeznaczenie", tag:"CORE / WILL", books:[
+      {title:"Kronika Woli", status:"IDEA", cover:""}
+    ]},
+    {id:5, name:"BRAMA V — OBFITOŚĆ", sub:"Materia · Manifestacja · Przepływ", tag:"EMBODIED", books:[
+      {title:"ObfitoSeeker – Kod Obfitości", status:"WYDANE", cover:""}
+    ]},
+    {id:6, name:"BRAMA VI — BIOSEEKER", sub:"Ciało · Biologia · Regulacja", tag:"EMBODIED / BIO", books:[
+      {title:"BioSeeker: Protokół Biologii Pola", status:"IDEA", cover:""}
+    ]},
+    {id:7, name:"BRAMA VII — SPLĄTANIE", sub:"AI · Obserwator · Technologia", tag:"META / TECH", books:[
+      {title:"SplątanieSeeker: Protokół AI", status:"IDEA", cover:""}
+    ]},
+    {id:8, name:"BRAMA VIII — TRAJEKTORIE", sub:"Linie Czasu · Fizyka Duszy", tag:"META / PHYSICS", books:[
+      {title:"TrajektoriaSeeker", status:"GOTOWE", cover:""}
+    ]},
+    {id:9, name:"BRAMA IX — ETERNIONY", sub:"Wspólnota · Misja · Węzły", tag:"COLLECTIVE", books:[]},
+    {id:10, name:"BRAMA X — ETERUNIVERSE", sub:"Integracja · Jedność · Architekt", tag:"INTEGRATION", books:[
+      {title:"Architekt Eteru — Manifest Twórcy", status:"W TRAKCIE", cover:""}
+    ]}
   ];
 
-  // Przykładowe księgi z Twojego JSON (możesz rozszerzyć)
-  const SAMPLE_BOOKS = {
-    1: [
-      { title: "INTERSEEKER: Geneza", status: "ready" },
-      { title: "InterSeeker – Atlas Wewnętrzny", status: "published" },
-      { title: "Kronika Woli", status: "idea" }
-    ],
-    2: [
-      { title: "EterSeeker – Księga Zakazana (Tom Zero)", status: "writing" },
-      { title: "PoleSeeker – Topologia Ludzkiego Pola", status: "idea" }
-    ],
-    3: [
-      { title: "Fito-Seeker", status: "draft" },
-      { title: "ObfitoSeeker – Kod Obfitości", status: "published" }
-    ],
-    // ... reszta Bram na razie pusta
-  };
-
-  let mapData = {
-    bramy: ORIGINAL_BRAMY.map(brama => ({
-      ...brama,
-      x: 0, y: 0,
-      books: SAMPLE_BOOKS[brama.id] || []
-    })),
-    timestamp: Date.now(),
-    version: 13.0
-  };
-
-  // Canvas
-  const canvas = document.getElementById('mapCanvas');
-  const ctx = canvas.getContext('2d');
-  let scale = 0.8, offsetX = 0, offsetY = 0;
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  // Pozycje w okręgu
-  const initPositions = () => {
-    const radius = 900;
-    mapData.bramy.forEach((brama, i) => {
-      const angle = (i / mapData.bramy.length) * Math.PI * 2 - Math.PI / 2;
-      brama.x = Math.cos(angle) * radius;
-      brama.y = Math.sin(angle) * radius;
-    });
-  };
-
-  // Status → kolor
-  const getStatusColor = (status) => {
-    const colors = {
-      published: '#12C65B',
-      ready: '#D9A441',
-      writing: '#28D3C6',
-      draft: '#FFB14B',
-      idea: '#888888'
-    };
-    return colors[status] || '#888888';
-  };
-
-  // Rysowanie
-  const renderMap = () => {
-    ctx.fillStyle = 'rgba(0,0,0,0.08)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.save();
-    ctx.translate(canvas.width/2 + offsetX, canvas.height/2 + offsetY);
-    ctx.scale(scale, scale);
-
-    // Połączenia
-    ctx.strokeStyle = 'rgba(40,211,198,0.15)';
-    ctx.lineWidth = 1.5 / scale;
-    for (let i = 0; i < mapData.bramy.length; i++) {
-      for (let j = i+1; j < mapData.bramy.length; j++) {
-        const b1 = mapData.bramy[i], b2 = mapData.bramy[j];
-        ctx.beginPath();
-        ctx.moveTo(b1.x, b1.y);
-        ctx.lineTo(b2.x, b2.y);
-        ctx.stroke();
-      }
-    }
-
-    // Bramy i księgi
-    mapData.bramy.forEach(brama => {
-      const pulse = Math.sin(Date.now() / 800 + brama.id) * 0.2 + 1.3;
-      const size = 40 * pulse;
-
-      const grad = ctx.createRadialGradient(brama.x, brama.y, 0, brama.x, brama.y, size * 2);
-      grad.addColorStop(0, brama.color);
-      grad.addColorStop(0.4, brama.color + 'cc');
-      grad.addColorStop(1, 'transparent');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(brama.x, brama.y, size * 2, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Księgi
-      brama.books.forEach((book, i) => {
-        const angle = (i / brama.books.length) * Math.PI * 2 + Date.now() / 5000;
-        const dist = 160 + Math.sin(Date.now() / 1000 + i) * 20;
-        const bx = brama.x + Math.cos(angle) * dist;
-        const by = brama.y + Math.sin(angle) * dist;
-
-        ctx.fillStyle = getStatusColor(book.status);
-        ctx.beginPath();
-        ctx.arc(bx, by, 10, 0, Math.PI * 2);
-        ctx.fill();
-      });
-    });
-
-    ctx.restore();
-    requestAnimationFrame(renderMap);
-  };
-
-  // Kliknięcie
-  canvas.addEventListener('click', (e) => {
-    if (isDragging) return;
-    const rect = canvas.getBoundingClientRect();
-    const mx = (e.clientX - rect.left - canvas.width/2 - offsetX) / scale;
-    const my = (e.clientY - rect.top - canvas.height/2 - offsetY) / scale;
-
-    const clicked = mapData.bramy.find(b => Math.hypot(b.x - mx, b.y - my) < 60);
-    if (clicked) {
-      document.getElementById('infoTitle').textContent = clicked.name;
-      document.getElementById('infoSub').textContent = clicked.sub;
-      const list = document.getElementById('booksList');
-      list.innerHTML = clicked.books.length ? '' : '<li style="text-align:center; color:#888;">Brak ksiąg (jeszcze)</li>';
-      clicked.books.forEach(book => {
-        const li = document.createElement('li');
-        li.className = 'book-item';
-        li.innerHTML = `
-          <div class="book-title">${book.title}</div>
-          <span class="book-status status-\( {book.status}" style="background: \){getStatusColor(book.status)}">
-            ${book.status || 'idea'}
-          </span>
-        `;
-        list.appendChild(li);
-      });
-      document.getElementById('infoPanel').style.display = 'block';
-    }
+  const grid = document.getElementById('gatesGrid');
+  const mG = document.getElementById('mGate');
+  DATA.forEach(g => {
+    const o = `<option value="${g.id}">${g.name}</option>`;
+    document.getElementById('gateFilter').innerHTML += o;
+    mG.innerHTML += o;
   });
 
-  document.getElementById('closeInfo').onclick = () => {
-    document.getElementById('infoPanel').style.display = 'none';
-  };
+  function render(){
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const f = document.getElementById('gateFilter').value;
+    grid.innerHTML = '';
+    DATA.forEach(brama => {
+      if(f !== 'all' && String(brama.id) !== f) return;
+      const card = document.createElement('div');
+      card.className = 'brama-card';
+      card.innerHTML = `<div class="brama-header"><div><div class="brama-title">${brama.name}</div><div class="brama-sub">${brama.sub}</div></div><span class="badge">${brama.tag}</span></div><div class="books"></div>`;
+      const bWrap = card.querySelector('.books');
+      brama.books.forEach((b, idx) => {
+        if(q && !b.title.toLowerCase().includes(q)) return;
+        const el = document.createElement('div');
+        el.className = 'book';
+        el.onclick = () => openM(brama.id, idx);
+        const stCol = b.status === 'WYDANE' ? 'var(--green)' : b.status === 'GOTOWE' ? 'var(--gold)' : 'var(--muted)';
+        el.innerHTML = `
+  <div class="book-cover-thumb" style="${b.cover ? `background-image:url('${b.cover}')` : ''}">
+    ${b.cover ? '' : 'okładka'}
+    
+  </div>
 
-  document.getElementById('centerMap').onclick = () => {
-    scale = 0.8; offsetX = 0; offsetY = 0;
-  };
+  <div class="book-main">
+    <div class="book-title">
+      ${b.title}
+      <button class="audio-btn">AUDIO (${(b.audio||[]).length})</button>
+    </div>
 
-  // Reszta kodu: drag, zoom, sync, saveLocal – jak w poprzedniej wersji
+    <div class="status-tag" style="color:${stCol}">${b.status}</div>
 
-  // Start
-  initPositions();
-  renderMap();
+    <div class="audio-panel">
+      ${(b.audio||[]).map(a => `
+        <div class="audio-item">
+          <span>${a.name} [${a.type}]</span>
+          <a href="${a.link}" target="_blank">▶</a>
+        </div>
+      `).join('')}
+    </div>
+  </div>
+`;
+        bWrap.appendChild(el);
+      });
+      grid.appendChild(card);
+    });
+    localStorage.setItem(KEY, JSON.stringify(DATA));
+  }
+
+  function openM(gId=null, bIdx=null){
+    editContext = gId ? {gId, bIdx} : null;
+    document.getElementById('mDel').style.display = editContext ? 'block' : 'none';
+    if(editContext){
+      const b = DATA.find(x => x.id === gId).books[bIdx];
+      document.getElementById('mTitle').value = b.title;
+      document.getElementById('mStatus').value = b.status;
+      document.getElementById('mCover').value = b.cover || '';
+      mG.value = gId;
+    } else {
+      document.getElementById('mTitle').value = '';
+      document.getElementById('mCover').value = '';
+    }
+    document.getElementById('addModal').style.display = 'flex';
+  }
+
+  function closeM(){ document.getElementById('addModal').style.display='none'; }
+
+  function save(){
+    const t = document.getElementById('mTitle').value.trim();
+    if(!t) return;
+    const gId = parseInt(mG.value);
+    const b = {title:t, status:document.getElementById('mStatus').value, cover:document.getElementById('mCover').value};
+    if(editContext) DATA.find(x => x.id === editContext.gId).books.splice(editContext.bIdx, 1);
+    DATA.find(x => x.id === gId).books.push(b);
+    closeM(); render();
+  }
+
+  function del(){
+    if(editContext && confirm('Usunąć ten projekt?')){
+      DATA.find(x => x.id === editContext.gId).books.splice(editContext.bIdx, 1);
+      closeM(); render();
+    }
+  }
+
+  document.getElementById('searchInput').oninput = render;
+  document.getElementById('gateFilter').onchange = render;
+  render();
 </script>
 </body>
 </html>
