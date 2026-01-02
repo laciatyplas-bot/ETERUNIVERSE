@@ -3,331 +3,627 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eterniverse – Zoptymalizowana Mapa Bram</title>
+  <title>Eterniverse – Bella Author Mode + Animacje</title>
 
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js"></script>
 
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:Arial,sans-serif; background:#111; color:#eee; min-height:100vh; display:flex; flex-direction:column; }
-    header { background:#222; padding:15px; text-align:center; border-bottom:1px solid #444; }
-    header h1 { font-size:2rem; }
-    .toolbar { background:#222; padding:10px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center; border-bottom:1px solid #444; }
-    button, select { padding:10px 14px; background:#333; color:#eee; border:1px solid #555; border-radius:6px; cursor:pointer; font-size:0.95rem; }
-    button:hover { background:#444; }
-    .layout { flex:1; padding:10px; display:grid; grid-template-columns:1fr; gap:12px; overflow:hidden; }
-    .section { background:#1e1e1e; border:1px solid #444; border-radius:8px; padding:14px; display:flex; flex-direction:column; overflow:hidden; }
-    .section h2 { margin-bottom:10px; font-size:1.3rem; color:#0cf; }
-    #current-path { margin-bottom:8px; font-size:0.9rem; color:#c0a0ff; }
-    #element-title { width:100%; padding:10px; font-size:1.6rem; background:transparent; border:none; border-bottom:2px solid #0cf; color:#eee; margin-bottom:12px; text-align:center; }
-    textarea { flex:1; background:#222; border:1px solid #444; border-radius:6px; padding:12px; color:#eee; font-size:1rem; resize:none; }
-    .tree-node { padding:10px; margin:6px 0; background:#282828; border-left:4px solid #555; border-radius:4px; cursor:pointer; }
-    .tree-node:hover { background:#333; border-left-color:#0cf; }
-    .tree-node.selected { border-left-color:#0cf; background:#003366; }
-    .nested { margin-left:18px; }
+    /* ========================================
+       Eterniverse - Bella Author Mode + Pełne Animacje
+       ======================================== */
 
-    /* Zoptymalizowana mapa bram – siatka kart */
+    /* === ZMIENNE CSS === */
+    :root {
+      --bg-primary: #121212;
+      --bg-secondary: #1e1e1e;
+      --bg-panel: #222222;
+      --bg-hover: #333333;
+      --bg-active: #4a5568;
+      --bg-selected: #4a90e2;
+
+      --text-primary: #eeeeee;
+      --text-secondary: #bbbbbb;
+      --text-muted: #888888;
+      --text-selected: #000000;
+
+      --accent: #4a90e2;
+      --accent-hover: #5aa0f2;
+      --accent-active: #357abd;
+
+      --success: #50c878;
+      --success-hover: #45b06a;
+      --warning: #f39c12;
+      --warning-hover: #e67e22;
+      --danger: #e74c3c;
+      --danger-hover: #c0392b;
+
+      --border: #333333;
+      --border-light: #444444;
+      --shadow: 0 4px 12px rgba(0,0,0,0.4);
+      --shadow-hover: 0 12px 32px rgba(0,0,0,0.6);
+      --glow: 0 0 20px rgba(74, 144, 226, 0.3);
+
+      --transition-fast: 0.2s ease;
+      --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 0.6s ease;
+    }
+
+    /* === RESET I PODSTAWY === */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      overflow: hidden;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    /* === ANIMACJE === */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 10px rgba(74, 144, 226, 0.3); }
+      50% { box-shadow: 0 0 30px rgba(74, 144, 226, 0.6); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+
+    /* === GŁÓWNY KONTENER === */
+    .app-container {
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    /* === PANEL UNIWERSUM === */
+    .universe-panel {
+      width: 340px;
+      min-width: 340px;
+      background: var(--bg-secondary);
+      border-right: 2px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .panel-header {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 1.5rem 1.5rem 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--accent);
+      color: var(--accent);
+      position: relative;
+    }
+
+    .panel-header::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 2px;
+      animation: pulseGlow 3s infinite;
+    }
+
+    #structure-tree {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 1rem;
+    }
+
+    /* === HIERARCHIA Z ANIMACJAMI === */
+    .hierarchy li {
+      padding: 0.9rem 1.2rem;
+      margin: 0.4rem 0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all var(--transition);
+      position: relative;
+      border-left: 4px solid transparent;
+      animation: fadeInScale 0.5s ease-out forwards;
+      opacity: 0;
+      animation-delay: calc(var(--order) * 0.05s);
+    }
+
+    .hierarchy li:hover {
+      background: var(--bg-hover);
+      transform: translateX(12px) scale(1.02);
+      border-left-color: var(--accent);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .hierarchy li.selected {
+      background: linear-gradient(135deg, var(--bg-selected), #3a7bc8);
+      color: var(--text-selected);
+      border-left-color: #ffffff;
+      box-shadow: var(--glow);
+      transform: scale(1.03);
+      animation: pulseGlow 2s infinite;
+    }
+
+    .hierarchy li > ul {
+      margin-left: 1.5rem;
+      margin-top: 0.75rem;
+      border-left: 2px dashed var(--accent);
+      padding-left: 1.2rem;
+      opacity: 0.9;
+    }
+
+    /* === MAPA BRAM – ANIMOWANE KARTY === */
     #mapa-grid {
-      flex:1;
-      overflow-y:auto;
-      display:grid;
-      grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
-      gap:12px;
-      padding:8px 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      padding: 1rem;
+      overflow-y: auto;
     }
+
     .brama-card {
-      background:#1a1a2e;
-      border:1px solid #444;
-      border-radius:8px;
-      padding:14px;
-      cursor:pointer;
-      transition:background 0.2s, border-color 0.2s;
-      display:flex;
-      flex-direction:column;
+      background: linear-gradient(145deg, #1a1a2a, #252540);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all var(--transition-slow);
+      position: relative;
+      overflow: hidden;
+      animation: fadeInScale 0.6s ease-out forwards;
+      opacity: 0;
+      animation-delay: calc(var(--order) * 0.1s);
+      box-shadow: var(--shadow);
     }
+
+    .brama-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(74,144,226,0.15), transparent);
+      transition: left 0.8s ease;
+    }
+
+    .brama-card:hover::before {
+      left: 100%;
+    }
+
     .brama-card:hover {
-      background:#203050;
-      border-color:#0cf;
-    }
-    .brama-name {
-      font-weight:bold;
-      margin-bottom:8px;
-      color:#0cf;
-      font-size:1.05rem;
-    }
-    .brama-books {
-      flex:1;
-      font-size:0.9rem;
-      opacity:0.9;
-      line-height:1.4;
-    }
-    .brama-hint {
-      margin-top:10px;
-      font-size:0.8rem;
-      opacity:0.6;
-      text-align:center;
+      transform: translateY(-16px) scale(1.05);
+      border-color: var(--accent);
+      box-shadow: 0 20px 50px rgba(74, 144, 226, 0.4);
+      animation: float 4s ease-in-out infinite;
     }
 
-    .status { background:#222; padding:12px; text-align:center; border-top:1px solid #444; font-size:0.95rem; }
+    .brama-card .brama-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      text-shadow: 0 0 12px rgba(74,144,226,0.4);
+      transition: var(--transition);
+    }
 
-    @media (min-width:768px) { .layout { grid-template-columns:1fr 1fr; } .section:nth-child(3){grid-column:span 2;} }
-    @media (min-width:1024px) { .layout { grid-template-columns:350px 1fr 400px; } .section:nth-child(3){grid-column:unset;} }
+    .brama-card:hover .brama-name {
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(74,144,226,0.8);
+      transform: scale(1.05);
+    }
+
+    .brama-card .brama-books {
+      line-height: 1.7;
+      opacity: 0.9;
+    }
+
+    .brama-card .brama-hint {
+      margin-top: 1.2rem;
+      font-style: italic;
+      opacity: 0.7;
+      text-align: center;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    .brama-card:hover .brama-hint {
+      opacity: 1;
+      color: var(--accent);
+    }
+
+    /* === PRZYCISKI Z ANIMACJAMI === */
+    button {
+      position: relative;
+      overflow: hidden;
+      transition: all var(--transition);
+    }
+
+    button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease, height 0.6s ease;
+      pointer-events: none;
+    }
+
+    button:active::after {
+      width: 300px;
+      height: 300px;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    button.success:hover {
+      animation: pulseGlow 1.5s infinite;
+    }
+
+    /* === SUGESTIE === */
+    .suggestion {
+      background: rgba(74, 144, 226, 0.1);
+      border-left: 5px solid var(--accent);
+      padding: 1.2rem;
+      margin: 1rem 0;
+      border-radius: 10px;
+      transition: all var(--transition);
+      animation: fadeIn 0.5s ease-out;
+      opacity: 0;
+      animation-fill-mode: forwards;
+      animation-delay: calc(var(--order) * 0.08s);
+    }
+
+    .suggestion:hover {
+      background: rgba(74, 144, 226, 0.2);
+      transform: translateX(12px);
+      box-shadow: var(--shadow);
+      border-left-width: 8px;
+    }
+
+    /* === SCROLLBARY === */
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: var(--bg-panel); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 10px; transition: var(--transition); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); box-shadow: 0 0 15px rgba(74,144,226,0.5); }
+
+    /* === RESPONSYWNOŚĆ === */
+    @media (max-width: 1024px) {
+      .universe-panel { width: 300px; min-width: 300px; }
+      #mapa-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+    }
+
+    @media (max-width: 768px) {
+      .app-container { flex-direction: column; }
+      .universe-panel { width: 100%; height: 260px; }
+      #mapa-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <header><h1>ETERNIVERSE</h1></header>
+  <div class="app-container">
+    <div class="universe-panel">
+      <div class="panel-header">Kwantowa Hierarchia</div>
+      <div id="structure-tree"></div>
+    </div>
 
-  <div class="toolbar">
-    <select id="profile-select"><option value="wattpad">Wattpad</option><option value="amazon">Amazon</option></select>
-    <button id="add-universe">+ Nowe Uniwersum</button>
-    <button id="add-child">+ Dziecko</button>
-    <button id="generate-story">AI Generuj</button>
-    <button id="bella-analyze">Bella Analiza</button>
-    <button id="export-docx">DOCX</button>
-    <button id="save-project-file">Zapisz</button>
-    <button id="load-project-file">Wczytaj</button>
-    <input type="file" id="file-input" accept=".eterniverse,.json" style="display:none;">
-    <button id="start-dictate">Dyktuj</button>
-    <button id="stop-dictate" disabled>Stop</button>
+    <div class="main-panel">
+      <header>
+        <h1>ETERNIVERSE</h1>
+      </header>
+
+      <div class="controls">
+        <select id="profile-select">
+          <option value="wattpad">Wattpad</option>
+          <option value="amazon">Amazon</option>
+        </select>
+        <button id="add-universe">+ Nowe Uniwersum</button>
+        <button id="add-child">+ Dziecko</button>
+        <button id="generate-story" class="success">AI Generuj</button>
+        <button id="bella-analyze">Bella Analiza</button>
+        <button id="export-docx">Eksport DOCX</button>
+        <button id="save-project-file">Zapisz Projekt</button>
+        <button id="load-project-file">Wczytaj Projekt</button>
+        <input type="file" id="file-input" accept=".eterniverse,.json" style="display:none;">
+        <button id="start-dictate">Dyktuj</button>
+        <button id="stop-dictate" disabled>Stop</button>
+      </div>
+
+      <div class="editor-section">
+        <div id="current-path"></div>
+        <input type="text" id="element-title" placeholder="Tytuł kwantowej manifestacji...">
+        <textarea id="element-content" placeholder="Tu splatają się wymiary..."></textarea>
+      </div>
+
+      <div class="output-section">
+        <div class="dual-output">
+          <div class="output-box">
+            <h4>Mapa Eterycznych Bram</h4>
+            <div id="mapa-grid"></div>
+          </div>
+          <div class="archive-box">
+            <h4>Sugestie Bella AI</h4>
+            <div id="suggestions"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="layout">
-    <div class="section"><h2>Hierarchia</h2><div id="current-path"></div><div id="structure-tree" style="flex:1;overflow-y:auto;"></div></div>
-    <div class="section"><h2>Edytor</h2><input type="text" id="element-title" placeholder="Tytuł..."><textarea id="element-content" placeholder="Treść..."></textarea></div>
-    <div class="section"><h2>Zoptymalizowana Mapa Bram</h2><div id="mapa-grid"></div><div id="suggestions" style="margin-top:15px;"></div></div>
-  </div>
-
-  <div class="status" id="status">Gotowy</div>
+  <div class="status" id="status">Ładowanie...</div>
 
   <script>
     'use strict';
 
-    class DataMaster{
-      constructor(){
-        this.k={s:'struct',m:'mapa',p:'prof'};
-        this.structure=this.l(this.k.s,[]);
-        this.mapa=this.l(this.k.m,this.dm());
-        this.profile=this.l(this.k.p,'wattpad');
+    class DataMaster {
+      constructor() {
+        this.structure = this.load('struct', []);
+        this.mapa = [];
+        this.profile = this.load('prof', 'wattpad');
+        this.loadMapa();
       }
-      dm(){
-        const n=["INTERSEEKER","ETERSEEKER","OBFITOSEEKER","THE KNOT","RELIGIOSEEKER","LUXSEEKER","UMBRASEEKER","AETHERSEEKER","CHRONOSEEKER","VOIDSEEKER"];
+      load(k, f) { try { return JSON.parse(localStorage.getItem(k)) || f; } catch { return f; } }
+      save(k, d) { try { localStorage.setItem(k, JSON.stringify(d)); } catch {} }
+      getStructure() { return this.structure; }
+      setStructure(s) { this.structure = s; this.save('struct', s); }
+      getMapa() { return this.mapa; }
+      getProfile() { return this.profile; }
+      setProfile(p) { this.profile = p; this.save('prof', p); }
+      async loadMapa() {
+        try {
+          const r = await fetch('mapa.json');
+          this.mapa = await r.json();
+        } catch {
+          this.mapa = this.defaultMapa();
+        }
+        if (window.master) master.renderer.renderMapa();
+      }
+      defaultMapa() {
+        const n = ["INTERSEEKER","ETERSEEKER","OBFITOSEEKER","THE KNOT","RELIGIOSEEKER","LUXSEEKER","UMBRASEEKER","AETHERSEEKER","CHRONOSEEKER","VOIDSEEKER"];
         return n.map((name,i)=>({id:i+1,name:`BRAMA ${i+1} — ${name}`,books:[`Księga ${i+1}.1`,`Księga ${i+1}.2`]}));
       }
-      l(k,f){try{return JSON.parse(localStorage.getItem(k))||f;}catch{return f;}}
-      sv(k,d){try{localStorage.setItem(k,JSON.stringify(d));}catch{}}
-      getStructure(){return this.structure;}
-      setStructure(s){this.structure=s;this.sv(this.k.s,s);}
-      getMapa(){return this.mapa;}
-      getProfile(){return this.profile;}
-      setProfile(p){this.profile=p;this.sv(this.k.p,p);}
     }
 
-    class Renderer{
-      constructor(app){
-        this.app=app;
-        this.e={
-          tree:document.getElementById('structure-tree'),
-          mapa:document.getElementById('mapa-grid'),
-          sugg:document.getElementById('suggestions'),
-          title:document.getElementById('element-title'),
-          content:document.getElementById('element-content'),
-          path:document.getElementById('current-path'),
-          status:document.getElementById('status')
+    class Renderer {
+      constructor(app) {
+        this.app = app;
+        this.e = {
+          tree: document.getElementById('structure-tree'),
+          mapa: document.getElementById('mapa-grid'),
+          sugg: document.getElementById('suggestions'),
+          title: document.getElementById('element-title'),
+          content: document.getElementById('element-content'),
+          path: document.getElementById('current-path'),
+          status: document.getElementById('status')
         };
       }
-      renderAll(){this.renderStructure();this.renderMapa();this.renderEdit();this.renderSuggestions([]);}
-      renderStructure(){
-        const c=this.e.tree;
-        const s=this.app.data.getStructure();
-        if(s.length===0){c.innerHTML='<p style="text-align:center;padding:30px;opacity:0.6;">+ Nowe Uniwersum</p>';return;}
-        let html='';
-        for(let i=0;i<s.length;i++) html+=this.buildNode(s[i]);
-        c.innerHTML=html;
+      renderAll() { this.renderStructure(); this.renderMapa(); this.renderEdit(); this.renderSuggestions([]); }
+      renderStructure() {
+        const c = this.e.tree;
+        const s = this.app.data.getStructure();
+        if (s.length === 0) { c.innerHTML = '<p style="text-align:center;padding:30px;opacity:0.6;">+ Nowe Uniwersum</p>'; return; }
+        let html = '<ul class="hierarchy">';
+        for (let i = 0; i < s.length; i++) html += this.buildNode(s[i], i);
+        html += '</ul>';
+        c.innerHTML = html;
       }
-      buildNode(n){
-        const sel=this.app.currentElement?.id===n.id;
-        let h=`<div class="tree-node \( {sel?'selected':''}" onclick="master.selectElement(' \){n.id}')">
-          <strong>\( {n.title||'(bez tytułu)'}</strong> <small> \){n.type||''}</small>
-        </div>`;
-        if(n.children?.length){
-          h+='<div class="nested">';
-          for(let i=0;i<n.children.length;i++) h+=this.buildNode(n.children[i]);
-          h+='</div>';
+      buildNode(n, order) {
+        const sel = this.app.currentElement?.id === n.id;
+        let h = `<li style="--order:\( {order}" class=" \){sel ? 'selected' : ''}" onclick="master.selectElement('${n.id}')">
+          <strong>\( {n.title || '(bez tytułu)'}</strong> <small> \){n.type || ''}</small>`;
+        if (n.children?.length) {
+          h += '<ul>';
+          for (let i = 0; i < n.children.length; i++) h += this.buildNode(n.children[i], i);
+          h += '</ul>';
         }
+        h += '</li>';
         return h;
       }
-      // ZOPTYMALIZOWANA MAPA BRAM – karty w siatce
-      renderMapa(){
-        const c=this.e.mapa;
-        const m=this.app.data.getMapa();
-        let html='';
-        for(let i=0;i<m.length;i++){
-          const b=m[i];
-          const booksHtml=b.books.map(book=>`<div>• ${book}</div>`).join('');
-          html+=`<div class="brama-card" onclick="master.insertBrama(${b.id})">
+      renderMapa() {
+        const c = this.e.mapa;
+        const m = this.app.data.getMapa();
+        let html = '';
+        for (let i = 0; i < m.length; i++) {
+          const b = m[i];
+          const books = b.books.map(book => `<div>• ${book}</div>`).join('');
+          html += `<div class="brama-card" style="--order:\( {i}" onclick="master.insertBrama( \){b.id})">
             <div class="brama-name">${b.name}</div>
-            <div class="brama-books">${booksHtml}</div>
+            <div class="brama-books">${books}</div>
             <div class="brama-hint">Kliknij, by wstawić</div>
           </div>`;
         }
-        c.innerHTML=html;
+        c.innerHTML = html;
       }
-      renderEdit(){
-        const el=this.app.currentElement;
-        this.e.title.value=el?.title||'';
-        this.e.content.value=el?.content||'';
-        this.e.path.textContent=el?this.app.getPathToElement(el).map(n=>n.title||n.type).join(' → '):'';
+      renderEdit() {
+        const el = this.app.currentElement;
+        this.e.title.value = el?.title || '';
+        this.e.content.value = el?.content || '';
+        this.e.path.textContent = el ? this.app.getPathToElement(el).map(n => n.title || n.type).join(' → ') : '';
       }
-      renderSuggestions(items){
-        const p=this.e.sugg;
-        if(items.length===0){p.innerHTML='<p style="text-align:center;padding:30px;opacity:0.6;">Użyj Bella Analiza lub AI</p>';return;}
-        let html='';
-        for(let i=0;i<items.length;i++) html+=`<div>${items[i].text}</div>`;
-        p.innerHTML=html;
+      renderSuggestions(items) {
+        const p = this.e.sugg;
+        if (items.length === 0) { p.innerHTML = '<p style="text-align:center;padding:30px;opacity:0.6;">Użyj Bella Analiza lub AI</p>'; return; }
+        let html = '';
+        for (let i = 0; i < items.length; i++) html += `<div class="suggestion" style="--order:\( {i}"> \){items[i].text}</div>`;
+        p.innerHTML = html;
       }
-      setStatus(m,t=5000){
-        this.e.status.textContent=m;
-        if(t>0) setTimeout(()=>{this.e.status.textContent='Gotowy';},t);
+      setStatus(m, t = 5000) {
+        this.e.status.textContent = m;
+        if (t > 0) setTimeout(() => this.e.status.textContent = 'Gotowy', t);
       }
     }
 
-    class EterniverseMasterPRO{
-      constructor(){
-        this.data=new DataMaster();
-        this.renderer=new Renderer(this);
-        this.currentElement=null;
-        this.currentProfile=this.data.getProfile();
-        this.recognition=null;
+    class EterniverseMasterPRO {
+      constructor() {
+        this.data = new DataMaster();
+        this.renderer = new Renderer(this);
+        this.currentElement = null;
+        this.currentProfile = this.data.getProfile();
+        this.recognition = null;
         this.init();
       }
-      init(){
+      init() {
         this.bindEvents();
         this.renderer.renderAll();
         this.initSpeechRecognition();
         this.renderer.setStatus('Gotowy');
       }
-      bindEvents(){
-        document.getElementById('profile-select').value=this.currentProfile;
-        document.getElementById('profile-select').onchange=e=>{this.currentProfile=e.target.value;this.data.setProfile(this.currentProfile);};
-        document.getElementById('add-universe').onclick=()=>this.addRootUniverse();
-        document.getElementById('add-child').onclick=()=>this.addChildElement();
-        document.getElementById('generate-story').onclick=()=>this.generateAIContent();
-        document.getElementById('bella-analyze').onclick=()=>this.bellaDeepAnalysis();
-        document.getElementById('export-docx').onclick=()=>this.exportToDocx();
-        document.getElementById('save-project-file').onclick=()=>this.saveToFile();
-        document.getElementById('load-project-file').onclick=()=>document.getElementById('file-input').click();
-        document.getElementById('file-input').onchange=e=>this.loadFromFile(e.target.files[0]);
-        document.getElementById('element-title').oninput=()=>this.autoSaveCurrent();
-        document.getElementById('element-content').oninput=()=>this.autoSaveCurrent();
-        document.getElementById('start-dictate').onclick=()=>this.startDictation();
-        document.getElementById('stop-dictate').onclick=()=>this.stopDictation();
+      bindEvents() {
+        document.getElementById('profile-select').value = this.currentProfile;
+        document.getElementById('profile-select').onchange = e => { this.currentProfile = e.target.value; this.data.setProfile(this.currentProfile); };
+        document.getElementById('add-universe').onclick = () => this.addRootUniverse();
+        document.getElementById('add-child').onclick = () => this.addChildElement();
+        document.getElementById('generate-story').onclick = () => this.generateAIContent();
+        document.getElementById('bella-analyze').onclick = () => this.bellaDeepAnalysis();
+        document.getElementById('export-docx').onclick = () => this.exportToDocx();
+        document.getElementById('save-project-file').onclick = () => this.saveToFile();
+        document.getElementById('load-project-file').onclick = () => document.getElementById('file-input').click();
+        document.getElementById('file-input').onchange = e => this.loadFromFile(e.target.files[0]);
+        document.getElementById('element-title').oninput = () => this.autoSaveCurrent();
+        document.getElementById('element-content').oninput = () => this.autoSaveCurrent();
+        document.getElementById('start-dictate').onclick = () => this.startDictation();
+        document.getElementById('stop-dictate').onclick = () => this.stopDictation();
       }
-      generateUniqueId(){return 'id_'+Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
-      addRootUniverse(){
-        const u={id:this.generateUniqueId(),type:'Uniwersum',title:'Nowe Uniwersum',content:'',children:[]};
-        const s=this.data.getStructure();s.push(u);this.data.setStructure(s);
-        this.currentElement=u;this.renderer.renderAll();
+      generateUniqueId() { return 'id_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
+      addRootUniverse() {
+        const u = { id: this.generateUniqueId(), type: 'Uniwersum', title: 'Nowe Uniwersum', content: '', children: [] };
+        const s = this.data.getStructure(); s.push(u); this.data.setStructure(s);
+        this.currentElement = u; this.renderer.renderAll();
       }
-      addChildElement(){
-        if(!this.currentElement)return;
-        const types=['Uniwersum','Świat','Tom','Rozdział','Podrozdział','Fragment'];
-        const idx=types.indexOf(this.currentElement.type||'Uniwersum');
-        const type=types[idx+1]||'Fragment';
-        const c={id:this.generateUniqueId(),type,title:`Nowy ${type}`,content:'',children:[]};
+      addChildElement() {
+        if (!this.currentElement) return;
+        const types = ['Uniwersum', 'Świat', 'Tom', 'Rozdział', 'Podrozdział', 'Fragment'];
+        const idx = types.indexOf(this.currentElement.type || 'Uniwersum');
+        const type = types[idx + 1] || 'Fragment';
+        const c = { id: this.generateUniqueId(), type, title: `Nowy ${type}`, content: '', children: [] };
         this.currentElement.children.push(c);
         this.data.setStructure(this.data.getStructure());
-        this.currentElement=c;this.renderer.renderAll();
+        this.currentElement = c; this.renderer.renderAll();
       }
-      selectElement(id){
-        this.currentElement=this.findElementById(id,this.data.getStructure());
+      selectElement(id) {
+        this.currentElement = this.findElementById(id, this.data.getStructure());
         this.renderer.renderAll();
       }
-      findElementById(id,nodes){
-        for(const n of nodes){
-          if(n.id===id)return n;
-          if(n.children?.length){
-            const f=this.findElementById(id,n.children);
-            if(f)return f;
+      findElementById(id, nodes) {
+        for (const n of nodes) {
+          if (n.id === id) return n;
+          if (n.children?.length) {
+            const f = this.findElementById(id, n.children);
+            if (f) return f;
           }
         }
         return null;
       }
-      getPathToElement(el){
-        const p=[];const t=(ns)=>{for(const n of ns){if(n.id===el.id){p.unshift(n);return true;}if(n.children?.length&&t(n.children)){p.unshift(n);return true;}}return false;};
-        t(this.data.getStructure());return p;
+      getPathToElement(el) {
+        const p = [];
+        const t = (ns) => {
+          for (const n of ns) {
+            if (n.id === el.id) { p.unshift(n); return true; }
+            if (n.children?.length && t(n.children)) { p.unshift(n); return true; }
+          }
+          return false;
+        };
+        t(this.data.getStructure());
+        return p;
       }
-      autoSaveCurrent(){
-        if(!this.currentElement) return;
-        this.currentElement.title=document.getElementById('element-title').value.trim()||'(bez tytułu)';
-        this.currentElement.content=document.getElementById('element-content').value;
+      autoSaveCurrent() {
+        if (!this.currentElement) return;
+        this.currentElement.title = document.getElementById('element-title').value.trim() || '(bez tytułu)';
+        this.currentElement.content = document.getElementById('element-content').value;
         this.data.setStructure(this.data.getStructure());
       }
-      insertBrama(id){
-        const b=this.data.getMapa().find(x=>x.id===id);
-        if(!b||!this.currentElement)return;
-        const l=b.books.map(t=>`• ${t}`).join('\n');
-        document.getElementById('element-content').value+=`\n\n✦ === \( {b.name} === ✦\n \){l}\n\n`;
+      insertBrama(id) {
+        const b = this.data.getMapa().find(x => x.id === id);
+        if (!b || !this.currentElement) return;
+        const l = b.books.map(t => `• ${t}`).join('\n');
+        document.getElementById('element-content').value += `\n\n✦ === \( {b.name} === ✦\n \){l}\n\n`;
         this.autoSaveCurrent();
       }
-      generateAIContent(){
-        const txt=this.currentProfile==='amazon'?'⭐⭐⭐⭐⭐ Bestseller!':'W jego oczach była wieczność...';
-        document.getElementById('element-content').value+=`\n\n--- AI ---\n${txt}`;
+      generateAIContent() {
+        const txt = this.currentProfile === 'amazon' ? '⭐⭐⭐⭐⭐ Bestseller! Ekskluzywna edycja.' : 'W jego oczach była cała wieczność...';
+        document.getElementById('element-content').value += `\n\n--- AI ---\n${txt}`;
         this.autoSaveCurrent();
-        this.renderer.renderSuggestions([{type:'generated',text:txt}]);
+        this.renderer.renderSuggestions([{ type: 'generated', text: txt }]);
       }
-      bellaDeepAnalysis(){
-        const s=['Dodaj dialogi','Wzmocnij emocje','Rozwijaj sceny'];
-        this.renderer.renderSuggestions(s.map(t=>({type:'suggestion',text:t})));
+      bellaDeepAnalysis() {
+        const s = ['Dodaj dialogi', 'Wzmocnij emocje', 'Rozwijaj sceny'];
+        this.renderer.renderSuggestions(s.map(t => ({ type: 'suggestion', text: t })));
       }
-      async exportToDocx(){
-        if(!this.currentElement)return this.renderer.setStatus('Brak elementu');
-        const {Document,Packer,Paragraph}=docx;
-        const doc=new Document({sections:[{children:[new Paragraph(this.currentElement.title||'Bez tytułu'),new Paragraph(this.currentElement.content||'')] }]});
-        const blob=await Packer.toBlob(doc);
-        const url=URL.createObjectURL(blob);
-        const a=document.createElement('a');a.href=url;a.download='eterniverse.docx';a.click();URL.revokeObjectURL(url);
+      async exportToDocx() {
+        if (!this.currentElement) return this.renderer.setStatus('Brak elementu');
+        const { Document, Packer, Paragraph } = docx;
+        const doc = new Document({ sections: [{ children: [new Paragraph(this.currentElement.title || 'Bez tytułu'), new Paragraph(this.currentElement.content || '')] }] });
+        const blob = await Packer.toBlob(doc);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'eterniverse.docx'; a.click(); URL.revokeObjectURL(url);
       }
-      saveToFile(){
-        const d={structure:this.data.getStructure(),mapa:this.data.getMapa(),profile:this.currentProfile};
-        const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
-        const url=URL.createObjectURL(blob);
-        const a=document.createElement('a');a.href=url;a.download='eterniverse.eterniverse';a.click();URL.revokeObjectURL(url);
+      saveToFile() {
+        const d = { structure: this.data.getStructure(), profile: this.currentProfile };
+        const blob = new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'eterniverse.eterniverse'; a.click(); URL.revokeObjectURL(url);
       }
-      loadFromFile(file){
-        const r=new FileReader();
-        r.onload=e=>{
-          try{
-            const imp=JSON.parse(e.target.result);
-            this.data.setStructure(imp.structure||[]);
-            this.currentProfile=imp.profile||'wattpad';
+      loadFromFile(file) {
+        const r = new FileReader();
+        r.onload = e => {
+          try {
+            const imp = JSON.parse(e.target.result);
+            this.data.setStructure(imp.structure || []);
+            this.currentProfile = imp.profile || 'wattpad';
             this.renderer.renderAll();
-          }catch{this.renderer.setStatus('Błąd pliku');}
+          } catch { this.renderer.setStatus('Błąd pliku'); }
         };
         r.readAsText(file);
       }
-      initSpeechRecognition(){
-        if(!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) return;
-        const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-        this.recognition=new SR();
-        this.recognition.lang='pl-PL';
-        this.recognition.continuous=true;
-        this.recognition.interimResults=true;
-        this.recognition.onresult=ev=>{
-          let f='';
-          for(let i=ev.resultIndex;i<ev.results.length;i++){
-            if(ev.results[i].isFinal) f+=ev.results[i][0].transcript;
+      initSpeechRecognition() {
+        if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) return;
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        this.recognition = new SR();
+        this.recognition.lang = 'pl-PL';
+        this.recognition.continuous = true;
+        this.recognition.interimResults = true;
+        this.recognition.onresult = ev => {
+          let f = '';
+          for (let i = ev.resultIndex; i < ev.results.length; i++) {
+            if (ev.results[i].isFinal) f += ev.results[i][0].transcript;
           }
-          if(f){
-            document.getElementById('element-content').value+=f+' ';
+          if (f) {
+            document.getElementById('element-content').value += f + ' ';
             this.autoSaveCurrent();
           }
         };
-        this.recognition.onstart=()=>{document.getElementById('start-dictate').disabled=true;document.getElementById('stop-dictate').disabled=false;};
-        this.recognition.onend=()=>{document.getElementById('start-dictate').disabled=false;document.getElementById('stop-dictate').disabled=true;};
+        this.recognition.onstart = () => { document.getElementById('start-dictate').disabled = true; document.getElementById('stop-dictate').disabled = false; };
+        this.recognition.onend = () => { document.getElementById('start-dictate').disabled = false; document.getElementById('stop-dictate').disabled = true; };
       }
-      startDictation(){if(this.recognition)this.recognition.start();}
-      stopDictation(){if(this.recognition)this.recognition.stop();}
-      status(m,t=5000){this.renderer.setStatus(m,t);}
+      startDictation() { if (this.recognition) this.recognition.start(); }
+      stopDictation() { if (this.recognition) this.recognition.stop(); }
+      status(m, t = 5000) { this.renderer.setStatus(m, t); }
     }
 
     const master = new EterniverseMasterPRO();
