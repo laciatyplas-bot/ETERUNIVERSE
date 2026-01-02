@@ -1,140 +1,215 @@
-// Pełny kod renderowania Panelu Edycji – Eterniverse Master Premium PRO v13.0
-// Renderuje tytuł, treść, ścieżkę i metadane bieżącego elementu
+// Pełny kod renderowania i zarządzania Panelem Edycji z walidacją i autosave
+// Eterniverse Master Premium PRO v13.0
 
-function renderEditPanel(currentElement, options = {}) {
-  const {
-    titleContainerId = 'element-title',
-    contentContainerId = 'element-content',
-    pathContainerId = 'current-path',
-    metaContainerId = 'element-meta' // opcjonalny kontener na metadane
-  } = options;
+class EditPanelManager {
+  constructor(app) {
+    this.app = app; // odniesienie do głównej aplikacji (master/daja)
+    this.autoSaveDelay = 1000; // 1 sekunda po ostatnim wpisywaniu
+    this.autoSaveTimeout = null;
+    this.isValid = true;
 
-  // === TYTUŁ ===
-  const titleInput = document.getElementById(titleContainerId);
-  if (titleInput) {
-    titleInput.value = currentElement?.title || '';
-    titleInput.placeholder = currentElement?.type 
-      ? `Tytuł ${currentElement.type.toLowerCase()}...` 
-      : 'Tytuł elementu...';
-    
-    // Dodatkowe atrybuty dla lepszego UX
-    titleInput.dataset.elementId = currentElement?.id || '';
+    this.elements = {
+      title: document.getElementById('element-title'),
+      content: document.getElementById('element-content'),
+      path: document.getElementById('current-path'),
+      meta: document.getElementById('element-meta'),
+      status: document.getElementById('status')
+    };
+
+    this.bindEvents();
   }
 
-  // === TREŚĆ ===
-  const contentTextarea = document.getElementById(contentContainerId);
-  if (contentTextarea) {
-    contentTextarea.value = currentElement?.content || '';
-    contentTextarea.placeholder = currentElement 
-      ? `Tu rozwija się \( {currentElement.type.toLowerCase()} „ \){currentElement.title || 'nowy element'}”...\nAI może przyspieszyć kreację.`
-      : 'Wybierz element w hierarchii, aby edytować jego treść...';
-  }
+  // Renderowanie całego panelu edycji
+  render(currentElement) {
+    this.currentElement = currentElement;
 
-  // === ŚCIEŻKA BIEŻĄCEGO ELEMENTU ===
-  const pathEl = document.getElementById(pathContainerId);
-  if (pathEl) {
-    if (!currentElement) {
-      pathEl.textContent = '';
-      pathEl.style.opacity = '0.5';
-    } else {
-      const path = getPathToElement(currentElement, window.master?.data?.structure || []);
-      pathEl.innerHTML = path.map((node, index) => {
-        const icon = {
-          'Uniwersum': '🌌',
-          'Świat': '🌍',
-          'Tom': '📚',
-          'Rozdział': '📖',
-          'Podrozdział': '📄',
-          'Fragment': '📜'
-        }[node.type] || '📄';
+    // Tytuł
+    if (this.elements.title) {
+      this.elements.title.value = currentElement?.title || '';
+      this.elements.title.placeholder = currentElement?.type 
+        ? `Tytuł ${currentElement.type.toLowerCase()}...` 
+        : 'Tytuł elementu...';
 
-        const isLast = index === path.length - 1;
-        return `
-          <span style="opacity:\( {isLast ? '1' : '0.7'}; font-weight: \){isLast ? '700' : '500'};">
-            ${icon} ${escapeHtml(node.title || node.type)}
-          </span>
-          ${!isLast ? '<span style="margin:0 12px; opacity:0.5;">→</span>' : ''}
-        `;
-      }).join('');
-      pathEl.style.opacity = '1';
+      // Walidacja tytułu
+      this.validateTitle();
+    }
+
+    // Treść
+    if (this.elements.content) {
+      this.elements.content.value = currentElement?.content || '';
+      this.elements.content.placeholder = currentElement
+        ? `Tu rozwija się \( {currentElement.type?.toLowerCase()} „ \){currentElement.title || 'nowy element'}”...\nAI może przyspieszyć kreację.`
+        : 'Wybierz element w hierarchii, aby edytować jego treść...';
+    }
+
+    // Ścieżka
+    this.renderPath(currentElement);
+
+    // Metadane
+    this.renderMeta(currentElement);
+
+    // Focus na tytuł jeśli nowy element
+    if (currentElement && this.elements.title && document.activeElement !== this.elements.title) {
+      setTimeout(() => this.elements.title.focus(), 100);
     }
   }
 
-  // === METADANE (opcjonalne – typ, ID, data utworzenia, słowo count) ===
-  const metaEl = document.getElementById(metaContainerId);
-  if (metaEl) {
-    if (!currentElement) {
-      metaEl.innerHTML = '<em style="opacity:0.5;">Wybierz element, aby zobaczyć metadane</em>';
-    } else {
-      const wordCount = wordCount(currentElement.content || '');
-      const createdDate = currentElement.created 
-        ? new Date(currentElement.created).toLocaleDateString('pl-PL') 
-        : 'nieznana';
+  // Renderowanie ścieżki
+  renderPath(element) {
+    if (!this.elements.path) return;
 
-      metaEl.innerHTML = `
-        <div style="display:flex; flex-wrap:wrap; gap:1.5rem; font-size:0.95rem; opacity:0.8; margin-top:1rem;">
-          <div><strong>Typ:</strong> ${escapeHtml(currentElement.type || 'Nieznany')}</div>
-          <div><strong>ID:</strong> <code style="background:rgba(0,224,255,0.1); padding:2px 8px; border-radius:6px;">${currentElement.id}</code></div>
-          <div><strong>Utworzono:</strong> ${createdDate}</div>
-          <div><strong>Słów:</strong> ${wordCount}</div>
-          <div><strong>Profil:</strong> ${window.master?.currentProfile?.toUpperCase() || 'WATTPAD'}</div>
-        </div>
+    if (!element) {
+      this.elements.path.innerHTML = '<em style="opacity:0.5;">Brak wybranego elementu</em>';
+      return;
+    }
+
+    const path = this.app.getPathToElement(element);
+    this.elements.path.innerHTML = path.map((node, idx) => {
+      const icon = {
+        'Uniwersum': '🌌', 'Świat': '🌍', 'Tom': '📚',
+        'Rozdział': '📖', 'Podrozdział': '📄', 'Fragment': '📜'
+      }[node.type] || '📄';
+
+      const isLast = idx === path.length - 1;
+      return `
+        <span style="opacity:\( {isLast ? '1' : '0.7'}; font-weight: \){isLast ? '700' : '500'};">
+          ${icon} ${this.escape(node.title || node.type)}
+        </span>
+        ${!isLast ? '<span style="margin:0 12px; opacity:0.5;">→</span>' : ''}
       `;
+    }).join('');
+  }
+
+  // Renderowanie metadanych
+  renderMeta(element) {
+    if (!this.elements.meta) return;
+
+    if (!element) {
+      this.elements.meta.innerHTML = '<em style="opacity:0.5;">Wybierz element, aby zobaczyć metadane</em>';
+      return;
+    }
+
+    const wordCount = this.wordCount(element.content || '');
+    const charCount = (element.content || '').length;
+    const created = element.created ? new Date(element.created).toLocaleString('pl-PL') : 'nieznana';
+
+    this.elements.meta.innerHTML = `
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; font-size:0.95rem; opacity:0.9;">
+        <div><strong>Typ:</strong> ${this.escape(element.type || 'Nieznany')}</div>
+        <div><strong>ID:</strong> <code style="background:rgba(0,224,255,0.1); padding:2px 8px; border-radius:6px;">${element.id}</code></div>
+        <div><strong>Utworzono:</strong> ${created}</div>
+        <div><strong>Słów:</strong> ${wordCount}</div>
+        <div><strong>Znaków:</strong> ${charCount}</div>
+        <div><strong>Profil:</strong> ${this.app.currentProfile?.toUpperCase() || 'WATTPAD'}</div>
+      </div>
+    `;
+  }
+
+  // === WALIDACJA ===
+  validateTitle() {
+    if (!this.elements.title || !this.currentElement) return true;
+
+    const value = this.elements.title.value.trim();
+    const minLength = 1;
+    const maxLength = 200;
+
+    let valid = true;
+    let message = '';
+
+    if (value.length < minLength) {
+      valid = false;
+      message = 'Tytuł jest wymagany';
+    } else if (value.length > maxLength) {
+      valid = false;
+      message = `Tytuł zbyt długi (max ${maxLength} znaków)`;
+    }
+
+    // Stylizacja walidacji
+    this.elements.title.style.borderColor = valid ? 'var(--quantum-gold)' : '#ff4060';
+    this.elements.title.title = message;
+
+    this.isValid = valid;
+    return valid;
+  }
+
+  validateAll() {
+    return this.validateTitle();
+  }
+
+  // === AUTOSAVE ===
+  bindEvents() {
+    if (this.elements.title) {
+      this.elements.title.addEventListener('input', () => {
+        this.validateTitle();
+        this.triggerAutoSave();
+      });
+    }
+
+    if (this.elements.content) {
+      this.elements.content.addEventListener('input', () => {
+        this.triggerAutoSave();
+        this.renderMeta(this.currentElement); // aktualizuj liczbę słów na żywo
+      });
     }
   }
 
-  // Focus na tytuł jeśli nowy element
-  if (currentElement && titleInput && document.activeElement !== titleInput) {
-    titleInput.focus();
-  }
-}
+  triggerAutoSave() {
+    if (!this.app.autoSaveCurrent) return;
 
-// Pomocnicza funkcja do ścieżki (jeśli nie ma w app.js)
-function getPathToElement(target, structure) {
-  const path = [];
+    clearTimeout(this.autoSaveTimeout);
 
-  function traverse(nodes) {
-    for (const node of nodes) {
-      if (node.id === target.id) {
-        path.unshift(node);
-        return true;
+    this.autoSaveTimeout = setTimeout(() => {
+      if (this.validateAll()) {
+        this.app.autoSaveCurrent();
+        this.status('Zapisano automatycznie', 3000);
+      } else {
+        this.status('Nie zapisano – popraw błędy', 5000);
       }
-      if (node.children?.length) {
-        if (traverse(node.children)) {
-          path.unshift(node);
-          return true;
-        }
+    }, this.autoSaveDelay);
+  }
+
+  // === POMOCNICZE ===
+  escape(text = '') {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  wordCount(text = '') {
+    return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+  }
+
+  status(message, duration = 4000) {
+    if (this.elements.status) {
+      this.elements.status.textContent = message;
+      if (duration > 0) {
+        setTimeout(() => {
+          if (this.elements.status.textContent === message) {
+            this.elements.status.textContent = 'Gotowy';
+          }
+        }, duration);
       }
     }
-    return false;
   }
-
-  traverse(structure);
-  return path;
 }
 
-// Liczenie słów
-function wordCount(text = '') {
-  return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-}
+// === INICJALIZACJA ===
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.master) {
+    window.editPanel = new EditPanelManager(window.master);
+    
+    // Renderuj panel po każdej zmianie elementu
+    const originalSelect = window.master.selectElement.bind(window.master);
+    window.master.selectElement = function(id) {
+      originalSelect(id);
+      if (window.editPanel) {
+        window.editPanel.render(this.currentElement);
+      }
+    };
 
-// Bezpieczne escapowanie
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-// Przykład użycia po zmianie elementu
-function onElementSelected(element) {
-  renderEditPanel(element, {
-    titleContainerId: 'element-title',
-    contentContainerId: 'element-content',
-    pathContainerId: 'current-path',
-    metaContainerId: 'element-meta' // opcjonalnie dodaj <div id="element-meta"></div> w HTML
-  });
-}
-
-// Globalny eksport
-window.renderEditPanel = renderEditPanel;
-window.onElementSelected = onElementSelected;
+    // Początkowe renderowanie
+    if (window.editPanel && window.master.currentElement) {
+      window.editPanel.render(window.master.currentElement);
+    }
+  }
+});
