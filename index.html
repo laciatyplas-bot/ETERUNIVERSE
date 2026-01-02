@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ETERNIVERSE — Interaktywna Mapa Uniwersum EterSeeker</title>
     
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body {
             margin: 0;
@@ -18,7 +16,7 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
         .header h1 {
             font-size: 2.5em;
@@ -33,66 +31,143 @@
             opacity: 0.8;
             margin-top: 10px;
         }
-        #map {
-            height: 70vh;
-            width: 100%;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        .gates-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .gate-card {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.4s ease;
             position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        .gate-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+        .gate-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            border-color: rgba(255,255,255,0.4);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+        }
+        .gate-card:hover::before {
+            left: 100%;
+        }
+        .gate-color {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            border: 4px solid rgba(255,255,255,0.3);
+            box-shadow: 0 0 30px currentColor;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .gate-psyche .gate-color { background: #ff6b6b; }
+        .gate-cien .gate-color { background: #4ecdc4; }
+        .gate-wola .gate-color { background: #45b7d1; }
+        .gate-obfitosc .gate-color { background: #96ceb4; }
+        .gate-pole .gate-color { background: #feca57; }
+        .gate-name {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: white;
+        }
+        .gate-series {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            display: inline-block;
+        }
+        .gate-desc {
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        .connections {
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 0.95em;
+        }
+        .connection {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            padding: 6px 12px;
+            margin: 4px 4px 4px 0;
+            border-radius: 15px;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .connection:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
         }
         .legend {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.8);
-            padding: 15px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
+            max-width: 800px;
+            margin: 40px auto 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
         }
         .legend-item {
             display: flex;
             align-items: center;
-            margin-bottom: 8px;
-            font-size: 0.9em;
+            background: rgba(0,0,0,0.5);
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
         }
         .legend-color {
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            margin-right: 10px;
-        }
-        .controls {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .btn {
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.2);
-            color: white;
-            padding: 12px 24px;
-            margin: 0 10px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1em;
-        }
-        .btn:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            margin-right: 12px;
+            border: 2px solid rgba(255,255,255,0.5);
         }
         .info-panel {
             background: rgba(0,0,0,0.7);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 900px;
+            margin: 40px auto 0;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .popup-content {
-            font-size: 1.1em;
-            line-height: 1.6;
+        @media (max-width: 768px) {
+            .gates-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .legend {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 </head>
@@ -102,7 +177,72 @@
         <p>Interaktywna mapa uniwersum książek EterSeeker</p>
     </div>
 
-    <div id="map"></div>
+    <div class="gates-container">
+        <div class="gate-card gate-psyche">
+            <div class="gate-color"></div>
+            <div class="gate-name">Brama Psyche</div>
+            <div class="gate-series">Seria: Psyche</div>
+            <div class="gate-desc">
+                Pierwsza brama świadomości. Początek podróży przez umysły Eteru.
+            </div>
+            <div class="connections">
+                <span class="connection">Brama Cień</span>
+                <span class="connection">Brama Wola</span>
+            </div>
+        </div>
+
+        <div class="gate-card gate-cien">
+            <div class="gate-color"></div>
+            <div class="gate-name">Brama Cień</div>
+            <div class="gate-series">Seria: Cień</div>
+            <div class="gate-desc">
+                Ujawnienie ukrytych wymiarów. Tam gdzie światło spotyka ciemność.
+            </div>
+            <div class="connections">
+                <span class="connection">Brama Psyche</span>
+                <span class="connection">Brama Pole</span>
+            </div>
+        </div>
+
+        <div class="gate-card gate-wola">
+            <div class="gate-color"></div>
+            <div class="gate-name">Brama Wola</div>
+            <div class="gate-series">Seria: Wola</div>
+            <div class="gate-desc">
+                Siła determinacji kształtująca rzeczywistość Eteru.
+            </div>
+            <div class="connections">
+                <span class="connection">Brama Psyche</span>
+                <span class="connection">Brama Obfitość</span>
+            </div>
+        </div>
+
+        <div class="gate-card gate-obfitosc">
+            <div class="gate-color"></div>
+            <div class="gate-name">Brama Obfitość</div>
+            <div class="gate-series">Seria: Obfitość</div>
+            <div class="gate-desc">
+                Nieskończone możliwości i bogactwo energetyczne.
+            </div>
+            <div class="connections">
+                <span class="connection">Brama Wola</span>
+                <span class="connection">Brama Pole</span>
+            </div>
+        </div>
+
+        <div class="gate-card gate-pole">
+            <div class="gate-color"></div>
+            <div class="gate-name">Brama Pole</div>
+            <div class="gate-series">Seria: Pole</div>
+            <div class="gate-desc">
+                Centralny punkt równowagi wszystkich sił Eteru.
+            </div>
+            <div class="connections">
+                <span class="connection">Brama Cień</span>
+                <span class="connection">Brama Obfitość</span>
+            </div>
+        </div>
+    </div>
 
     <div class="legend">
         <div class="legend-item">
@@ -127,166 +267,21 @@
         </div>
     </div>
 
-    <div class="controls">
-        <button class="btn" onclick="resetView()">🔄 Reset Widok</button>
-        <button class="btn" onclick="toggleConnections()">🔗 Połączenia</button>
+    <div class="info-panel">
+        <h3>🌟 Witaj w ETERNIVERSE</h3>
+        <p>Najeżdżaj myszką na bramy aby odkrywać ich powiązania między seriami: <strong>Psyche • Cień • Wola • Obfitość • Pole</strong></p>
     </div>
 
-    <div class="info-panel" id="info-panel">
-        <h3>Kliknij na bramę, aby odkryć powiązania...</h3>
-    </div>
-
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
     <script>
-        // Inicjalizacja mapy
-        const map = L.map('map').setView([52.2297, 21.0122], 7); // Centrum Polski
-        
-        // Custom tiles dla efektu kosmicznego
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap',
-            opacity: 0.3
-        }).addTo(map);
-
-        // Dane uniwersum EterSeeker
-        const universeData = {
-            gates: [
-                {
-                    name: "Brama Psyche",
-                    series: "Psyche",
-                    coords: [52.2297, 19.0],
-                    color: "#ff6b6b",
-                    description: "Pierwsza brama świadomości. Początek podróży przez umysły Eteru.",
-                    connections: ["Brama Cień", "Brama Wola"]
-                },
-                {
-                    name: "Brama Cień",
-                    series: "Cień", 
-                    coords: [50.0647, 19.9450],
-                    color: "#4ecdc4",
-                    description: "Ujawnienie ukrytych wymiarów. Tam gdzie światło spotyka ciemność.",
-                    connections: ["Brama Psyche", "Brama Pole"]
-                },
-                {
-                    name: "Brama Wola",
-                    series: "Wola",
-                    coords: [54.309, 20.0],
-                    color: "#45b7d1",
-                    description: "Siła determinacji kształtująca rzeczywistość Eteru.",
-                    connections: ["Brama Psyche", "Brama Obfitość"]
-                },
-                {
-                    name: "Brama Obfitość",
-                    series: "Obfitość",
-                    coords: [51.0, 22.0],
-                    color: "#96ceb4",
-                    description: "Nieskończone możliwości i bogactwo energetyczne.",
-                    connections: ["Brama Wola", "Brama Pole"]
-                },
-                {
-                    name: "Brama Pole",
-                    series: "Pole",
-                    coords: [52.0, 21.0],
-                    color: "#feca57",
-                    description: "Centralny punkt równowagi wszystkich sił Eteru.",
-                    connections: ["Brama Cień", "Brama Obfitość"]
-                }
-            ]
-        };
-
-        // Stwórz markery
-        const markers = [];
-        const connections = L.layerGroup().addTo(map);
-        let showConnections = true;
-
-        universeData.gates.forEach((gate, index) => {
-            // Marker
-            const marker = L.circleMarker(gate.coords, {
-                radius: 15,
-                fillColor: gate.color,
-                color: '#fff',
-                weight: 3,
-                opacity: 1,
-                fillOpacity: 0.8
-            }).addTo(map);
-
-            marker.bindPopup(`
-                <div class="popup-content">
-                    <h3 style="color: ${gate.color}; margin: 0 0 10px 0;">${gate.name}</h3>
-                    <p><strong>Seria:</strong> ${gate.series}</p>
-                    <p>${gate.description}</p>
-                    <p><em>Kliknij inne bramy, by zobaczyć powiązania</em></p>
-                </div>
-            `);
-
-            marker.on('mouseover', function() {
-                this.setStyle({ radius: 20, fillOpacity: 1 });
+        // Dodatkowe animacje interaktywne
+        document.querySelectorAll('.gate-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(1.05) rotate(1deg)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
             });
-
-            marker.on('mouseout', function() {
-                this.setStyle({ radius: 15, fillOpacity: 0.8 });
-            });
-
-            markers.push({ marker, data: gate });
         });
-
-        // Rysuj połączenia
-        function drawConnections() {
-            connections.clearLayers();
-            markers.forEach((m1, i) => {
-                m1.data.connections.forEach(connName => {
-                    const target = universeData.gates.find(g => g.name === connName);
-                    if (target) {
-                        const targetMarker = markers.find(m => 
-                            m.data.name === target.name
-                        );
-                        if (targetMarker) {
-                            L.polyline([m1.marker.getLatLng(), targetMarker.marker.getLatLng()], {
-                                color: 'rgba(255,255,255,0.3)',
-                                weight: 2,
-                                opacity: 0.6
-                            }).addTo(connections);
-                        }
-                    }
-                });
-            });
-        }
-
-        drawConnections();
-
-        // Funkcje sterowania
-        function resetView() {
-            map.setView([52.2297, 21.0122], 7);
-        }
-
-        function toggleConnections() {
-            showConnections = !showConnections;
-            if (showConnections) {
-                connections.addTo(map);
-            } else {
-                map.removeLayer(connections);
-            }
-        }
-
-        // Animacja powitalna
-        setTimeout(() => {
-            map.eachLayer(layer => {
-                if (layer instanceof L.CircleMarker) {
-                    layer.setStyle({ radius: 20 });
-                    setTimeout(() => {
-                        layer.setStyle({ radius: 15 });
-                    }, 500);
-                }
-            });
-        }, 1000);
-
-        // Info panel
-        document.getElementById('info-panel').innerHTML = `
-            <h3>🌟 Witaj w ETERNIVERSE</h3>
-            <p>Klikaj bramy aby odkrywać powiązania między seriami: <strong>Psyche • Cień • Wola • Obfitość • Pole</strong></p>
-            <p>Użyj kółka myszy do zoomu, przeciągnij mapę aby się poruszać.</p>
-        `;
     </script>
 </body>
 </html>
