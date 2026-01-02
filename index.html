@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eterniverse Master Premium PRO v14.0 – Ultimate Full Edition</title>
-  <meta name="description" content="Pełna, samodzielna wersja Eterniverse z wszystkimi silnikami, kompletnym CSS i lokalnym systemem plików">
+  <meta name="description" content="Pełna, samodzielna wersja Eterniverse z wszystkimi silnikami w jednym pliku HTML">
 
   <!-- DOCX Export -->
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js"></script>
@@ -290,7 +290,7 @@
 <body>
   <header>
     <h1>ETERNIVERSE</h1>
-    <p>Master Premium PRO v14.0 — Ultimate Full Edition</p>
+    <p>Master Premium PRO v14.0 — Ultimate Full Edition (wszystkie silniki w jednym pliku)</p>
   </header>
 
   <div class="toolbar">
@@ -329,18 +329,20 @@
       <h2>Bella AI • Kwantowy Generator</h2>
       <div style="flex:1;overflow-y:auto;" id="suggestions">
         <p style="text-align:center; opacity:0.7; padding:4rem 0; line-height:1.8;">
-          Pełna wersja Eterniverse – wszystkie silniki zintegrowane<br><br>
-          Ctrl + ` → Bella Master Console<br>
-          Zapisz/Wczytaj projekt lokalnie<br><br>
+          Wszystkie silniki zintegrowane w jednym pliku HTML<br><br>
+          • DataMaster – pamięć i lokalny system plików<br>
+          • Renderer – renderowanie UI<br>
+          • Bella Console – Ctrl + `<br>
+          • Daja Master – główna logika i AI<br><br>
           Witaj w nieskończoności
         </p>
       </div>
     </div>
   </div>
 
-  <div class="status" id="status">Eterniverse v14.0 — pełna wersja gotowa</div>
+  <div class="status" id="status">Eterniverse v14.0 — wszystkie silniki załadowane</div>
 
-  <!-- ==================== WSZYSTKIE SILNIKI W JEDNYM MIEJSCU ==================== -->
+  <!-- ==================== WSZYSTKIE SILNIKI W JEDNYM SKRYPCIE ==================== -->
   <script>
     'use strict';
 
@@ -389,7 +391,7 @@
       setProfile(p) { this.profile = p; this.save(this.KEYS.PROFILE, p); }
     }
 
-    // === 2. RENDERER ===
+    // === 2. RENDERER – Renderowanie UI ===
     class Renderer {
       constructor(app) {
         this.app = app;
@@ -408,6 +410,7 @@
         this.renderStructure();
         this.renderMapa();
         this.renderEditPanel(this.app.currentElement);
+        this.renderSuggestions([]);
       }
 
       renderStructure() {
@@ -431,7 +434,7 @@
         let html = `
           <div class="tree-node \( {selected ? 'selected' : ''}" onclick="master.selectElement(' \){node.id}')">
             <span class="icon">${icon}</span>
-            <strong>${node.title || '(Bez tytułu)'}</strong>
+            <strong>${this.escape(node.title || '(Bez tytułu)')}</strong>
             <small style="margin-left:8px;opacity:0.7;">${node.type || ''}</small>
         `;
 
@@ -451,7 +454,7 @@
         container.innerHTML = mapa.map(brama => `
           <div class="tree-node" onclick="master.insertBrama(${brama.id})">
             <span class="icon">🔮</span>
-            <strong>${brama.name}</strong>
+            <strong>${this.escape(brama.name)}</strong>
             <small style="margin-left:8px;opacity:0.7;">${brama.books?.length || 0} tytułów</small>
           </div>
         `).join('');
@@ -477,7 +480,7 @@
         const panel = this.elements.suggestions;
         if (!panel) return;
 
-        panel.innerHTML = items.length ? items.map(i => `<div class="\( {i.type || 'suggestion'}"> \){i.text}</div>`).join('') :
+        panel.innerHTML = items.length ? items.map(i => `<div class="\( {i.type || 'suggestion'}"> \){this.escape(i.text)}</div>`).join('') :
           '<p style="text-align:center;opacity:0.7;padding:4rem;">Użyj „Bella Analiza” lub „AI Generuj”</p>';
       }
 
@@ -486,6 +489,10 @@
           this.elements.status.textContent = msg;
           if (time > 0) setTimeout(() => this.elements.status.textContent = 'Gotowy', time);
         }
+      }
+
+      escape(text = '') {
+        return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
       }
     }
 
@@ -552,8 +559,7 @@
         if (!cmd) return;
         this.log(`> ${cmd}`, 'command');
         input.value = '';
-        // Proste komendy demo
-        if (cmd === 'help') this.log('Dostępne: help, clear, status, generate, bella');
+        if (cmd === 'help') this.log('Dostępne: help, clear, generate, bella, export');
         else if (cmd === 'clear') document.getElementById('console-output').innerHTML = '';
         else if (cmd === 'generate') this.app.generateAIContent();
         else if (cmd === 'bella') this.app.bellaDeepAnalysis();
@@ -561,9 +567,10 @@
       }
     }
 
-    // === 4. GŁÓWNY MASTER ===
+    // === 4. GŁÓWNY MASTER – APP.JS ===
     class EterniverseMasterPRO {
       constructor() {
+        this.VERSION = 'v14.0';
         this.data = new DataMaster();
         this.renderer = new Renderer(this);
         this.console = new BellaConsole(this);
@@ -571,6 +578,7 @@
         this.currentElement = null;
         this.currentProfile = this.data.getProfile();
         this.recognition = null;
+        this.isDictating = false;
 
         this.init();
       }
@@ -578,8 +586,8 @@
       init() {
         this.bindEvents();
         this.renderEverything();
-        this.initSpeech();
-        this.status('Eterniverse v14.0 — pełna wersja uruchomiona');
+        this.initSpeechRecognition();
+        this.status(`Eterniverse ${this.VERSION} — wszystkie silniki uruchomione`);
       }
 
       bindEvents() {
@@ -598,20 +606,20 @@
         document.getElementById('load-project-file').onclick = () => document.getElementById('file-input').click();
         document.getElementById('file-input').onchange = (e) => this.loadFromFile(e.target.files[0]);
 
-        document.getElementById('element-title').oninput = () => this.autoSave();
-        document.getElementById('element-content').oninput = () => this.autoSave();
+        document.getElementById('element-title').oninput = () => this.autoSaveCurrent();
+        document.getElementById('element-content').oninput = () => this.autoSaveCurrent();
       }
 
       renderEverything() {
         this.renderer.renderAll();
       }
 
-      generateId() {
+      generateUniqueId() {
         return 'node_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
       }
 
       addRootUniverse() {
-        const univ = { id: this.generateId(), type: 'Uniwersum', title: 'Nowe Uniwersum', content: '', children: [] };
+        const univ = { id: this.generateUniqueId(), type: 'Uniwersum', title: 'Nowe Uniwersum', content: '', children: [] };
         const s = this.data.getStructure();
         s.push(univ);
         this.data.setStructure(s);
@@ -625,7 +633,7 @@
         const types = ['Uniwersum','Świat','Tom','Rozdział','Podrozdział','Fragment'];
         const idx = types.indexOf(this.currentElement.type);
         const type = types[idx + 1] || 'Fragment';
-        const child = { id: this.generateId(), type, title: `Nowy ${type}`, content: '', children: [] };
+        const child = { id: this.generateUniqueId(), type, title: `Nowy ${type}`, content: '', children: [] };
         this.currentElement.children.push(child);
         this.data.setStructure(this.data.getStructure());
         this.currentElement = child;
@@ -633,15 +641,15 @@
       }
 
       selectElement(id) {
-        this.currentElement = this.findById(id, this.data.getStructure());
+        this.currentElement = this.findElementById(id, this.data.getStructure());
         this.renderEverything();
       }
 
-      findById(id, nodes) {
+      findElementById(id, nodes) {
         for (const n of nodes) {
           if (n.id === id) return n;
           if (n.children?.length) {
-            const f = this.findById(id, n.children);
+            const f = this.findElementById(id, n.children);
             if (f) return f;
           }
         }
@@ -667,7 +675,7 @@
         return path;
       }
 
-      autoSave() {
+      autoSaveCurrent() {
         if (!this.currentElement) return;
         this.currentElement.title = document.getElementById('element-title').value.trim();
         this.currentElement.content = document.getElementById('element-content').value;
@@ -679,7 +687,7 @@
         if (!brama || !this.currentElement) return;
         const list = brama.books.map(b => `• ${b}`).join('\n');
         document.getElementById('element-content').value += `\n\n✦ === \( {brama.name} === ✦\n \){list}\n\n`;
-        this.autoSave();
+        this.autoSaveCurrent();
       }
 
       generateAIContent() {
@@ -687,7 +695,7 @@
           ? '⭐⭐⭐⭐⭐ Rewolucyjna książka roku! Ekskluzywna edycja.'
           : 'W jego oczach błysnęło coś więcej niż miłość – to było przeznaczenie.';
         document.getElementById('element-content').value += `\n\n--- AI Generated ---\n${text}`;
-        this.autoSave();
+        this.autoSaveCurrent();
         this.renderer.renderSuggestions([{type:'generated',text}]);
       }
 
@@ -697,7 +705,37 @@
       }
 
       async exportToDocx() {
-        // kod eksportu DOCX (jak w poprzednich wersjach)
+        if (!this.currentElement) {
+          this.status('Brak wybranego elementu');
+          return;
+        }
+
+        const { Document, Packer, Paragraph, HeadingLevel } = docx;
+        const path = this.getPathToElement(this.currentElement);
+
+        const doc = new Document({
+          sections: [{
+            children: [
+              new Paragraph({ text: this.currentElement.title || 'Bez tytułu', heading: HeadingLevel.TITLE, alignment: "center" }),
+              new Paragraph({ text: path.map(n => n.title || n.type).join(' → '), alignment: "center" }),
+              new Paragraph({ text: `Typ: ${this.currentElement.type} • Profil: ${this.currentProfile.toUpperCase()} • ${new Date().toLocaleDateString('pl-PL')}`, alignment: "center" }),
+              new Paragraph({ text: this.currentElement.content || '' })
+            ]
+          }]
+        });
+
+        try {
+          const blob = await Packer.toBlob(doc);
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${(this.currentElement.title || 'element').replace(/[^a-z0-9]/gi, '_')}_Eterniverse_v14.docx`;
+          a.click();
+          URL.revokeObjectURL(url);
+          this.status('Eksport DOCX zakończony');
+        } catch (e) {
+          this.status('Błąd eksportu DOCX');
+        }
       }
 
       saveToFile() {
@@ -715,6 +753,7 @@
         a.download = 'eterniverse_project.eterniverse';
         a.click();
         URL.revokeObjectURL(url);
+        this.status('Projekt zapisany lokalnie');
       }
 
       loadFromFile(file) {
@@ -733,8 +772,54 @@
         reader.readAsText(file);
       }
 
-      initSpeech() {
-        // kod dyktowania (jak wcześniej)
+      initSpeechRecognition() {
+        if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+          this.status('Dyktowanie nieobsługiwane w tej przeglądarce');
+          return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        this.recognition = new SpeechRecognition();
+        this.recognition.lang = 'pl-PL';
+        this.recognition.continuous = true;
+        this.recognition.interimResults = true;
+
+        this.recognition.onresult = (event) => {
+          let final = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+              final += event.results[i][0].transcript;
+            }
+          }
+          if (final) {
+            document.getElementById('element-content').value += final + ' ';
+            this.autoSaveCurrent();
+          }
+        };
+
+        this.recognition.onstart = () => {
+          this.isDictating = true;
+          document.getElementById('start-dictate').disabled = true;
+          document.getElementById('stop-dictate').disabled = false;
+          this.status('Dyktowanie aktywne – mów');
+        };
+
+        this.recognition.onend = () => {
+          this.isDictating = false;
+          document.getElementById('start-dictate').disabled = false;
+          document.getElementById('stop-dictate').disabled = true;
+          this.status('Dyktowanie zatrzymane');
+        };
+
+        this.recognition.onerror = (e) => this.status('Błąd dyktowania: ' + e.error);
+      }
+
+      startDictation() {
+        if (this.recognition) this.recognition.start();
+      }
+
+      stopDictation() {
+        if (this.recognition) this.recognition.stop();
       }
 
       status(msg, time = 6000) {
@@ -746,7 +831,7 @@
     const master = new EterniverseMasterPRO();
     window.master = master;
 
-    console.log('Eterniverse Master Premium PRO v14.0 — pełna wersja uruchomiona');
+    console.log('Eterniverse Master Premium PRO v14.0 — wszystkie silniki w jednym pliku HTML uruchomione');
   </script>
 </body>
 </html>
