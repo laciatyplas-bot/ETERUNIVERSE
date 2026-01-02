@@ -1,105 +1,140 @@
-// Pełny kod renderowania Mapy Bram – Eterniverse Master Premium PRO v13.0
-// Renderuje 10 eterycznych bram z książkami, ikonami i interakcją
+// Pełny kod renderowania Panelu Edycji – Eterniverse Master Premium PRO v13.0
+// Renderuje tytuł, treść, ścieżkę i metadane bieżącego elementu
 
-function renderMapa(mapaData, containerId = 'mapa-grid') {
-  const container = document.getElementById(containerId);
-  if (!container) {
-    console.error('Kontener mapy nie znaleziony:', containerId);
-    return;
+function renderEditPanel(currentElement, options = {}) {
+  const {
+    titleContainerId = 'element-title',
+    contentContainerId = 'element-content',
+    pathContainerId = 'current-path',
+    metaContainerId = 'element-meta' // opcjonalny kontener na metadane
+  } = options;
+
+  // === TYTUŁ ===
+  const titleInput = document.getElementById(titleContainerId);
+  if (titleInput) {
+    titleInput.value = currentElement?.title || '';
+    titleInput.placeholder = currentElement?.type 
+      ? `Tytuł ${currentElement.type.toLowerCase()}...` 
+      : 'Tytuł elementu...';
+    
+    // Dodatkowe atrybuty dla lepszego UX
+    titleInput.dataset.elementId = currentElement?.id || '';
   }
 
-  if (!mapaData || mapaData.length === 0) {
-    container.innerHTML = `
-      <p style="
-        opacity:0.6;
-        text-align:center;
-        padding:3rem 2rem;
-        font-size:1.1rem;
-        color:var(--text-ethereal);
-      ">
-        Brak eterycznych bram w pamięci<br><br>
-        Struktura mapy zostanie przywrócona przy następnym uruchomieniu
-      </p>`;
-    return;
+  // === TREŚĆ ===
+  const contentTextarea = document.getElementById(contentContainerId);
+  if (contentTextarea) {
+    contentTextarea.value = currentElement?.content || '';
+    contentTextarea.placeholder = currentElement 
+      ? `Tu rozwija się \( {currentElement.type.toLowerCase()} „ \){currentElement.title || 'nowy element'}”...\nAI może przyspieszyć kreację.`
+      : 'Wybierz element w hierarchii, aby edytować jego treść...';
   }
 
-  // Sortuj bramy po ID (1-10)
-  const sortedMapa = [...mapaData].sort((a, b) => a.id - b.id);
+  // === ŚCIEŻKA BIEŻĄCEGO ELEMENTU ===
+  const pathEl = document.getElementById(pathContainerId);
+  if (pathEl) {
+    if (!currentElement) {
+      pathEl.textContent = '';
+      pathEl.style.opacity = '0.5';
+    } else {
+      const path = getPathToElement(currentElement, window.master?.data?.structure || []);
+      pathEl.innerHTML = path.map((node, index) => {
+        const icon = {
+          'Uniwersum': '🌌',
+          'Świat': '🌍',
+          'Tom': '📚',
+          'Rozdział': '📖',
+          'Podrozdział': '📄',
+          'Fragment': '📜'
+        }[node.type] || '📄';
 
-  container.innerHTML = sortedMapa.map(brama => buildBramaCard(brama)).join('');
-}
+        const isLast = index === path.length - 1;
+        return `
+          <span style="opacity:\( {isLast ? '1' : '0.7'}; font-weight: \){isLast ? '700' : '500'};">
+            ${icon} ${escapeHtml(node.title || node.type)}
+          </span>
+          ${!isLast ? '<span style="margin:0 12px; opacity:0.5;">→</span>' : ''}
+        `;
+      }).join('');
+      pathEl.style.opacity = '1';
+    }
+  }
 
-// Buduje pojedynczą kartę bramy
-function buildBramaCard(brama) {
-  const bookCount = brama.books?.length || 0;
-  const bookList = brama.books 
-    ? brama.books.map(book => `• ${escapeHtml(book)}`).join('<br>')
-    : '<em style="opacity:0.6;">Brak opublikowanych tytułów</em>';
+  // === METADANE (opcjonalne – typ, ID, data utworzenia, słowo count) ===
+  const metaEl = document.getElementById(metaContainerId);
+  if (metaEl) {
+    if (!currentElement) {
+      metaEl.innerHTML = '<em style="opacity:0.5;">Wybierz element, aby zobaczyć metadane</em>';
+    } else {
+      const wordCount = wordCount(currentElement.content || '');
+      const createdDate = currentElement.created 
+        ? new Date(currentElement.created).toLocaleDateString('pl-PL') 
+        : 'nieznana';
 
-  return `
-    <div class="tree-node brama-card" onclick="master.insertBrama(${brama.id})">
-      <div style="display:flex; align-items:center; margin-bottom:1rem;">
-        <span class="icon" style="font-size:1.8rem; margin-right:1rem;">🔮</span>
-        <strong style="font-size:1.4rem; color:var(--aether-glow); text-shadow:0 0 15px rgba(0,224,255,0.4);">
-          ${escapeHtml(brama.name)}
-        </strong>
-      </div>
-      
-      <div style="
-        background:rgba(30,20,80,0.4);
-        border-radius:14px;
-        padding:1.2rem;
-        margin-top:1rem;
-        border-left:4px solid var(--quantum-gold);
-        font-size:0.95rem;
-        line-height:1.6;
-      ">
-        <div style="margin-bottom:0.8rem; opacity:0.8;">
-          <strong>${bookCount} opublikowanych ksiąg</strong>
+      metaEl.innerHTML = `
+        <div style="display:flex; flex-wrap:wrap; gap:1.5rem; font-size:0.95rem; opacity:0.8; margin-top:1rem;">
+          <div><strong>Typ:</strong> ${escapeHtml(currentElement.type || 'Nieznany')}</div>
+          <div><strong>ID:</strong> <code style="background:rgba(0,224,255,0.1); padding:2px 8px; border-radius:6px;">${currentElement.id}</code></div>
+          <div><strong>Utworzono:</strong> ${createdDate}</div>
+          <div><strong>Słów:</strong> ${wordCount}</div>
+          <div><strong>Profil:</strong> ${window.master?.currentProfile?.toUpperCase() || 'WATTPAD'}</div>
         </div>
-        <div style="opacity:0.9;">
-          ${bookList}
-        </div>
-      </div>
+      `;
+    }
+  }
 
-      <div style="
-        margin-top:1.2rem;
-        font-size:0.9rem;
-        opacity:0.7;
-        text-align:center;
-        padding:0.8rem;
-        background:rgba(0,224,255,0.05);
-        border-radius:12px;
-      ">
-        Kliknij, aby wstawić do bieżącego elementu
-      </div>
-    </div>
-  `;
-}
-
-// Funkcja wstawiania treści bramy do edytora (z app.js lub globalna)
-function insertBrama(bramaId) {
-  if (window.master) {
-    window.master.insertBrama(bramaId);
-  } else {
-    console.error('Master nie załadowany');
+  // Focus na tytuł jeśli nowy element
+  if (currentElement && titleInput && document.activeElement !== titleInput) {
+    titleInput.focus();
   }
 }
 
-// Bezpieczne escapowanie HTML
+// Pomocnicza funkcja do ścieżki (jeśli nie ma w app.js)
+function getPathToElement(target, structure) {
+  const path = [];
+
+  function traverse(nodes) {
+    for (const node of nodes) {
+      if (node.id === target.id) {
+        path.unshift(node);
+        return true;
+      }
+      if (node.children?.length) {
+        if (traverse(node.children)) {
+          path.unshift(node);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  traverse(structure);
+  return path;
+}
+
+// Liczenie słów
+function wordCount(text = '') {
+  return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+}
+
+// Bezpieczne escapowanie
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
-// Przykład użycia po załadowaniu danych
-document.addEventListener('DOMContentLoaded', () => {
-  if (window.master && window.master.data) {
-    renderMapa(window.master.data.mapa);
-  }
-});
+// Przykład użycia po zmianie elementu
+function onElementSelected(element) {
+  renderEditPanel(element, {
+    titleContainerId: 'element-title',
+    contentContainerId: 'element-content',
+    pathContainerId: 'current-path',
+    metaContainerId: 'element-meta' // opcjonalnie dodaj <div id="element-meta"></div> w HTML
+  });
+}
 
-// Eksport funkcji dla globalnego dostępu
-window.renderMapa = renderMapa;
-window.buildBramaCard = buildBramaCard;
+// Globalny eksport
+window.renderEditPanel = renderEditPanel;
+window.onElementSelected = onElementSelected;
