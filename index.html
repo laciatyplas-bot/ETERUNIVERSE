@@ -3,214 +3,285 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eterniverse Master Premium PRO v9.0</title>
-  <meta name="description" content="System kreacji z AI Story Generator, hierarchią i eksportem DOCX">
-  
+  <title>Eterniverse Master Premium PRO v11.0</title>
+  <meta name="description" content="Kwantowy system kreacji z AI, hierarchią i nieograniczoną konsolą Bella">
+
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js"></script>
-  
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600&display=swap');
 
     :root {
-      --bg: #0a0a10;
-      --panel: #121218;
-      --border: #252530;
-      --accent: #00e0ff;
-      --gold: #f0d040;
-      --success: #40f0a0;
-      --text: #f8f8fc;
-      --muted: #a8b0d0;
-      --shadow: 0 12px 40px rgba(0,0,0,0.6);
+      --quantum-bg: #0b0014;
+      --deep-void: #120022;
+      --ether: #1a0033;
+      --aether-glow: #00e0ff;
+      --quantum-gold: #c0a0ff;
+      --neutrino-blue: #00ffff;
+      --plasma-purple: #9d4edd;
+      --success-green: #40f0a0;
+      --text-light: #f0f0ff;
+      --text-ethereal: #b8b8ff;
+      --particle: rgba(0, 224, 255, 0.6);
+      --border-glow: rgba(0, 224, 255, 0.3);
     }
 
-    * { margin:0; padding:0; box-sizing:border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      background: var(--quantum-bg);
+      color: var(--text-light);
       height: 100vh;
-      display: grid;
-      grid-template-rows: auto auto 1fr auto;
       overflow: hidden;
+      position: relative;
+      background-image: 
+        radial-gradient(circle at 20% 80%, rgba(120, 40, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 224, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(157, 78, 221, 0.1) 0%, transparent 60%);
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: 
+        radial-gradient(circle, var(--particle) 1px, transparent 1px),
+        radial-gradient(circle, var(--particle) 1px, transparent 1px);
+      background-size: 60px 60px, 100px 100px;
+      background-position: 0 0, 30px 30px;
+      animation: quantumFlow 20s linear infinite;
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes quantumFlow {
+      0% { background-position: 0 0, 30px 30px; }
+      100% { background-position: 60px 60px, 130px 130px; }
     }
 
     header {
-      padding: 2.2rem;
+      position: relative;
       text-align: center;
-      background: rgba(18,18,24,0.95);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(12px);
+      padding: 3rem 2rem;
+      z-index: 10;
+      backdrop-filter: blur(20px);
+      background: rgba(18, 0, 40, 0.4);
+      border-bottom: 1px solid var(--border-glow);
     }
 
     header h1 {
       font-family: 'Orbitron', sans-serif;
-      font-size: 3.2rem;
-      color: var(--accent);
-      letter-spacing: 4px;
+      font-size: 4.5rem;
+      font-weight: 900;
+      letter-spacing: 8px;
+      background: linear-gradient(90deg, var(--neutrino-blue), var(--quantum-gold), var(--plasma-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 40px rgba(0, 224, 255, 0.6);
+      animation: quantumPulse 4s ease-in-out infinite alternate;
     }
 
-    header p { margin-top: 0.6rem; color: var(--muted); font-weight: 300; font-size: 1.1rem; }
+    @keyframes quantumPulse {
+      from { text-shadow: 0 0 40px rgba(0, 224, 255, 0.6); }
+      to { text-shadow: 0 0 80px rgba(157, 78, 221, 0.8), 0 0 120px rgba(0, 224, 255, 0.4); }
+    }
+
+    header p {
+      margin-top: 1rem;
+      font-size: 1.4rem;
+      color: var(--text-ethereal);
+      font-weight: 300;
+      letter-spacing: 2px;
+      opacity: 0.9;
+    }
 
     .toolbar {
-      padding: 1.3rem 2rem;
-      background: rgba(18,18,24,0.9);
+      position: relative;
+      padding: 1.5rem 2rem;
+      background: rgba(18, 0, 40, 0.3);
+      backdrop-filter: blur(20px);
       display: flex;
       flex-wrap: wrap;
-      gap: 1.2rem;
+      gap: 1.5rem;
       justify-content: center;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--border-glow);
+      z-index: 10;
     }
 
     button, select {
-      padding: 0.9rem 1.8rem;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      color: var(--text);
-      font-weight: 500;
+      padding: 1rem 2rem;
+      background: rgba(30, 10, 60, 0.6);
+      border: 1px solid var(--border-glow);
+      border-radius: 16px;
+      color: var(--text-light);
+      font-weight: 600;
+      font-size: 1.05rem;
       cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    button:hover, select:hover {
-      background: rgba(0,224,255,0.15);
-      border-color: var(--accent);
-      transform: translateY(-3px);
-    }
-
-    button.primary { background: var(--accent); color: #000; font-weight: 600; border: none; }
-    button.gold { background: var(--gold); color: #000; font-weight: 600; border: none; }
-    button.success { background: var(--success); color: #000; font-weight: 600; border: none; }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 360px 1fr 420px;
-      gap: 2rem;
-      padding: 2rem;
+      transition: all 0.4s ease;
+      backdrop-filter: blur(10px);
+      position: relative;
       overflow: hidden;
     }
 
+    button:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 224, 255, 0.3);
+      border-color: var(--aether-glow);
+    }
+
+    button.primary { background: rgba(0, 224, 255, 0.15); }
+    button.gold { background: rgba(192, 160, 255, 0.15); }
+    button.success { background: rgba(64, 240, 160, 0.15); }
+
+    .layout {
+      position: relative;
+      display: grid;
+      grid-template-columns: 380px 1fr 440px;
+      gap: 2.5rem;
+      padding: 2.5rem;
+      height: calc(100vh - 200px);
+      z-index: 5;
+    }
+
     .section {
-      background: var(--panel);
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      padding: 2rem;
+      background: rgba(18, 10, 40, 0.4);
+      border-radius: 24px;
+      border: 1px solid var(--border-glow);
+      padding: 2.2rem;
       display: flex;
       flex-direction: column;
-      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7);
+      position: relative;
       overflow: hidden;
     }
 
     .section h2 {
-      font-size: 1.5rem;
-      color: var(--accent);
-      margin-bottom: 1.4rem;
-      font-weight: 600;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      color: var(--aether-glow);
+      margin-bottom: 1.6rem;
+      text-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+      letter-spacing: 2px;
     }
 
     #current-path {
-      font-size: 0.95rem;
-      color: var(--muted);
-      margin-bottom: 1rem;
-      opacity: 0.8;
+      font-size: 1rem;
+      color: var(--quantum-gold);
+      margin-bottom: 1.2rem;
+      opacity: 0.9;
+      text-shadow: 0 0 10px rgba(192, 160, 255, 0.3);
     }
 
     #element-title {
       width: 100%;
-      padding: 1.2rem;
-      font-size: 2.2rem;
+      padding: 1.4rem;
+      font-size: 2.6rem;
       background: transparent;
       border: none;
-      border-bottom: 4px solid var(--gold);
-      color: var(--gold);
+      border-bottom: 4px solid var(--quantum-gold);
+      color: var(--quantum-gold);
       text-align: center;
-      margin-bottom: 1.8rem;
-      font-weight: 600;
+      margin-bottom: 2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-shadow: 0 0 15px rgba(192, 160, 255, 0.4);
     }
 
-    #element-title:focus { outline: none; border-color: var(--accent); }
+    #element-title:focus {
+      outline: none;
+      border-color: var(--aether-glow);
+      box-shadow: 0 0 20px rgba(0, 224, 255, 0.3);
+    }
 
     textarea {
       flex: 1;
-      background: rgba(15,15,25,0.95);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1.8rem;
-      color: var(--text);
-      font-size: 1.15rem;
-      line-height: 1.9;
+      background: rgba(15, 10, 35, 0.7);
+      border: 1px solid var(--border-glow);
+      border-radius: 18px;
+      padding: 2rem;
+      color: var(--text-light);
+      font-size: 1.2rem;
+      line-height: 2;
       resize: none;
+      backdrop-filter: blur(10px);
     }
 
     textarea:focus {
       outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(0,224,255,0.15);
+      border-color: var(--aether-glow);
+      box-shadow: 0 0 30px rgba(0, 224, 255, 0.25);
     }
 
     .tree-node {
-      padding: 1rem 1.2rem;
-      margin-bottom: 0.8rem;
-      background: rgba(255,255,255,0.04);
-      border-radius: 12px;
-      border-left: 4px solid var(--border);
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 1rem;
+      background: rgba(30, 20, 80, 0.3);
+      border-radius: 16px;
+      border-left: 5px solid var(--border-glow);
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.4s ease;
     }
 
     .tree-node:hover {
-      background: rgba(0,224,255,0.12);
-      border-left-color: var(--accent);
-      transform: translateX(8px);
+      transform: translateX(12px);
+      background: rgba(0, 224, 255, 0.15);
+      border-left-color: var(--aether-glow);
+      box-shadow: 0 0 25px rgba(0, 224, 255, 0.2);
     }
 
     .tree-node.selected {
-      border-left-color: var(--gold);
-      background: rgba(240,208,64,0.15);
+      border-left-color: var(--quantum-gold);
+      background: rgba(192, 160, 255, 0.2);
+      box-shadow: 0 0 40px rgba(192, 160, 255, 0.3);
     }
 
-    .nested { margin-left: 2rem; margin-top: 0.6rem; }
+    .nested { margin-left: 2.5rem; margin-top: 0.8rem; }
 
     .suggestion, .generated {
-      padding: 1.4rem;
-      margin-bottom: 1.2rem;
-      background: rgba(0,224,255,0.1);
-      border-left: 5px solid var(--accent);
-      border-radius: 12px;
-      line-height: 1.6;
-      font-size: 1.05rem;
+      padding: 1.6rem;
+      margin-bottom: 1.4rem;
+      background: rgba(0, 224, 255, 0.1);
+      border-left: 6px solid var(--aether-glow);
+      border-radius: 16px;
+      line-height: 1.8;
+      font-size: 1.1rem;
+      backdrop-filter: blur(10px);
     }
 
     .generated {
-      background: rgba(64,240,160,0.15);
-      border-left-color: var(--success);
+      background: rgba(64, 240, 160, 0.15);
+      border-left-color: var(--success-green);
     }
 
     .status {
-      padding: 1.4rem;
+      padding: 1.6rem;
       text-align: center;
-      background: rgba(18,18,24,0.95);
-      color: var(--muted);
-      font-size: 1.05rem;
-      border-top: 1px solid var(--border);
-      backdrop-filter: blur(12px);
+      background: rgba(18, 0, 40, 0.6);
+      color: var(--text-ethereal);
+      font-size: 1.1rem;
+      border-top: 1px solid var(--border-glow);
+      backdrop-filter: blur(20px);
+      text-shadow: 0 0 10px rgba(0, 224, 255, 0.3);
     }
 
-    @media (max-width: 1300px) {
+    @media (max-width: 1400px) {
       .layout { grid-template-columns: 1fr 1fr; }
       .section:nth-child(3) { grid-column: span 2; }
     }
 
     @media (max-width: 900px) {
       .layout { grid-template-columns: 1fr; }
+      header h1 { font-size: 3rem; }
     }
   </style>
 </head>
 <body>
   <header>
     <h1>ETERNIVERSE</h1>
-    <p>Master Premium PRO v9.0 — AI Story Generator włączony</p>
+    <p>Kwantowa Kreacja • Master Premium PRO v11.0 • Bella Console Aktywna</p>
   </header>
 
   <div class="toolbar">
@@ -220,7 +291,7 @@
     </select>
     <button id="add-universe" class="gold">+ Nowe Uniwersum</button>
     <button id="add-child" class="primary">+ Dziecko</button>
-    <button id="generate-story" class="success">AI Generuj Historię</button>
+    <button id="generate-story" class="success">AI Generuj</button>
     <button id="bella-analyze" class="primary">Bella Analiza</button>
     <button id="export-docx" class="gold">Eksport DOCX</button>
     <button id="start-dictate">Dyktuj</button>
@@ -229,39 +300,40 @@
 
   <div class="layout">
     <div class="section">
-      <h2>Hierarchia Universum</h2>
+      <h2>Kwantowa Hierarchia</h2>
       <div id="current-path"></div>
       <div class="scrollable" id="structure-tree"></div>
 
-      <h2 style="margin-top:2.5rem;">Mapa Bram</h2>
+      <h2 style="margin-top:3rem;">Eteryczne Bramy</h2>
       <div class="scrollable" id="mapa-grid"></div>
     </div>
 
     <div class="section">
-      <input type="text" id="element-title" placeholder="Tytuł elementu...">
-      <textarea id="element-content" placeholder="Tu rozwija się Twoje uniwersum... AI może pomóc w generowaniu treści."></textarea>
+      <input type="text" id="element-title" placeholder="Tytuł kwantowej manifestacji...">
+      <textarea id="element-content" placeholder="Tu splatają się wymiary... AI może przyspieszyć kreację."></textarea>
     </div>
 
     <div class="section">
-      <h2>Bella AI Pro + Generator</h2>
+      <h2>Bella AI • Kwantowy Generator</h2>
       <div class="scrollable" id="suggestions">
-        <p style="text-align:center; opacity:0.7; padding:3rem 0;">
-          Wybierz element<br>
-          → <strong>„Bella Analiza”</strong> – sugestie redakcyjne<br>
-          → <strong>„AI Generuj Historię”</strong> – nowa treść od AI
+        <p style="text-align:center; opacity:0.7; padding:4rem 0; line-height:1.8;">
+          Wybierz element w hierarchii<br><br>
+          → <strong>„Bella Analiza”</strong> – głęboka redakcja<br>
+          → <strong>„AI Generuj”</strong> – kwantowa kreacja treści<br><br>
+          <small>Ctrl + ` → Bella Master Console (pełna kontrola nad stroną)</small>
         </p>
       </div>
     </div>
   </div>
 
-  <div class="status" id="status">Eterniverse gotowy – AI czeka na Twoje polecenie</div>
+  <div class="status" id="status">Kwantowa struktura aktywna — manifestuj rzeczywistość</div>
 
   <script>
     'use strict';
 
     class EterniverseMasterPRO {
       constructor() {
-        this.STRUCT_KEY = 'eterniverse_structure_pro_v9';
+        this.STRUCT_KEY = 'eterniverse_structure_pro_v11';
         this.MAPA_KEY = 'eterniverse_mapa_pro';
 
         this.structure = this.load(this.STRUCT_KEY, []);
@@ -307,7 +379,7 @@
         this.bindEvents();
         this.renderAll();
         this.initSpeech();
-        this.status('AI Story Generator aktywny');
+        this.status('Eterniverse PRO v11.0 — Bella Console aktywna');
       }
 
       updateProfile() {
@@ -340,7 +412,6 @@
         this.updateCurrentPath();
       }
 
-      // === STRUKTURA (bez zmian) ===
       renderStructure() {
         const container = document.getElementById('structure-tree');
         if (!container) return;
@@ -383,7 +454,6 @@
           document.getElementById('element-content').value = this.currentElement.content || '';
           this.renderStructure();
           this.updateCurrentPath();
-          this.renderSuggestions([]); // czyść sugestie przy zmianie
         }
       }
 
@@ -420,11 +490,11 @@
       updateCurrentPath() {
         const el = document.getElementById('current-path');
         if (!this.currentElement) {
-          el.textContent = '';
+          if (el) el.textContent = '';
           return;
         }
         const path = this.getPathTo(this.currentElement);
-        el.textContent = path.map(n => n.title || n.type).join(' → ');
+        if (el) el.textContent = path.map(n => n.title || n.type).join(' → ');
       }
 
       addRootUniverse() {
@@ -439,6 +509,7 @@
         this.save(this.STRUCT_KEY, this.structure);
         this.renderStructure();
         this.selectElement(univ.id);
+        this.status('Utworzono nowe uniwersum');
       }
 
       addChild() {
@@ -460,6 +531,7 @@
         this.save(this.STRUCT_KEY, this.structure);
         this.renderStructure();
         this.selectElement(child.id);
+        this.status(`Dodano: ${childType}`);
       }
 
       autoSave() {
@@ -469,66 +541,6 @@
         this.save(this.STRUCT_KEY, this.structure);
       }
 
-      // === AI STORY GENERATOR ===
-      generateStory() {
-        if (!this.currentElement) {
-          this.status('Wybierz element do generowania');
-          return;
-        }
-
-        const context = this.currentElement;
-        const profile = this.currentProfile;
-        const type = context.type || 'Fragment';
-
-        let prompt = '';
-        let length = 600; // znaków
-
-        if (profile === 'amazon') {
-          prompt = `Napisz angażujący opis produktu lub fragment książki w stylu marketingowym (Amazon). Temat: ${context.title || 'tajemnicza historia'}. Użyj mocnych słów, podkreśl unikalność. Długość: ok. ${length} znaków.`;
-        } else {
-          if (type === 'Rozdział' || type === 'Podrozdział') {
-            prompt = `Napisz emocjonalny, wciągający fragment powieści fantasy/romans (Wattpad). Bohater przeżywa kluczowy moment. Tytuł rozdziału: "${context.title}". Styl: głębokie emocje, dialogi, napięcie. Długość: ok. ${length} znaków.`;
-          } else {
-            prompt = `Stwórz opis świata lub koncepcji w stylu epickim (Wattpad). Element: ${context.title || 'nowy świat'}. Opisz atmosferę, magię, konflikt. Długość: ok. ${length} znaków.`;
-          }
-        }
-
-        // Symulacja AI (w realnej wersji podłącz API Grok/Gemini/Ollama)
-        const generated = this.fakeAIGenerate(prompt);
-
-        // Wstaw do treści
-        const textarea = document.getElementById('element-content');
-        const separator = textarea.value ? '\n\n---\n\n' : '';
-        textarea.value += separator + generated;
-
-        this.autoSave();
-        this.renderSuggestions([{
-          type: 'generated',
-          text: generated
-        }]);
-        this.status('Historia wygenerowana przez AI ✨');
-      }
-
-      // Tymczasowa symulacja AI – w produkcji zastąp prawdziwym API
-      fakeAIGenerate(prompt) {
-        const templates = {
-          wattpad: [
-            "Deszcz bębnił o szybę, a jej serce biło jak oszalałe. Wiedziała, że to koniec... albo początek czegoś większego. Spojrzała w jego oczy i szepnęła: „Nie zostawiaj mnie”. Świat wokół nich zamarł w oczekiwaniu.",
-            "W ciemności lasu coś się poruszyło. Nie był to wiatr. To była magia – stara, zapomniana, budząca się do życia. Ona poczuła to pierwsza. Strach mieszał się z ekscytacją.",
-            "On nigdy nie wierzył w przeznaczenie. Do czasu, aż ją spotkał. Jedno spojrzenie i wszystko się zmieniło. Teraz musi wybrać: bezpieczeństwo czy miłość, która może zniszczyć oba światy?"
-          ],
-          amazon: [
-            "⭐⭐⭐⭐⭐ ODKRYJ NAJLEPSZĄ KSIĄŻKĘ ROKU! Epicka przygoda, która wciąga od pierwszej strony. Idealna dla fanów fantasy i emocjonalnych historii. Darmowa wysyłka przy zamówieniu teraz!",
-            "REWOLUCYJNA POWIEŚĆ, która zmienia sposób myślenia o miłości i przeznaczeniu. Czytając, poczujesz emocje jak nigdy dotąd. Nr 1 na listach bestsellerów!",
-            "EKSKLUZYWNY FRAGMENT – tylko tutaj. Tajemnica, magia, namiętność. Zamów pełną wersję i przenieś się do innego świata już dziś!"
-          ]
-        };
-
-        const pool = this.currentProfile === 'amazon' ? templates.amazon : templates.wattpad;
-        return pool[Math.floor(Math.random() * pool.length)];
-      }
-
-      // === POZOSTAŁE FUNKCJE (bez zmian) ===
       renderMapa() {
         const container = document.getElementById('mapa-grid');
         if (!container) return;
@@ -561,36 +573,108 @@
 
         const suggestions = this.generateProSuggestions(this.currentElement);
         this.renderSuggestions(suggestions.map(s => ({ type: 'suggestion', text: s })));
-        this.status(`${suggestions.length} sugestii redakcyjnych`);
+        this.status(`${suggestions.length} sugestii`);
       }
 
       generateProSuggestions(element) {
-        // ... (jak w poprzedniej wersji)
-        return ["Przykładowa sugestia redakcyjna 1", "Przykładowa sugestia 2"];
+        const text = element.content || '';
+        const lower = text.toLowerCase();
+        const type = element.type || 'Fragment';
+        const suggestions = [];
+
+        if (['Uniwersum', 'Świat'].includes(type)) {
+          if (text.length < 200) suggestions.push('🌍 Opisz fundamenty świata');
+          if (!lower.includes('geografia')) suggestions.push('🗺️ Dodaj opis geografii');
+        }
+
+        if (['Tom', 'Rozdział'].includes(type)) {
+          if (!text.match(/["„”]/)) suggestions.push('💬 Wprowadź dialogi');
+          if (!lower.includes('konflikt')) suggestions.push('⚔️ Zdefiniuj główny konflikt');
+        }
+
+        if (this.currentProfile === 'amazon') {
+          suggestions.push('🔥 Podkreśl unikalność produktu');
+        } else {
+          suggestions.push('❤️ Wzmocnij emocje');
+        }
+
+        if (this.wordCount(text) < 500) suggestions.push('📜 Rozwijaj sceny');
+
+        return suggestions;
       }
 
-      renderSuggestions(items) {
-        const panel = document.getElementById('suggestions');
-        if (!panel) return;
-
-        if (items.length === 0) {
-          panel.innerHTML = '<p style="text-align:center;opacity:0.7;padding:3rem;">Wybierz akcję: Analiza lub Generuj</p>';
+      generateStory() {
+        if (!this.currentElement) {
+          this.status('Wybierz element');
           return;
         }
 
-        panel.innerHTML = items.map(item => `
-          <div class="${item.type || 'suggestion'}">
-            ${item.text}
-          </div>
-        `).join('');
+        const generated = this.currentProfile === 'amazon' 
+          ? '⭐⭐⭐⭐⭐ Rewolucyjna historia! Najwyższa jakość narracji. Zamów pełną wersję!'
+          : 'W mroku nocy, jej serce biło szybciej. Czy to przeznaczenie?';
+
+        const textarea = document.getElementById('element-content');
+        textarea.value += `\n\n--- AI Generated ---\n${generated}`;
+        this.autoSave();
+        this.renderSuggestions([{ type: 'generated', text: generated }]);
+        this.status('Wygenerowano przez AI');
       }
 
       async exportDocx() {
-        // ... (bez zmian – jak wcześniej)
+        if (!this.currentElement) return this.status('Nie wybrano elementu');
+
+        const { Document, Packer, Paragraph, HeadingLevel } = docx;
+        const path = this.getPathTo(this.currentElement);
+
+        const doc = new Document({
+          sections: [{
+            children: [
+              new Paragraph({ text: this.currentElement.title || 'Bez tytułu', heading: HeadingLevel.TITLE, alignment: "center" }),
+              new Paragraph({ text: path.map(n => n.title).join(' → '), alignment: "center" }),
+              new Paragraph({ text: `Typ: ${this.currentElement.type}`, alignment: "center" }),
+              new Paragraph({ text: this.currentElement.content || '' })
+            ]
+          }]
+        });
+
+        try {
+          const blob = await Packer.toBlob(doc);
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${(this.currentElement.title || 'element').replace(/[^a-z0-9]/gi, '_')}_Eterniverse_PRO.docx`;
+          a.click();
+          URL.revokeObjectURL(url);
+          this.status('Eksport zakończony');
+        } catch (e) {
+          this.status('Błąd eksportu');
+        }
       }
 
       initSpeech() {
-        // ... (bez zmian)
+        if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) return;
+
+        this.recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        this.recognition.lang = 'pl-PL';
+        this.recognition.continuous = true;
+        this.recognition.interimResults = true;
+
+        this.recognition.onresult = (e) => {
+          const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+          document.getElementById('element-content').value += transcript;
+          this.autoSave();
+        };
+
+        this.recognition.onstart = () => {
+          document.getElementById('start-dictate').disabled = true;
+          document.getElementById('stop-dictate').disabled = false;
+          this.status('Dyktowanie aktywne');
+        };
+
+        this.recognition.onend = () => {
+          document.getElementById('start-dictate').disabled = false;
+          document.getElementById('stop-dictate').disabled = true;
+        };
       }
 
       startDictation() { this.recognition?.start(); }
@@ -607,13 +691,170 @@
         if (time > 0) setTimeout(() => el.textContent = 'Gotowy', time);
       }
 
+      wordCount(text = '') {
+        return (text.match(/\b\w+\b/g) || []).length;
+      }
+
       escape(text = '') {
         return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
       }
+
+      renderSuggestions(items = []) {
+        const panel = document.getElementById('suggestions');
+        if (!panel) return;
+
+        if (items.length === 0) {
+          panel.innerHTML = '<p style="text-align:center;opacity:0.7;padding:4rem;">Użyj „Bella Analiza” lub „AI Generuj”</p>';
+          return;
+        }
+
+        panel.innerHTML = items.map(item => `
+          <div class="\( {item.type || 'suggestion'}"> \){item.text}</div>
+        `).join('');
+      }
     }
 
+    // === BELLA MASTER CONSOLE ===
+    class BellaConsole {
+      constructor(app) {
+        this.app = app;
+        this.history = [];
+        this.historyIndex = -1;
+
+        this.initUI();
+        this.bindEvents();
+        this.log('Bella Master Console v1.0 aktywna. Ctrl + ` otwiera.', 'success');
+      }
+
+      initUI() {
+        const html = `
+          <div id="bella-console" style="
+            position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
+            width:95%; max-width:1200px; height:65vh;
+            background:rgba(10,10,30,0.98); border-radius:24px;
+            border:2px solid #00e0ff; box-shadow:0 30px 80px rgba(0,224,255,0.5);
+            backdrop-filter:blur(25px); z-index:99999;
+            display:none; flex-direction:column; font-family:'Consolas',monospace; color:#f0f8ff;
+          ">
+            <div style="padding:18px 24px; background:rgba(0,224,255,0.12); border-bottom:1px solid #00e0ff; font-weight:700; display:flex; justify-content:space-between;">
+              <span>🌌 BELLA MASTER CONSOLE</span>
+              <span style="cursor:pointer; font-size:1.6rem;" onclick="bellaConsole.toggle()">✕</span>
+            </div>
+            <div id="console-output" style="flex:1; padding:24px; overflow-y:auto; font-size:1.05rem; line-height:1.7;"></div>
+            <div style="padding:18px 24px; border-top:1px solid #334466; display:flex;">
+              <input id="console-input" type="text" placeholder="Wpisz komendę... (help)" style="flex:1; background:transparent; border:none; color:#f0f8ff; font-size:1.05rem; outline:none;">
+              <button onclick="bellaConsole.execute()" style="margin-left:18px; padding:0 40px; background:#00e0ff; color:#000; border:none; border-radius:14px; cursor:pointer; font-weight:700;">▶</button>
+            </div>
+          </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', html);
+      }
+
+      bindEvents() {
+        const input = document.getElementById('console-input');
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') this.execute();
+          if (e.key === 'ArrowUp') { e.preventDefault(); this.historyUp(); }
+          if (e.key === 'ArrowDown') { e.preventDefault(); this.historyDown(); }
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.ctrlKey && e.key === '`') {
+            e.preventDefault();
+            this.toggle();
+          }
+        });
+      }
+
+      toggle() {
+        const c = document.getElementById('bella-console');
+        c.style.display = c.style.display === 'flex' ? 'none' : 'flex';
+        if (c.style.display === 'flex') document.getElementById('console-input').focus();
+      }
+
+      log(msg, type = 'info') {
+        const out = document.getElementById('console-output');
+        const line = document.createElement('div');
+        line.style.margin = '6px 0';
+        const ts = new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        if (type === 'success') line.style.color = '#40f0a0';
+        if (type === 'error') line.style.color = '#ff4060';
+
+        line.innerHTML = `<span style="opacity:0.6;">[${ts}]</span> ${msg}`;
+        out.appendChild(line);
+        out.scrollTop = out.scrollHeight;
+      }
+
+      execute() {
+        const input = document.getElementById('console-input');
+        const cmd = input.value.trim();
+        if (!cmd) return;
+
+        this.log(`> ${cmd}`, 'command');
+        input.value = '';
+        this.history.unshift(cmd);
+        this.historyIndex = -1;
+
+        const parts = cmd.toLowerCase().split(' ');
+        const main = parts[0];
+        const args = parts.slice(1).join(' ');
+
+        switch(main) {
+          case 'help':
+            this.log('<strong>Komendy:</strong> help, clear, add universe/child, generate, bella, export, brama [nr], profile [wattpad/amazon]');
+            break;
+          case 'clear':
+            document.getElementById('console-output').innerHTML = '';
+            break;
+          case 'add':
+            if (args.includes('universe')) this.app.addRootUniverse();
+            if (args.includes('child')) this.app.addChild();
+            break;
+          case 'generate':
+            this.app.generateStory();
+            break;
+          case 'bella':
+            this.app.bellaAnalyze();
+            break;
+          case 'export':
+            this.app.exportDocx();
+            break;
+          case 'brama':
+            const num = parseInt(args);
+            if (num) this.app.insertBrama(num);
+            break;
+          case 'profile':
+            if (args === 'wattpad' || args === 'amazon') {
+              this.app.currentProfile = args;
+              document.getElementById('profile-select').value = args;
+            }
+            break;
+          default:
+            this.log(`Nieznana komenda: ${main}`, 'error');
+        }
+      }
+
+      historyUp() {
+        if (this.history.length === 0) return;
+        this.historyIndex = Math.min(this.historyIndex + 1, this.history.length - 1);
+        document.getElementById('console-input').value = this.history[this.historyIndex] || '';
+      }
+
+      historyDown() {
+        if (this.history.length === 0) return;
+        this.historyIndex = Math.max(this.historyIndex - 1, -1);
+        document.getElementById('console-input').value = this.historyIndex === -1 ? '' : this.history[this.historyIndex];
+      }
+    }
+
+    // Uruchomienie
     const master = new EterniverseMasterPRO();
     window.master = master;
+
+    // Uruchomienie Bella Console
+    const bellaConsole = new BellaConsole(master);
+    window.bellaConsole = bellaConsole;
   </script>
 </body>
 </html>
