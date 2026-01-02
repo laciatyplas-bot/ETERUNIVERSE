@@ -1,0 +1,285 @@
+// scr.js - Eterniverse Master Suite
+// Połączone: Książki + Bella Redaktor + Architektura Universum
+
+class EterniverseMaster {
+  constructor() {
+    this.booksKey = 'eterniverse_master_books';
+    this.structKey = 'eterniverse_master_struct';
+    this.profilesKey = 'eterniverse_bella_profiles';
+    
+    this.books = JSON.parse(localStorage.getItem(this.booksKey) || '[]');
+    this.structure = JSON.parse(localStorage.getItem(this.structKey) || '[]');
+    this.profiles = JSON.parse(localStorage.getItem(this.profilesKey) || '{}');
+    
+    this.currentBookId = null;
+    this.currentStructId = null;
+    this.currentProfile = 'wattpad';
+    
+    this.init();
+  }
+
+  init() {
+    this.bindEvents();
+    this.renderAll();
+    this.speak('Eterniverse Master gotowy');
+  }
+
+  bindEvents() {
+    // Tabs
+    document.querySelectorAll('[data-tab]').forEach(tab => {
+      tab.onclick = () => this.switchTab(tab.dataset.tab);
+    });
+
+    // Books
+    document.getElementById('add-book').onclick = () => this.addBook();
+    document.getElementById('export-book').onclick = () => this.exportBook();
+    document.getElementById('import-book').onclick = () => this.showImport();
+
+    // Editor
+    document.getElementById('book-title').onblur = (e) => this.saveTitle(e);
+    document.getElementById('book-content').oninput = (e) => this.autoSaveContent(e);
+    document.getElementById('bella-suggest').onclick = () => this.bellaAnalyze();
+
+    // Structure
+    document.getElementById('add-universe').onclick = () => this.addUniverse();
+
+    // Profile
+    document.getElementById('profile-select').onchange = (e) => {
+      this.currentProfile = e.target.value;
+      this.saveProfiles();
+    };
+
+    // Speech
+    if ('webkitSpeechRecognition' in window) {
+      this.setupSpeech();
+    }
+  }
+
+  switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    document.querySelectorAll('.panel').forEach((p, i) => {
+      p.style.display = i === parseInt(tab) ? 'flex' : 'none';
+    });
+  }
+
+  // === BOOKS MANAGEMENT ===
+  renderBooks() {
+    const container = document.getElementById('book-list');
+    container.innerHTML = this.books.length ? 
+      this.books.map(book => `
+        <div class="book-item ${book.id === this.currentBookId ? 'active' : ''}" 
+             onclick="master.openBook(${book.id})">
+          📖 ${book.title}
+          <span class="book-meta">${this.formatWords(book.content)} słów</span>
+        </div>
+      `).join('') : 
+      '<div class="empty-state">📚 Dodaj pierwszą książkę</div>';
+  }
+
+  addBook() {
+    const book = {
+      id: Date.now(),
+      title: 'Nowa Księga',
+      content: '',
+      chapters: [],
+      audiobooks: [],
+      created: new Date().toISOString(),
+      status: 'IDEA'
+    };
+    this.books.unshift(book);
+    this.saveBooks();
+    this.openBook(book.id);
+    this.renderBooks();
+  }
+
+  openBook(id) {
+    this.currentBookId = id;
+    const book = this.books.find(b => b.id === id);
+    document.getElementById('book-title').value = book.title;
+    document.getElementById('book-content').value = book.content;
+    document.getElementById('book-status').value = book.status || 'IDEA';
+    this.renderBooks();
+    this.speak(`Otwarto ${book.title}`);
+  }
+
+  saveTitle(e) {
+    if (this.currentBookId) {
+      const book = this.books.find(b => b.id === this.currentBookId);
+      book.title = e.target.value || 'Bez tytułu';
+      this.saveBooks();
+      this.renderBooks();
+    }
+  }
+
+  autoSaveContent(e) {
+    if (this.currentBookId) {
+      const book = this.books.find(b => b.id === this.currentBookId);
+      book.content = e.target.value;
+      book.wordCount = (e.target.value.match(/\bw+\b/g) || []).length;
+      this.saveBooks();
+    }
+  }
+
+  saveBooks() {
+    localStorage.setItem(this.booksKey, JSON.stringify(this.books));
+  }
+
+  // === BELLA REDAKTOR ===
+  bellaAnalyze() {
+    if (!this.currentBookId) return this.notify('Wybierz książkę!');
+    
+    const content = document.getElementById('book-content').value;
+    const suggestions = this.getBellaSuggestions(content, this.currentProfile);
+    
+    const modal = document.createElement('div');
+    modal.className = 'suggestion-modal';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <h3>💡 Sugestie Bella [${this.currentProfile.toUpperCase()}]</h3>
+        ${suggestions.map(s => `<div class="suggestion">${s}</div>`).join('')}
+        <div class="modal-actions">
+          <button onclick="this.parentNode.parentNode.remove()">Zamknij</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    this.speak(`${suggestions.length} sugestii`);
+  }
+
+  getBellaSuggestions(text, profile) {
+    const suggestions = [];
+    const words = text.match(/\bw+\b/g) || [];
+    
+    if (profile === 'amazon') {
+      // SEO & Marketing
+      if (!/darmowa.*wysyłka/i.test(text)) suggestions.push('🔍 Dodaj "darmowa wysyłka"');
+      if (words.filter(w => /najlepszy|idealny|doskonały/i.test(w)).length === 0) {
+        suggestions.push('🏆 Słowa sprzedaży: najlepszy, idealny, rewolucyjny');
+      }
+    } else {
+      // Wattpad - Emocje & Dialogi
+      const emotions = words.filter(w => /smutn|szczęśliw|zakocha|przeraż/i.test(w)).length;
+      if (emotions < 3) suggestions.push('❤️ Więcej emocji!');
+      if (!/[„”"'].*[„”"']/g.test(text)) suggestions.push('💬 Dialogi angażują!');
+    }
+
+    // Ogólne
+    const sentences = text.split(/[.!?]+/).length;
+    if (sentences < 5) suggestions.push('📝 Minimum 5 zdań');
+    
+    return suggestions.slice(0, 5);
+  }
+
+  // === STRUCTURE ===
+  renderStructure() {
+    const container = document.getElementById('struct-list');
+    container.innerHTML = this.structure.length ? 
+      this.buildTree(this.structure) : 
+      '<div class="empty-state">🏗️ Stwórz pierwsze uniwersum</div>';
+  }
+
+  buildTree(items) {
+    return items.map(item => `
+      <div class="struct-item ${item.id === this.currentStructId ? 'active' : ''}" 
+           onclick="master.selectStruct(${item.id})">
+        ${this.getIcon(item.type)} ${item.title}
+        ${item.children?.length ? `<div class="children">${this.buildTree(item.children)}</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  addUniverse() {
+    const univ = {
+      id: Date.now(),
+      type: 'Uniwersum',
+      title: 'Nowe Uniwersum',
+      children: []
+    };
+    this.structure.push(univ);
+    this.saveStructure();
+    this.renderStructure();
+  }
+
+  selectStruct(id) {
+    this.currentStructId = id;
+    this.renderStructure();
+  }
+
+  saveStructure() {
+    localStorage.setItem(this.structKey, JSON.stringify(this.structure));
+  }
+
+  // === EXPORT/IMPORT ===
+  exportBook() {
+    if (!this.currentBookId) return this.notify('Brak książki!');
+    const book = this.books.find(b => b.id === this.currentBookId);
+    const data = JSON.stringify(book, null, 2);
+    this.download(data, `${book.title.replace(/[^a-z0-9]/gi, '_')}.json`, 'application/json');
+  }
+
+  download(data, filename, mime) {
+    const blob = new Blob([data], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // === SPEECH ===
+  setupSpeech() {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'pl-PL';
+    recognition.onresult = (e) => {
+      const text = e.results[0][0].transcript;
+      document.getElementById('console-input') ? 
+        document.getElementById('console-input').value += text : 
+        this.notify(`🎙️ ${text}`);
+    };
+    document.querySelector('.speech-btn').onclick = () => recognition.start();
+  }
+
+  speak(text) {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'pl-PL';
+      speechSynthesis.speak(utterance);
+    }
+  }
+
+  notify(msg) {
+    // Simple toast
+    const toast = document.createElement('div');
+    toast.textContent = msg;
+    toast.style.cssText = 'position:fixed;top:20px;right:20px;padding:16px;background:var(--gold);color:#000;border-radius:8px;z-index:9999;';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  formatWords(text) {
+    return (text.match(/\bw+\b/g) || []).length;
+  }
+
+  saveProfiles() {
+    localStorage.setItem(this.profilesKey, JSON.stringify(this.profiles));
+  }
+}
+
+// Icons
+EterniverseMaster.prototype.getIcon = function(type) {
+  const icons = {
+    'Uniwersum': '🌌', 'Świat': '🌍', 'Tom': '📚', 
+    'Rozdział': '📖', 'Fragment': '📄'
+  };
+  return icons[type] || '📄';
+};
+
+// Global instance
+const master = new EterniverseMaster();
+
+// Export functions for onclick handlers
+window.master = master;
+  </script>
