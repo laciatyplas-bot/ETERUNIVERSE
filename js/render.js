@@ -1,6 +1,20 @@
+'use strict';
+
+/*
+  =========================================
+  ETERNIVERSE — RENDER ENGINE
+  Bella Author Mode Compatible
+  =========================================
+  Odpowiedzialność:
+  - TYLKO render DOM
+  - ZERO logiki danych
+  - ZERO globalnych onclick
+*/
+
 class Renderer {
   constructor(app) {
-    this.app = app; // odniesienie do głównej aplikacji (master)
+    this.app = app;
+
     this.elements = {
       structureTree: document.getElementById('structure-tree'),
       mapaGrid: document.getElementById('mapa-grid'),
@@ -12,119 +26,163 @@ class Renderer {
     };
   }
 
-  // Główna metoda – renderuje wszystko naraz
+  /* =====================================
+     GŁÓWNY RENDER
+  ===================================== */
   renderAll() {
     this.renderStructure();
     this.renderMapa();
-    this.renderEditPanel(this.app.currentElement);
-    this.renderSuggestions([]);
+    this.renderEditPanel(this.app.currentElement || null);
   }
 
-  // === 1. RENDEROWANIE HIERARCHII ===
+  /* =====================================
+     1. STRUKTURA / DRZEWO
+  ===================================== */
   renderStructure() {
     const container = this.elements.structureTree;
     if (!container) return;
 
     const structure = this.app.data.getStructure();
-    if (structure.length === 0) {
+
+    if (!structure || structure.length === 0) {
       container.innerHTML = `
-        <p style="opacity:0.6;text-align:center;padding:3rem;font-size:1.1rem;">
-          Brak uniwersów<br><br>
-          Kliknij „+ Nowe Uniwersum”, by rozpocząć kreację
+        <p style="opacity:.6;text-align:center;padding:3rem;">
+          Brak struktury.<br>
+          Utwórz pierwsze Uniwersum.
         </p>`;
       return;
     }
 
-    container.innerHTML = structure.map(root => this.buildTreeNode(root)).join('');
+    container.innerHTML = structure
+      .map(node => this.buildTreeNode(node))
+      .join('');
   }
 
   buildTreeNode(node) {
     const icons = {
-      'Uniwersum': '🌌',
-      'Świat': '🌍',
-      'Tom': '📚',
-      'Rozdział': '📖',
-      'Podrozdział': '📄',
-      'Fragment': '📜'
+      Uniwersum: '🌌',
+      Świat: '🌍',
+      Tom: '📚',
+      Rozdział: '📖',
+      Podrozdział: '📄',
+      Fragment: '📜'
     };
-    const icon = icons[node.type] || '📄';
-    const isSelected = this.app.currentElement && this.app.currentElement.id === node.id;
 
-    let html = `
-      <div class="tree-node \( {isSelected ? 'selected' : ''}" onclick="master.selectElement(' \){node.id}')">
-        <span class="icon">${icon}</span>
+    const selected =
+      this.app.currentElement &&
+      this.app.currentElement.id === node.id;
+
+    return `
+      <div class="tree-node ${selected ? 'selected' : ''}"
+           data-id="${node.id}"
+           data-type="${node.type}">
+        <span class="icon">${icons[node.type] || '📄'}</span>
         <strong>${this.escape(node.title || '(Bez tytułu)')}</strong>
-        <small style="margin-left:8px;opacity:0.7;">${node.type || ''}</small>
+        <small style="margin-left:6px;opacity:.7;">${node.type}</small>
+
+        ${
+          node.children && node.children.length
+            ? `<div class="nested">
+                ${node.children.map(c => this.buildTreeNode(c)).join('')}
+               </div>`
+            : ''
+        }
+      </div>
     `;
-
-    if (node.children && node.children.length > 0) {
-      html += `<div class="nested">${node.children.map(child => this.buildTreeNode(child)).join('')}</div>`;
-    }
-
-    html += `</div>`;
-    return html;
   }
 
-  // === 2. RENDEROWANIE MAPY BRAM ===
+  /* =====================================
+     2. MAPA BRAM
+  ===================================== */
   renderMapa() {
     const container = this.elements.mapaGrid;
     if (!container) return;
 
     const mapa = this.app.data.getMapa();
-    container.innerHTML = mapa.map(brama => `
-      <div class="tree-node" onclick="master.insertBrama(${brama.id})">
-        <span class="icon">🔮</span>
-        <strong>${this.escape(brama.name)}</strong>
-        <small style="margin-left:8px;opacity:0.7;">${brama.books?.length || 0} tytułów</small>
-      </div>
-    `).join('');
-  }
 
-  // === 3. RENDEROWANIE PANELU EDYCJI ===
-  renderEditPanel(element) {
-    if (this.elements.elementTitle) {
-      this.elements.elementTitle.value = element?.title || '';
-    }
-    if (this.elements.elementContent) {
-      this.elements.elementContent.value = element?.content || '';
-    }
-    this.renderCurrentPath(element);
-  }
-
-  renderCurrentPath(element) {
-    if (!this.elements.currentPath || !element) {
-      if (this.elements.currentPath) this.elements.currentPath.innerHTML = '';
-      return;
-    }
-
-    const path = this.app.getPathToElement(element);
-    this.elements.currentPath.innerHTML = path.map(n => `${n.title || n.type}`).join(' → ');
-  }
-
-  // === 4. RENDEROWANIE SUGESTII BELLA AI ===
-  renderSuggestions(items = []) {
-    const panel = this.elements.suggestions;
-    if (!panel) return;
-
-    if (items.length === 0) {
-      panel.innerHTML = `
-        <p style="text-align:center;opacity:0.7;padding:4rem;line-height:1.8;">
-          Wybierz element i użyj „Bella Analiza” lub „AI Generuj”
+    if (!mapa || mapa.length === 0) {
+      container.innerHTML = `
+        <p style="opacity:.6;text-align:center;padding:3rem;">
+          Brak Bram
         </p>`;
       return;
     }
 
-    panel.innerHTML = items.map(item => `
-      <div class="${item.type || 'suggestion'}">
-        ${this.escape(item.text)}
+    container.innerHTML = mapa.map((brama, i) => `
+      <div class="brama-card"
+           data-id="${brama.id}"
+           style="--order:${i}">
+        <div class="brama-name">${this.escape(brama.name)}</div>
+        <div class="brama-books">
+          ${brama.books ? brama.books.length : 0} książek
+        </div>
+        <div class="brama-hint">
+          Kliknij, aby dodać do struktury
+        </div>
       </div>
     `).join('');
   }
 
-  // === 5. STATUS DOLNY PASEK ===
-  setStatus(message, timeout = 6000) {
+  /* =====================================
+     3. PANEL EDYCJI
+  ===================================== */
+  renderEditPanel(element) {
+    if (this.elements.elementTitle) {
+      this.elements.elementTitle.value = element?.title || '';
+    }
+
+    if (this.elements.elementContent) {
+      this.elements.elementContent.value = element?.content || '';
+    }
+
+    this.renderCurrentPath(element);
+  }
+
+  renderCurrentPath(element) {
+    const container = this.elements.currentPath;
+    if (!container) return;
+
+    if (!element) {
+      container.textContent = '';
+      return;
+    }
+
+    const path = this.app.getPathToElement(element);
+    container.textContent = path
+      .map(p => p.title || p.type)
+      .join(' → ');
+  }
+
+  /* =====================================
+     4. SUGESTIE AI
+  ===================================== */
+  renderSuggestions(items = []) {
+    const panel = this.elements.suggestions;
+    if (!panel) return;
+
+    if (!items.length) {
+      panel.innerHTML = `
+        <p style="opacity:.6;text-align:center;padding:3rem;">
+          Brak sugestii
+        </p>`;
+      return;
+    }
+
+    panel.innerHTML = items.map((item, i) => `
+      <div class="suggestion" style="--order:${i}">
+        ${this.escape(item.text || '')}
+      </div>
+    `).join('');
+  }
+
+  /* =====================================
+     5. STATUS
+  ===================================== */
+  setStatus(message = 'Gotowy', timeout = 5000) {
     if (!this.elements.status) return;
+
     this.elements.status.textContent = message;
+
     if (timeout > 0) {
       setTimeout(() => {
         if (this.elements.status.textContent === message) {
@@ -134,8 +192,15 @@ class Renderer {
     }
   }
 
-  // === POMOCNICZA ===
+  /* =====================================
+     HELPERS
+  ===================================== */
   escape(text = '') {
-    return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return String(text)
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 }
+
+// eksport globalny (dla app.js)
+window.Renderer = Renderer;
