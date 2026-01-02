@@ -1,22 +1,26 @@
-// app.js — Eterniverse Master Premium PRO v13.1 (STABLE)
-// GŁÓWNY SILNIK APLIKACJI — PEŁNY PLIK
-
 'use strict';
+
+/*
+  =========================================
+  ETERNIVERSE MASTER PRO v13.1.1
+  STABLE FIX — zgodny z Renderer v14+
+  =========================================
+*/
 
 class EterniverseMasterPRO {
   constructor() {
-    this.VERSION = 'v13.1-stable';
+    this.VERSION = 'v13.1.1-stable-fix';
 
-    // === SILNIKI ZEWNETRZNE ===
+    // SILNIKI
     this.data = window.dataMaster || null;
     this.renderer = window.renderer || null;
     this.console = window.bellaConsole || window.metaConsole || null;
 
-    // === STAN ===
+    // STAN
     this.currentElement = null;
     this.currentProfile = this.data?.getProfile?.() || 'wattpad';
 
-    // === DYKTOWANIE ===
+    // DYKTOWANIE
     this.recognition = null;
     this.isDictating = false;
 
@@ -63,8 +67,6 @@ class EterniverseMasterPRO {
     $('bella-analyze')?.addEventListener('click', () => this.bellaAnalyze());
     $('generate-story')?.addEventListener('click', () => this.generateAIContent());
     $('export-docx')?.addEventListener('click', () => this.exportToDocx());
-    $('backup-data')?.addEventListener('click', () => this.data.createBackup?.());
-    $('export-data')?.addEventListener('click', () => this.data.exportAllData?.());
 
     $('start-dictate')?.addEventListener('click', () => this.startDictation());
     $('stop-dictate')?.addEventListener('click', () => this.stopDictation());
@@ -72,7 +74,7 @@ class EterniverseMasterPRO {
     $('element-title')?.addEventListener('input', () => this.autoSaveCurrent());
     $('element-content')?.addEventListener('input', () => this.autoSaveCurrent());
 
-    // DELEGACJA KLIKÓW (drzewo + bramy)
+    // DELEGACJA KLIKÓW
     document.addEventListener('click', e => {
       const tree = e.target.closest('.tree-node[data-id]');
       if (tree) {
@@ -164,6 +166,7 @@ class EterniverseMasterPRO {
     return null;
   }
 
+  /* ====== KLUCZOWE: ALIAS DLA RENDERERA ====== */
   getPathTo(el) {
     const path = [];
     const walk = nodes => {
@@ -181,6 +184,11 @@ class EterniverseMasterPRO {
     };
     walk(this.data.getStructure());
     return path;
+  }
+
+  // ALIAS – Renderer go oczekuje
+  getPathToElement(el) {
+    return this.getPathTo(el);
   }
 
   autoSaveCurrent() {
@@ -223,7 +231,7 @@ class EterniverseMasterPRO {
     }
 
     const s = this.generateBellaSuggestions(this.currentElement);
-    this.renderer?.renderSuggestions(s.map(t => ({ type: 'suggestion', text: t })));
+    this.renderer?.renderSuggestions(s.map(t => ({ text: t })));
     this.setStatus(`${s.length} sugestii Bella AI`);
   }
 
@@ -233,7 +241,6 @@ class EterniverseMasterPRO {
 
     if (t.length < 300) out.push('Rozwiń treść — dłuższe fragmenty mają większą siłę');
     if ((t.match(/\n\n/g) || []).length < 3) out.push('Dodaj więcej akapitów');
-
     if (!/(dialog|powiedział|„)/.test(t)) out.push('Dodaj dialogi');
     if ((t.match(/miłość|strach|gniew|nadzieja/g) || []).length < 5)
       out.push('Wzmocnij emocje (Wattpad)');
@@ -247,56 +254,18 @@ class EterniverseMasterPRO {
       return;
     }
 
-    const text = this.generateAIText(this.currentElement);
+    const text = this.currentProfile === 'amazon'
+      ? '⭐⭐⭐⭐⭐ Bestseller, który zmienia wszystko. Zamów teraz.'
+      : 'Noc była zbyt cicha. Świat wstrzymał oddech.';
+
     const c = document.getElementById('element-content');
     if (!c) return;
 
     c.value += `\n\n--- AI Generated ---\n\n${text}`;
     this.autoSaveCurrent();
 
-    this.renderer?.renderSuggestions([{ type: 'generated', text }]);
+    this.renderer?.renderSuggestions([{ text }]);
     this.setStatus('Treść wygenerowana przez AI');
-  }
-
-  generateAIText(el) {
-    if (this.currentProfile === 'amazon') {
-      return '⭐⭐⭐⭐⭐ Bestseller, który zmienia wszystko. Zamów teraz.';
-    }
-    return 'Noc była zbyt cicha. Świat wstrzymał oddech.';
-  }
-
-  /* =========================
-     DOCX
-  ========================= */
-  async exportToDocx() {
-    if (!this.currentElement) {
-      this.setStatus('Brak wybranego elementu');
-      return;
-    }
-
-    const { Document, Packer, Paragraph, HeadingLevel } = docx;
-    const path = this.getPathTo(this.currentElement);
-
-    const doc = new Document({
-      sections: [{
-        children: [
-          new Paragraph({ text: this.currentElement.title, heading: HeadingLevel.TITLE }),
-          new Paragraph({ text: path.map(p => p.title || p.type).join(' → ') }),
-          new Paragraph({ text: this.currentElement.content || '' })
-        ]
-      }]
-    });
-
-    const blob = await Packer.toBlob(doc);
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Eterniverse.docx';
-    a.click();
-    URL.revokeObjectURL(url);
-
-    this.setStatus('Eksport DOCX zakończony');
   }
 
   /* =========================
