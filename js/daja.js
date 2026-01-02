@@ -1,152 +1,159 @@
-// Pełna i kompletna implementacja dyktowania głosowego – Eterniverse Master Premium PRO v14.0
-// Obsługa SpeechRecognition API z fallbackiem, walidacją, statusami i autosave
+// dają.js — Eterniverse Master Premium PRO v14.0
+// PEŁNA, KOMPLETNA OBSŁUGA DYKTOWANIA GŁOSOWEGO
+// WKLEJ 1:1 — NIE EDYTUJ
 
-initSpeechRecognition() {
-  // Sprawdź dostępność API
-  if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
-    this.status('Dyktowanie głosowe nie jest obsługiwane w tej przeglądarce', 10000);
-    document.getElementById('start-dictate').disabled = true;
-    document.getElementById('stop-dictate').disabled = true;
-    console.warn('SpeechRecognition API nieobsługiwane');
-    return false;
+'use strict';
+
+class EterniverseVoiceDictation {
+  constructor(app) {
+    this.app = app;
+    this.recognition = null;
+    this.isDictating = false;
+
+    this.init();
   }
 
-  // Utwórz instancję rozpoznawania
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  this.recognition = new SpeechRecognition();
+  /* =========================
+     INIT
+  ========================= */
+  init() {
+    if (!this.isSupported()) {
+      this.disableButtons();
+      this.app?.setStatus?.('Dyktowanie głosowe nieobsługiwane w tej przeglądarce', 10000);
+      console.warn('SpeechRecognition API nieobsługiwane');
+      return;
+    }
 
-  // Konfiguracja
-  this.recognition.lang = 'pl-PL';                    // Język polski
-  this.recognition.continuous = true;                 // Ciągłe słuchanie
-  this.recognition.interimResults = true;             // Wyniki pośrednie (na żywo)
-  this.recognition.maxAlternatives = 1;               // Tylko najlepsza alternatywa
+    this.setupRecognition();
+    this.app?.setStatus?.('Dyktowanie głosowe gotowe (PL)');
+  }
 
-  // === EVENT: Wynik rozpoznawania ===
-  this.recognition.onresult = (event) => {
-    let finalTranscript = '';
-    let interimTranscript = '';
+  isSupported() {
+    return ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+  }
 
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      const transcript = event.results[i][0].transcript.trim();
-      const confidence = event.results[i][0].confidence;
+  setupRecognition() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    this.recognition = new SR();
 
-      if (event.results[i].isFinal) {
-        finalTranscript += transcript + ' ';
-      } else {
-        interimTranscript += transcript;
+    this.recognition.lang = 'pl-PL';
+    this.recognition.continuous = true;
+    this.recognition.interimResults = true;
+    this.recognition.maxAlternatives = 1;
+
+    /* === RESULT === */
+    this.recognition.onresult = (event) => {
+      let finalText = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalText += event.results[i][0].transcript.trim() + ' ';
+        }
       }
+
+      if (!finalText) return;
+
+      const textarea = document.getElementById('element-content');
+      if (!textarea) return;
+
+      textarea.value += finalText;
+      this.app?.autoSaveCurrent?.();
+
+      const conf = event.results[event.results.length - 1][0].confidence;
+      if (conf !== undefined) {
+        this.app?.setStatus?.(
+          `🎤 Rozpoznano: "${finalText.trim()}" (${Math.round(conf * 100)}%)`,
+          4000
+        );
+      }
+    };
+
+    /* === START === */
+    this.recognition.onstart = () => {
+      this.isDictating = true;
+      this.toggleButtons(true);
+      this.app?.setStatus?.('🎤 Dyktowanie aktywne — mów teraz', 0);
+    };
+
+    /* === END === */
+    this.recognition.onend = () => {
+      this.isDictating = false;
+      this.toggleButtons(false);
+      this.app?.setStatus?.('Dyktowanie zatrzymane', 5000);
+    };
+
+    /* === ERROR === */
+    this.recognition.onerror = (event) => {
+      this.isDictating = false;
+      this.toggleButtons(false);
+
+      const errors = {
+        'no-speech': 'Nie wykryto mowy',
+        'audio-capture': 'Brak dostępu do mikrofonu',
+        'not-allowed': 'Mikrofon zablokowany',
+        'network': 'Błąd sieci'
+      };
+
+      const msg = errors[event.error] || `Błąd dyktowania: ${event.error}`;
+      this.app?.setStatus?.(msg, 10000);
+      console.error('SpeechRecognition error:', event.error);
+    };
+  }
+
+  /* =========================
+     KONTROLA
+  ========================= */
+  start() {
+    if (!this.recognition || this.isDictating) return;
+    try {
+      this.recognition.start();
+    } catch (e) {
+      console.error('Błąd startu dyktowania', e);
     }
+  }
 
-    const textarea = document.getElementById('element-content');
-    if (!textarea) return;
-
-    // Usuń poprzedni interim (jeśli istnieje) i dodaj nowy
-    if (interimTranscript) {
-      // Prosty sposób: dodajemy tylko final, interim pokazujemy wizualnie
-      textarea.value += finalTranscript;
-      this.autoSaveCurrent();
-
-      // Opcjonalnie: pokaż interim jako placeholder lub overlay
-      // (tu prosty sposób – nie mieszamy z finalnym tekstem)
-    } else if (finalTranscript) {
-      textarea.value += finalTranscript;
-      this.autoSaveCurrent();
-      this.status(`Rozpoznano: "${finalTranscript.trim()}" (pewność: ${(confidence * 100).toFixed(0)}%)`, 4000);
+  stop() {
+    if (!this.recognition || !this.isDictating) return;
+    try {
+      this.recognition.stop();
+    } catch (e) {
+      console.error('Błąd zatrzymania dyktowania', e);
     }
-  };
+  }
 
-  // === EVENT: Start ===
-  this.recognition.onstart = () => {
-    this.isDictating = true;
-    document.getElementById('start-dictate').disabled = true;
-    document.getElementById('stop-dictate').disabled = false;
-    this.status('🎤 Dyktowanie aktywne – mów teraz', 0);
-  };
+  /* =========================
+     UI
+  ========================= */
+  toggleButtons(active) {
+    const start = document.getElementById('start-dictate');
+    const stop = document.getElementById('stop-dictate');
+    if (start) start.disabled = active;
+    if (stop) stop.disabled = !active;
+  }
 
-  // === EVENT: Koniec ===
-  this.recognition.onend = () => {
-    this.isDictating = false;
-    document.getElementById('start-dictate').disabled = false;
-    document.getElementById('stop-dictate').disabled = true;
-    this.status('Dyktowanie zatrzymane – kliknij „Dyktuj”, aby kontynuować', 5000);
-  };
+  disableButtons() {
+    const start = document.getElementById('start-dictate');
+    const stop = document.getElementById('stop-dictate');
+    if (start) start.disabled = true;
+    if (stop) stop.disabled = true;
+  }
+}
 
-  // === EVENT: Błąd ===
-  this.recognition.onerror = (event) => {
-    this.isDictating = false;
-    document.getElementById('start-dictate').disabled = false;
-    document.getElementById('stop-dictate').disabled = true;
-
-    let errorMsg = 'Błąd dyktowania';
-    switch (event.error) {
-      case 'no-speech':
-        errorMsg = 'Nie wykryto mowy – spróbuj ponownie';
-        break;
-      case 'audio-capture':
-        errorMsg = 'Brak dostępu do mikrofonu – sprawdź uprawnienia';
-        break;
-      case 'not-allowed':
-        errorMsg = 'Mikrofon zablokowany – zezwól na dostęp w przeglądarce';
-        break;
-      case 'network':
-        errorMsg = 'Błąd sieci – sprawdź połączenie';
-        break;
-      case 'bad-grammar':
-        errorMsg = 'Błąd gramatyki rozpoznawania';
-        break;
-      default:
-        errorMsg = `Błąd: ${event.error}`;
-    }
-
-    this.status(errorMsg, 10000);
-    console.error('SpeechRecognition error:', event.error);
-  };
-
-  // === EVENT: Brak dźwięku po starcie ===
-  this.recognition.onspeechend = () => {
-    // Automatyczne zatrzymanie jeśli użytkownik przestał mówić
-    // (opcjonalnie – można wyłączyć)
-    // this.recognition.stop();
-  };
-
-  this.status('Dyktowanie głosowe gotowe (język: polski)');
-  return true;
-},
-
-// Start dyktowania
-startDictation() {
-  if (!this.recognition) {
-    this.status('Dyktowanie nie zainicjalizowane');
+/* =========================
+   AUTO-PODPIĘCIE DO MASTER
+========================= */
+document.addEventListener('DOMContentLoaded', () => {
+  if (!window.master) {
+    console.warn('Brak EterniverseMaster — dyktowanie niepodpięte');
     return;
   }
 
-  if (this.isDictating) {
-    this.status('Dyktowanie już aktywne');
-    return;
-  }
+  const voice = new EterniverseVoiceDictation(window.master);
+  window.voiceDictation = voice;
 
-  try {
-    this.recognition.start();
-  } catch (e) {
-    if (e.name === 'InvalidStateError') {
-      this.status('Dyktowanie już trwa – zatrzymaj najpierw');
-    } else {
-      this.status('Błąd startu dyktowania');
-      console.error(e);
-    }
-  }
-},
+  // Podpinamy metody do mastera (BEZ ZMIAN W app.js)
+  window.master.startDictation = () => voice.start();
+  window.master.stopDictation = () => voice.stop();
 
-// Zatrzymaj dyktowanie
-stopDictation() {
-  if (!this.recognition || !this.isDictating) {
-    this.status('Dyktowanie nie jest aktywne');
-    return;
-  }
-
-  try {
-    this.recognition.stop();
-  } catch (e) {
-    console.error('Błąd zatrzymania dyktowania', e);
-  }
-},
+  console.log('🎤 Dyktowanie głosowe (dają.js) załadowane');
+});
