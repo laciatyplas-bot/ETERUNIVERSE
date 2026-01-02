@@ -3,141 +3,196 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eterniverse – Czysta Wersja</title>
-  <meta name="description" content="Czysta, minimalistyczna wersja Eterniverse z wszystkimi silnikami">
+  <title>Eterniverse – Responsywna Wersja Mobilna</title>
 
-  <!-- Eksport DOCX -->
+  <!-- DOCX Export -->
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js"></script>
 
   <style>
+    /* Reset i podstawy */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #eee;
-      margin: 0;
-      padding: 0;
-      height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0d0d1a;
+      color: #e0e0ff;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
+
+    /* Header */
     header {
-      background: #222;
+      background: #1a1a2e;
       padding: 20px;
       text-align: center;
-      border-bottom: 1px solid #444;
+      border-bottom: 2px solid #00e0ff;
     }
     header h1 {
-      margin: 0;
-      font-size: 2.5rem;
+      font-size: 2.2rem;
+      color: #00e0ff;
     }
     header p {
-      margin: 10px 0 0;
-      font-size: 1.2rem;
+      margin-top: 8px;
       opacity: 0.8;
+      font-size: 1rem;
     }
+
+    /* Toolbar – mobilnie pionowo */
     .toolbar {
-      background: #222;
-      padding: 15px;
+      background: #16213e;
+      padding: 12px;
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       justify-content: center;
-      border-bottom: 1px solid #444;
+      border-bottom: 1px solid #334;
     }
     button, select {
-      padding: 10px 15px;
-      background: #333;
-      color: #eee;
-      border: 1px solid #555;
-      border-radius: 6px;
+      padding: 12px 16px;
+      background: #0f3460;
+      color: #e0e0ff;
+      border: 1px solid #00e0ff;
+      border-radius: 8px;
       cursor: pointer;
+      font-size: 1rem;
+      min-width: 140px;
     }
-    button:hover {
-      background: #444;
+    button:hover, select:hover {
+      background: #1e5f9e;
     }
+
+    /* Główny layout – kluczowa responsywność */
     .layout {
-      display: grid;
-      grid-template-columns: 350px 1fr 400px;
-      gap: 15px;
-      padding: 15px;
       flex: 1;
+      padding: 15px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
       overflow: hidden;
     }
+
     .section {
-      background: #1e1e1e;
-      border: 1px solid #444;
-      border-radius: 8px;
-      padding: 15px;
+      background: #16213e;
+      border: 1px solid #334;
+      border-radius: 10px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
     .section h2 {
-      margin: 0 0 15px 0;
+      margin-bottom: 15px;
+      color: #00e0ff;
       font-size: 1.4rem;
-      color: #0cf;
     }
+
+    /* Panele z przewijaniem */
+    #structure-tree, #mapa-grid, #suggestions, textarea {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
     #current-path {
-      margin-bottom: 10px;
-      font-size: 0.9rem;
-      opacity: 0.8;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+      color: #c0a0ff;
+      word-break: break-word;
     }
+
     #element-title {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       font-size: 1.8rem;
       background: transparent;
       border: none;
-      border-bottom: 2px solid #0cf;
-      color: #eee;
+      border-bottom: 3px solid #c0a0ff;
+      color: #e0e0ff;
       margin-bottom: 15px;
+      text-align: center;
     }
+
     textarea {
-      flex: 1;
-      background: #222;
-      border: 1px solid #444;
-      border-radius: 6px;
+      background: #0d1b2a;
+      border: 1px solid #334;
+      border-radius: 8px;
       padding: 15px;
-      color: #eee;
+      color: #e0e0ff;
       font-size: 1.1rem;
-      resize: none;
     }
+
     .tree-node {
-      padding: 10px;
-      margin: 5px 0;
-      background: #282828;
-      border-left: 4px solid #555;
+      padding: 12px;
+      margin: 8px 0;
+      background: #1a1a2e;
+      border-left: 4px solid #00e0ff;
+      border-radius: 6px;
       cursor: pointer;
-      border-radius: 4px;
+      word-break: break-word;
     }
     .tree-node:hover {
-      background: #333;
-      border-left-color: #0cf;
+      background: #203050;
     }
     .tree-node.selected {
-      border-left-color: #0cf;
-      background: #003366;
+      border-left-color: #c0a0ff;
+      background: #2a4060;
     }
     .nested { margin-left: 20px; }
+
+    /* Status */
     .status {
-      background: #222;
+      background: #16213e;
       padding: 15px;
       text-align: center;
-      border-top: 1px solid #444;
+      border-top: 1px solid #334;
       font-size: 1rem;
     }
-    @media (max-width: 1200px) {
-      .layout { grid-template-columns: 1fr 1fr; }
-      .section:nth-child(3) { grid-column: span 2; }
+
+    /* === RESPONSYWNOŚĆ === */
+    @media (min-width: 768px) {
+      .layout {
+        grid-template-columns: 1fr 1fr;
+      }
+      .section:nth-child(3) {
+        grid-column: span 2;
+      }
     }
-    @media (max-width: 800px) {
-      .layout { grid-template-columns: 1fr; }
+
+    @media (min-width: 1024px) {
+      .layout {
+        grid-template-columns: 360px 1fr 420px;
+      }
+      .section:nth-child(3) {
+        grid-column: unset;
+      }
+    }
+
+    @media (min-width: 1400px) {
+      .layout {
+        grid-template-columns: 400px 1fr 460px;
+        padding: 20px;
+      }
+    }
+
+    /* Dodatkowe ulepszenia mobilne */
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+    button, select, input, textarea {
+      font-size: 16px; /* zapobiega zoomowi na iOS */
+    }
+    .toolbar {
+      padding: 15px;
+    }
+    .section {
+      padding: 20px;
     }
   </style>
 </head>
 <body>
   <header>
     <h1>ETERNIVERSE</h1>
-    <p>Czysta wersja – wszystkie silniki w jednym pliku</p>
+    <p>Master Premium PRO – Doskonała na telefonie</p>
   </header>
 
   <div class="toolbar">
@@ -161,55 +216,48 @@
     <div class="section">
       <h2>Hierarchia</h2>
       <div id="current-path"></div>
-      <div style="flex:1;overflow-y:auto;" id="structure-tree"></div>
-
-      <h2 style="margin-top:20px;">Brama Eteryczne</h2>
-      <div style="flex:1;overflow-y:auto;" id="mapa-grid"></div>
+      <div id="structure-tree"></div>
     </div>
 
     <div class="section">
-      <input type="text" id="element-title" placeholder="Tytuł elementu...">
-      <textarea id="element-content" placeholder="Treść elementu..."></textarea>
+      <h2>Edytor</h2>
+      <input type="text" id="element-title" placeholder="Tytuł...">
+      <textarea id="element-content" placeholder="Treść..."></textarea>
     </div>
 
     <div class="section">
-      <h2>Sugestie AI</h2>
-      <div style="flex:1;overflow-y:auto;" id="suggestions">
-        <p style="text-align:center;opacity:0.7;padding:40px 0;">
-          Wybierz element i użyj AI lub Bella Analiza
-        </p>
-      </div>
+      <h2>Brama & Sugestie</h2>
+      <div id="mapa-grid"></div>
+      <div id="suggestions" style="margin-top:20px;"></div>
     </div>
   </div>
 
   <div class="status" id="status">Gotowy</div>
 
-  <!-- WSZYSTKIE SILNIKI W JEDNYM SKRYPCIE -->
+  <!-- WSZYSTKIE SILNIKI -->
   <script>
     'use strict';
 
-    // DataMaster – pamięć
     class DataMaster {
       constructor() {
-        this.KEYS = { STRUCTURE: 'structure', MAPA: 'mapa', PROFILE: 'profile' };
+        this.KEYS = { STRUCTURE: 'struct', MAPA: 'mapa', PROFILE: 'prof' };
         this.structure = this.load(this.KEYS.STRUCTURE, []);
         this.mapa = this.load(this.KEYS.MAPA, this.defaultMapa());
         this.profile = this.load(this.KEYS.PROFILE, 'wattpad');
       }
       defaultMapa() {
-        const names = ["INTERSEEKER", "ETERSEEKER", "OBFITOSEEKER", "THE KNOT", "RELIGIOSEEKER", "LUXSEEKER", "UMBRASEEKER", "AETHERSEEKER", "CHRONOSEEKER", "VOIDSEEKER"];
-        return names.map((n, i) => ({ id: i+1, name: `BRAMA ${i+1} — ${n}`, books: [`Księga ${i+1}.1`, `Księga ${i+1}.2`] }));
+        const n = ["INTERSEEKER","ETERSEEKER","OBFITOSEEKER","THE KNOT","RELIGIOSEEKER","LUXSEEKER","UMBRASEEKER","AETHERSEEKER","CHRONOSEEKER","VOIDSEEKER"];
+        return n.map((name,i)=>({id:i+1,name:`BRAMA ${i+1} — ${name}`,books:[`Księga ${i+1}.1`,`Księga ${i+1}.2`]}));
       }
-      load(k, f) { try { return JSON.parse(localStorage.getItem(k)) || f; } catch { return f; } }
-      save(k, d) { try { localStorage.setItem(k, JSON.stringify(d)); } catch {} }
-      getStructure() { return this.structure; }
-      setStructure(s) { this.structure = s; this.save(this.KEYS.STRUCTURE, s); }
-      getMapa() { return this.mapa; }
-      getProfile() { return this.profile; }
-      setProfile(p) { this.profile = p; this.save(this.KEYS.PROFILE, p); }
+      load(k,f){try{return JSON.parse(localStorage.getItem(k))||f;}catch{return f;}}
+      save(k,d){try{localStorage.setItem(k,JSON.stringify(d));}catch{}}
+      getStructure(){return this.structure;}
+      setStructure(s){this.structure=s;this.save(this.KEYS.STRUCTURE,s);}
+      getMapa(){return this.mapa;}
+      getProfile(){return this.profile;}
+      setProfile(p){this.profile=p;this.save(this.KEYS.PROFILE,p);}
     }
 
-    // Renderer
     class Renderer {
       constructor(app) {
         this.app = app;
@@ -232,44 +280,40 @@
       renderStructure() {
         const c = this.e.tree;
         const s = this.app.data.getStructure();
-        if (s.length === 0) { c.innerHTML = '<p style="text-align:center;padding:30px;opacity:0.6;">+ Nowe Uniwersum</p>'; return; }
-        c.innerHTML = s.map(r => this.buildNode(r)).join('');
+        if (s.length===0) { c.innerHTML='<p style="text-align:center;padding:30px;opacity:0.6;">+ Nowe Uniwersum</p>'; return; }
+        c.innerHTML = s.map(r=>this.buildNode(r)).join('');
       }
       buildNode(n) {
         const selected = this.app.currentElement?.id === n.id;
         let h = `<div class="tree-node \( {selected ? 'selected' : ''}" onclick="master.selectElement(' \){n.id}')">
-          <strong>\( {n.title || '(bez tytułu)'}</strong> <small> \){n.type || ''}</small>
+          <strong>\( {n.title||'(bez tytułu)'}</strong> <small> \){n.type||''}</small>
         </div>`;
-        if (n.children?.length) h += `<div class="nested">${n.children.map(ch => this.buildNode(ch)).join('')}</div>`;
+        if (n.children?.length) h += `<div class="nested">${n.children.map(ch=>this.buildNode(ch)).join('')}</div>`;
         return h;
       }
       renderMapa() {
         const c = this.e.mapa;
         const m = this.app.data.getMapa();
-        c.innerHTML = m.map(b => `
-          <div class="tree-node" onclick="master.insertBrama(${b.id})">
-            <strong>${b.name}</strong>
-            <small>${b.books.length} ksiąg</small>
-          </div>
-        `).join('');
+        c.innerHTML = m.map(b=>`<div class="tree-node" onclick="master.insertBrama(${b.id})">
+          <strong>\( {b.name}</strong> <small> \){b.books.length} ksiąg</small>
+        </div>`).join('');
       }
       renderEdit() {
         const el = this.app.currentElement;
-        this.e.title.value = el?.title || '';
-        this.e.content.value = el?.content || '';
-        this.e.path.textContent = el ? this.app.getPathToElement(el).map(n => n.title || n.type).join(' → ') : '';
+        this.e.title.value = el?.title||'';
+        this.e.content.value = el?.content||'';
+        this.e.path.textContent = el ? this.app.getPathToElement(el).map(n=>n.title||n.type).join(' → ') : '';
       }
       renderSuggestions(items) {
         const p = this.e.sugg;
-        p.innerHTML = items.length ? items.map(i => `<div>${i.text}</div>`).join('') : '<p style="text-align:center;opacity:0.6;padding:40px;">Użyj AI lub Bella Analiza</p>';
+        p.innerHTML = items.length ? items.map(i=>`<div>${i.text}</div>`).join('') : '<p style="text-align:center;padding:30px;opacity:0.6;">Użyj Bella Analiza lub AI</p>';
       }
-      setStatus(m, t=5000) {
-        this.e.status.textContent = m;
-        if (t > 0) setTimeout(() => this.e.status.textContent = 'Gotowy', t);
+      setStatus(m,t=5000) {
+        this.e.status.textContent=m;
+        if(t>0) setTimeout(()=>this.e.status.textContent='Gotowy',t);
       }
     }
 
-    // Główny Master
     class EterniverseMasterPRO {
       constructor() {
         this.data = new DataMaster();
@@ -301,145 +345,115 @@
         document.getElementById('file-input').onchange = e => this.loadFromFile(e.target.files[0]);
         document.getElementById('element-title').oninput = () => this.autoSaveCurrent();
         document.getElementById('element-content').oninput = () => this.autoSaveCurrent();
+        document.getElementById('start-dictate').onclick = () => this.startDictation();
+        document.getElementById('stop-dictate').onclick = () => this.stopDictation();
       }
-      generateUniqueId() {
-        return 'id_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-      }
+      generateUniqueId() { return 'id_'+Date.now().toString(36)+Math.random().toString(36).substr(2,5); }
       addRootUniverse() {
-        const u = { id: this.generateUniqueId(), type: 'Uniwersum', title: 'Nowe Uniwersum', content: '', children: [] };
-        const s = this.data.getStructure();
-        s.push(u);
-        this.data.setStructure(s);
-        this.currentElement = u;
-        this.renderer.renderAll();
+        const u = {id:this.generateUniqueId(),type:'Uniwersum',title:'Nowe Uniwersum',content:'',children:[]};
+        const s=this.data.getStructure(); s.push(u); this.data.setStructure(s);
+        this.currentElement=u; this.renderer.renderAll();
       }
       addChildElement() {
-        if (!this.currentElement) return;
-        const types = ['Uniwersum','Świat','Tom','Rozdział','Podrozdział','Fragment'];
-        const idx = types.indexOf(this.currentElement.type || 'Uniwersum');
-        const type = types[idx + 1] || 'Fragment';
-        const c = { id: this.generateUniqueId(), type, title: `Nowy ${type}`, content: '', children: [] };
+        if(!this.currentElement) return;
+        const types=['Uniwersum','Świat','Tom','Rozdział','Podrozdział','Fragment'];
+        const idx=types.indexOf(this.currentElement.type||'Uniwersum');
+        const type=types[idx+1]||'Fragment';
+        const c={id:this.generateUniqueId(),type,title:`Nowy ${type}`,content:'',children:[]};
         this.currentElement.children.push(c);
         this.data.setStructure(this.data.getStructure());
-        this.currentElement = c;
-        this.renderer.renderAll();
+        this.currentElement=c; this.renderer.renderAll();
       }
       selectElement(id) {
-        this.currentElement = this.findElementById(id, this.data.getStructure());
+        this.currentElement=this.findElementById(id,this.data.getStructure());
         this.renderer.renderAll();
       }
-      findElementById(id, nodes) {
-        for (const n of nodes) {
-          if (n.id === id) return n;
-          if (n.children?.length) {
-            const f = this.findElementById(id, n.children);
-            if (f) return f;
+      findElementById(id,nodes) {
+        for(const n of nodes){
+          if(n.id===id) return n;
+          if(n.children?.length){
+            const f=this.findElementById(id,n.children);
+            if(f) return f;
           }
         }
         return null;
       }
       getPathToElement(el) {
-        const p = [];
-        const t = (ns) => {
-          for (const n of ns) {
-            if (n.id === el.id) { p.unshift(n); return true; }
-            if (n.children?.length && t(n.children)) { p.unshift(n); return true; }
-          }
-          return false;
-        };
-        t(this.data.getStructure());
-        return p;
+        const p=[]; const t=(ns)=>{for(const n of ns){if(n.id===el.id){p.unshift(n);return true;}if(n.children?.length&&t(n.children)){p.unshift(n);return true;}}return false;};
+        t(this.data.getStructure()); return p;
       }
       autoSaveCurrent() {
-        if (!this.currentElement) return;
-        this.currentElement.title = document.getElementById('element-title').value.trim() || '(bez tytułu)';
-        this.currentElement.content = document.getElementById('element-content').value;
+        if(!this.currentElement) return;
+        this.currentElement.title=document.getElementById('element-title').value.trim()||'(bez tytułu)';
+        this.currentElement.content=document.getElementById('element-content').value;
         this.data.setStructure(this.data.getStructure());
       }
       insertBrama(id) {
-        const b = this.data.getMapa().find(x => x.id === id);
-        if (!b || !this.currentElement) return;
-        const list = b.books.map(t => `• ${t}`).join('\n');
-        document.getElementById('element-content').value += `\n\n=== \( {b.name} ===\n \){list}\n\n`;
+        const b=this.data.getMapa().find(x=>x.id===id);
+        if(!b||!this.currentElement) return;
+        const l=b.books.map(t=>`• ${t}`).join('\n');
+        document.getElementById('element-content').value+=`\n\n=== \( {b.name} ===\n \){l}\n\n`;
         this.autoSaveCurrent();
       }
       generateAIContent() {
-        const txt = this.currentProfile === 'amazon' 
-          ? '⭐⭐⭐⭐⭐ Bestseller! Rewolucyjna historia.'
-          : 'W jego oczach była cała wieczność...';
-        document.getElementById('element-content').value += `\n\n--- AI ---\n${txt}`;
+        const txt=this.currentProfile==='amazon'?'⭐⭐⭐⭐⭐ Bestseller!':'W jego oczach była wieczność...';
+        document.getElementById('element-content').value+=`\n\n--- AI ---\n${txt}`;
         this.autoSaveCurrent();
         this.renderer.renderSuggestions([{type:'generated',text:txt}]);
       }
       bellaDeepAnalysis() {
-        const s = ['Dodaj dialogi', 'Wzmocnij emocje', 'Rozwijaj sceny'];
+        const s=['Dodaj dialogi','Wzmocnij emocje','Rozwijaj sceny'];
         this.renderer.renderSuggestions(s.map(t=>({type:'suggestion',text:t})));
       }
       async exportToDocx() {
-        if (!this.currentElement) return this.renderer.setStatus('Brak elementu');
-        const { Document, Packer, Paragraph } = docx;
-        const doc = new Document({
-          sections: [{ children: [new Paragraph(this.currentElement.title || 'Bez tytułu'), new Paragraph(this.currentElement.content || '')] }]
-        });
-        const blob = await Packer.toBlob(doc);
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'eterniverse.docx';
-        a.click();
-        URL.revokeObjectURL(url);
+        if(!this.currentElement) return this.renderer.setStatus('Brak elementu');
+        const {Document,Packer,Paragraph}=docx;
+        const doc=new Document({sections:[{children:[new Paragraph(this.currentElement.title||'Bez tytułu'),new Paragraph(this.currentElement.content||'')]}]});
+        const blob=await Packer.toBlob(doc);
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a');a.href=url;a.download='eterniverse.docx';a.click();URL.revokeObjectURL(url);
       }
       saveToFile() {
-        const d = { structure: this.data.getStructure(), mapa: this.data.getMapa(), profile: this.currentProfile };
-        const blob = new Blob([JSON.stringify(d, null, 2)], {type:'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'eterniverse_project.eterniverse';
-        a.click();
-        URL.revokeObjectURL(url);
+        const d={structure:this.data.getStructure(),mapa:this.data.getMapa(),profile:this.currentProfile};
+        const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a');a.href=url;a.download='eterniverse.eterniverse';a.click();URL.revokeObjectURL(url);
       }
       loadFromFile(file) {
-        const r = new FileReader();
-        r.onload = e => {
-          try {
-            const imp = JSON.parse(e.target.result);
-            this.data.setStructure(imp.structure || []);
-            this.currentProfile = imp.profile || 'wattpad';
+        const r=new FileReader();
+        r.onload=e=>{
+          try{
+            const imp=JSON.parse(e.target.result);
+            this.data.setStructure(imp.structure||[]);
+            this.currentProfile=imp.profile||'wattpad';
             this.renderer.renderAll();
-          } catch { this.renderer.setStatus('Błąd pliku'); }
+          }catch{this.renderer.setStatus('Błąd pliku');}
         };
         r.readAsText(file);
       }
       initSpeechRecognition() {
-        if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) return;
-        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-        this.recognition = new SR();
-        this.recognition.lang = 'pl-PL';
-        this.recognition.continuous = true;
-        this.recognition.interimResults = true;
-        this.recognition.onresult = ev => {
-          let f = '';
-          for (let i = ev.resultIndex; i < ev.results.length; i++) {
-            if (ev.results[i].isFinal) f += ev.results[i][0].transcript;
+        if(!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) return;
+        const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+        this.recognition=new SR();
+        this.recognition.lang='pl-PL';
+        this.recognition.continuous=true;
+        this.recognition.interimResults=true;
+        this.recognition.onresult=ev=>{
+          let f='';
+          for(let i=ev.resultIndex;i<ev.results.length;i++){
+            if(ev.results[i].isFinal) f+=ev.results[i][0].transcript;
           }
-          if (f) {
-            document.getElementById('element-content').value += f + ' ';
+          if(f){
+            document.getElementById('element-content').value+=f+' ';
             this.autoSaveCurrent();
           }
         };
-        this.recognition.onstart = () => {
-          document.getElementById('start-dictate').disabled = true;
-          document.getElementById('stop-dictate').disabled = false;
-        };
-        this.recognition.onend = () => {
-          document.getElementById('start-dictate').disabled = false;
-          document.getElementById('stop-dictate').disabled = true;
-        };
+        this.recognition.onstart=()=>{document.getElementById('start-dictate').disabled=true;document.getElementById('stop-dictate').disabled=false;};
+        this.recognition.onend=()=>{document.getElementById('start-dictate').disabled=false;document.getElementById('stop-dictate').disabled=true;};
       }
-      startDictation() { if (this.recognition) this.recognition.start(); }
-      stopDictation() { if (this.recognition) this.recognition.stop(); }
-      status(m, t=5000) { this.renderer.setStatus(m, t); }
+      startDictation(){if(this.recognition)this.recognition.start();}
+      stopDictation(){if(this.recognition)this.recognition.stop();}
+      status(m,t=5000){this.renderer.setStatus(m,t);}
     }
 
     const master = new EterniverseMasterPRO();
