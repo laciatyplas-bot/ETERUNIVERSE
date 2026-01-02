@@ -3,489 +3,439 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ETERNIVERSE MASTER HUB — Architekt + Redaktor + Mapa</title>
-  
-  <!-- STYLES -->
+  <title>Eterniverse - Bella Asystent Redakcyjny</title>
   <style>
-    /* ========================================
-       MASTER HUB - Połączenie wszystkich 3 aplikacji
-       ======================================== */
-    
-    :root{
-      /* Eterniverse Theme */
-      --bg:#050814; 
-      --card:#0A1727; 
-      --card-soft:#0D1C30; 
-      --text:#E9F4FF;
-      --muted:#9BA9C8; 
-      --border:#20324A; 
-      --gold:#D9A441; 
-      --teal:#28D3C6;
-      --green:#12C65B; 
-      --orange:#FFB14B; 
-      --red:#FF6B6B; 
-      --gray:#8B8FA0;
-      
-      /* Layout */
-      --hub-height: 100vh;
-      --panel-w: 350px;
-      --tab-h: 48px;
+    :root {
+      --bg-primary: #121212;
+      --bg-secondary: #1e1e1e;
+      --bg-panel: #222;
+      --bg-hover: #333;
+      --text-primary: #eee;
+      --text-secondary: #bbb;
+      --accent: #4a90e2;
+      --success: #50c878;
+      --warning: #f39c12;
+      --danger: #e74c3c;
+      --border: #444;
     }
-    
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{
-      background: radial-gradient(circle at top, #15223A 0%, #050814 55%, #01030A 100%);
-      color:var(--text); 
-      font-family: system-ui, -apple-system, sans-serif; 
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Segoe UI', Tahoma, sans-serif;
       height: 100vh;
-      overflow: hidden;
-    }
-    
-    /* === HUB LAYOUT === */
-    .master-hub{
-      height: var(--hub-height);
-      display: grid;
-      grid-template-columns: var(--panel-w) 1fr var(--panel-w);
-      grid-template-rows: var(--tab-h) 1fr;
-      grid-template-areas: 
-        "tabs tabs tabs"
-        "map editor structure";
-      gap: 0;
-    }
-    
-    /* === TABS === */
-    .hub-tabs{
-      grid-area: tabs;
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
       display: flex;
-      padding: 0 16px;
+      flex-direction: column;
     }
-    
-    .tab-btn{
-      flex: 1;
-      padding: 12px;
-      border: none;
-      background: none;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+
+    header {
+      background: var(--bg-secondary);
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: bold;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .controls {
+      padding: 1rem;
+      background: var(--bg-panel);
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    select, button {
+      padding: 0.75rem 1.25rem;
+      background: var(--bg-hover);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
       cursor: pointer;
-      border-bottom: 2px solid transparent;
+      font-size: 1rem;
       transition: all 0.2s;
     }
-    
-    .tab-btn.active{
-      color: var(--gold);
-      border-bottom-color: var(--gold);
+
+    button:hover:not(:disabled) {
+      background: var(--accent);
+      border-color: var(--accent);
     }
-    
-    .tab-btn:hover:not(.active){
-      color: var(--text);
-      background: rgba(217,164,65,0.05);
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
-    
-    /* === MAPA PANEL === */
-    #mapa-panel{
-      grid-area: map;
-      background: var(--card);
-      border-right: 1px solid var(--border);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .panel-header{
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--gold);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    /* === STRUCTURE PANEL === */
-    #structure-panel{
-      grid-area: structure;
-      background: var(--card);
-      border-left: 1px solid var(--border);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    /* === EDITOR PANEL === */
-    #editor-panel{
-      grid-area: editor;
-      background: var(--card-soft);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .panel-content{
+
+    textarea {
       flex: 1;
-      overflow: auto;
-      padding: 16px;
+      margin: 1rem;
+      padding: 1.25rem;
+      background: var(--bg-panel);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: inherit;
+      resize: vertical;
     }
-    
-    /* === MAPA ETERNIVERSE === */
-    .map-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; }
-    .brama-card{ 
-      background:var(--card-soft); 
-      border-radius:12px; 
-      border:1px solid var(--border); 
-      padding:16px; 
-      cursor:pointer;
-      transition: all 0.2s;
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
     }
-    .brama-card:hover{ border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(217,164,65,0.15); }
-    .brama-title{ font-size:13px; font-weight:700; color:white; margin-bottom:6px; }
-    .brama-sub{ font-size:11px; color:var(--muted); }
-    .badge{ 
-      font-size:8px; padding:3px 8px; border-radius:12px; 
-      background:rgba(217,164,65,0.15); 
-      color:var(--gold); 
-      margin-top:8px; 
-      display: inline-block;
+
+    .output-section {
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
     }
-    
-    /* === STRUCTURE HIERARCHY === */
-    .hierarchy{ list-style:none; padding:0; }
-    .hierarchy li{ 
-      padding:10px 12px; 
-      margin:4px 0; 
-      border-radius:8px; 
-      cursor:pointer;
-      border-left:3px solid transparent;
-      transition: all 0.2s;
+
+    .dual-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
     }
-    .hierarchy li:hover{ background:var(--card-soft); border-left-color:var(--teal); }
-    .hierarchy li.selected{ background:var(--gold); color:#000; border-left-color:#000; }
-    .hierarchy li ul{ margin-left:16px; padding-left:8px; border-left:2px solid var(--teal); }
-    
-    /* === EDITOR === */
-    .editor-toolbar{ 
-      display:flex; gap:12px; margin-bottom:16px; padding-bottom:12px; 
-      border-bottom:1px solid var(--border);
+
+    .panel {
+      background: var(--bg-panel);
+      padding: 1rem;
+      border-radius: 8px;
+      min-height: 120px;
     }
-    .editor-toolbar button{ 
-      padding:8px 16px; border-radius:8px; border:1px solid var(--border); 
-      background:var(--card); color:var(--text); font-size:12px; cursor:pointer;
+
+    .suggestion {
+      background: rgba(74, 144, 226, 0.1);
+      border-left: 4px solid var(--accent);
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 6px;
+      cursor: pointer;
     }
-    .editor-toolbar button.active{ background:var(--gold); color:#000; }
-    
-    textarea{ 
-      width:100%; height:100%; min-height:200px; 
-      background:var(--card); border:1px solid var(--border); 
-      border-radius:12px; padding:16px; 
-      color:var(--text); font-size:14px; font-family:monospace;
-      resize:vertical;
+
+    .suggestion button {
+      margin-left: 1rem;
+      padding: 0.5rem 1rem;
+      background: var(--success);
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
-    textarea:focus{ outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(217,164,65,0.1); }
-    
-    /* === MODALS === */
-    .modal-backdrop{ 
-      position:fixed; inset:0; background:rgba(0,0,0,0.92); 
-      display:none; align-items:center; justify-content:center; 
-      z-index:9999; padding:20px;
-    }
-    .modal{ 
-      background:var(--card); border-radius:20px; border:2px solid var(--gold); 
-      padding:32px; max-width:500px; width:100%; max-height:90vh; overflow:auto;
-    }
-    
-    /* === UTILS === */
-    .flex-gap{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-    .status-tag{ 
-      font-size:10px; font-weight:800; padding:4px 8px; border-radius:6px; 
-      text-transform:uppercase; letter-spacing:0.5px;
-    }
-    .status-wydane{ background:var(--green); color:#000; }
-    .status-gotowe{ background:var(--gold); color:#000; }
-    .status-trakcie{ background:var(--orange); color:#000; }
-    
-    /* === RESPONSIVE === */
-    @media (max-width: 1200px){
-      .master-hub{ grid-template-columns: 280px 1fr 280px; }
-    }
-    @media (max-width: 768px){
-      .master-hub{ 
-        grid-template-columns: 1fr;
-        grid-template-areas: 
-          "tabs"
-          "map"
-          "editor"
-          "structure";
-      }
+
+    @media (max-width: 768px) {
+      .dual-panel { grid-template-columns: 1fr; }
+      .controls { flex-direction: column; }
     }
   </style>
 </head>
 <body>
-  <div class="master-hub">
-    <!-- TABS -->
-    <div class="hub-tabs">
-      <button class="tab-btn active" data-tab="mapa">🌌 Mapa Eterniverse</button>
-      <button class="tab-btn" data-tab="editor">✍️ Redaktor Bella</button>
-      <button class="tab-btn" data-tab="structure">🏗️ Architektura</button>
-    </div>
+  <header>Eterniverse - Bella Asystent Redakcyjny</header>
+
+  <div class="controls">
+    <label>Profil:</label>
+    <select id="profileSelector">
+      <option value="amazon">Amazon</option>
+      <option value="wattpad">Wattpad</option>
+    </select>
     
-    <!-- MAPA ETERNIVERSE -->
-    <div id="mapa-panel" class="panel">
-      <div class="panel-header">
-        <span>🌌 MAPA ETERNIVERSE</span>
-        <button onclick="openNewBookModal()">+ Nowa Księga</button>
-      </div>
-      <div id="mapa-grid" class="panel-content map-grid"></div>
-    </div>
+    <button id="startRecBtn">🎙️ Rozpocznij dyktowanie</button>
+    <button id="stopRecBtn" disabled>⏹️ Zatrzymaj</button>
+    <button id="executeBtn">✨ Wykonaj / Podpowiedź</button>
+    <button id="exportBtn">📤 Eksport DOCX</button>
+  </div>
+
+  <div style="flex: 1; display: flex; gap: 1rem; padding: 1rem; overflow: hidden;">
+    <textarea id="console" 
+              placeholder="Wpisz polecenia: REDAGUJ, PODPOWIEDŹ, GENERUJ TEKST, EKSPORTUJ&#10;lub tekst do analizy..."></textarea>
     
-    <!-- EDITOR BELLA -->
-    <div id="editor-panel" class="panel">
-      <div class="panel-header flex-gap">
-        <span>✍️ BELLA REDAKTOR</span>
-        <select id="profileSelect">
-          <option value="amazon">Amazon</option>
-          <option value="wattpad">Wattpad</option>
-        </select>
-      </div>
-      <div class="editor-toolbar flex-gap">
-        <button class="active" data-mode="content">Treść</button>
-        <button data-mode="notes">Notatki</button>
-        <button data-mode="console">Konsola</button>
-      </div>
-      <div class="panel-content">
-        <textarea id="mainEditor" placeholder="Treść projektu / Notatki / Komendy..."></textarea>
-      </div>
-    </div>
-    
-    <!-- STRUCTURE -->
-    <div id="structure-panel" class="panel">
-      <div class="panel-header">
-        <span>🏗️ HIERARCHIA UNIWERSUM</span>
-        <button onclick="addUniverse()">+ Uniwersum</button>
-      </div>
-      <div id="structure-list" class="panel-content hierarchy"></div>
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+      <textarea id="editor" 
+                placeholder="Edytor tekstu - tutaj edytuj i eksportuj..."></textarea>
+      
+      <div id="suggestions" style="flex: 1; overflow: auto;"></div>
     </div>
   </div>
+
+  <div class="output-section">
+    <div class="dual-panel">
+      <div class="panel">
+        <strong>📋 Status:</strong>
+        <div id="output">Bella gotowa do pracy! Mów "rozpocznij dyktowanie" lub wpisz polecenie.</div>
+      </div>
+      <div class="panel">
+        <strong>💾 Historia:</strong>
+        <div id="history">Czekam na pierwsze polecenie...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOCX Library -->
+  <script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.min.js"></script>
   
-  <!-- MODAL NOWA KSIĘGA -->
-  <div class="modal-backdrop" id="newBookModal">
-    <div class="modal">
-      <h2>🌟 Nowa Księga</h2>
-      <div class="flex-gap">
-        <select id="modalGate"><option>BRAMA I — INTERSEEKER</option></select>
-        <input id="modalTitle" placeholder="Tytuł projektu">
-      </div>
-      <button class="btn-save" onclick="saveNewBook()" style="
-        width:100%; margin-top:20px; padding:14px; background:var(--gold); 
-        color:#000; font-weight:bold; border:none; border-radius:12px;
-      ">➕ UTWÓRZ KSIĘGĘ</button>
-    </div>
-  </div>
-
+  <!-- APP LOGIC - Poprawiona wersja -->
   <script>
-    /* ========================================
-       MASTER HUB JAVASCRIPT - Wszystkie 3 aplikacje
-       ======================================== */
-    
-    // === GLOBAL STATE ===
-    const MAP_KEY = 'ETER_MASTER_MAP';
-    const STRUCT_KEY = 'ETER_MASTER_STRUCT';
-    let currentTab = 'mapa';
-    let selectedStructureId = null;
-    let editorMode = 'content';
-    
-    // === MAPA ETERNIVERSE DATA ===
-    let mapaData = JSON.parse(localStorage.getItem(MAP_KEY)) || [
-      {id:1, name:"BRAMA I — INTERSEEKER", sub:"Psychika · Cień · Trauma", tag:"CORE/PSYCHE", books:[]},
-      {id:2, name:"BRAMA II — CUSTOS", sub:"Strażnik · Rdzeń · Początek", tag:"CORE/ORIGIN", books:[]},
-      // ... (skrócone dla przykładu - dodaj pełne dane z poprzedniego)
-    ];
-    
-    // === STRUCTURE DATA ===
-    let structureData = JSON.parse(localStorage.getItem(STRUCT_KEY)) || [];
-    
-    // === INIT ===
-    document.addEventListener('DOMContentLoaded', initHub);
-    
-    function initHub(){
-      setupTabs();
-      renderMapa();
-      renderStructure();
-      setupEditor();
-    }
-    
-    /* === TABS SYSTEM === */
-    function setupTabs(){
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.onclick = () => switchTab(btn.dataset.tab);
-      });
-    }
-    
-    function switchTab(tab){
-      currentTab = tab;
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-      
-      // Hide/show panels
-      document.querySelectorAll('.panel').forEach((p,i) => {
-        p.style.display = ['mapa','editor','structure'][i] === tab ? 'flex' : 'none';
-      });
-    }
-    
-    /* === MAPA ETERNIVERSE === */
-    function renderMapa(){
-      const grid = document.getElementById('mapa-grid');
-      grid.innerHTML = '';
-      mapaData.forEach(brama => {
-        const card = document.createElement('div');
-        card.className = 'brama-card';
-        card.innerHTML = `
-          <div class="brama-title">${brama.name}</div>
-          <div class="brama-sub">${brama.sub}</div>
-          <span class="badge">${brama.tag}</span>
-          <div style="margin-top:12px;font-size:11px;color:var(--muted);">
-            ${brama.books.length} ksiąg
-          </div>
-        `;
-        card.onclick = () => selectBrama(brama.id);
-        grid.appendChild(card);
-      });
-      saveMapa();
-    }
-    
-    function selectBrama(id){
-      const brama = mapaData.find(b => b.id === id);
-      document.getElementById('mainEditor').value = 
-        `=== ${brama.name} ===
-${brama.sub}
+  (async () => {
+    const { Document, Packer, Paragraph, HeadingLevel } = docx;
 
-` +
-        (brama.books.length ? 
-         brama.books.map(b => `📖 ${b.title} [${b.status}]`).join('
-') : 
-         'Brak ksiąg - dodaj nową!'
-        );
-    }
-    
-    function openNewBookModal(){
-      document.getElementById('newBookModal').style.display = 'flex';
-    }
-    
-    function saveNewBook(){
-      const title = document.getElementById('modalTitle').value.trim();
-      if(!title) return alert('Podaj tytuł!');
-      
-      const gateId = parseInt(document.getElementById('modalGate').value);
-      const brama = mapaData.find(b => b.id === gateId);
-      brama.books.push({
-        title,
-        status: 'IDEA',
-        created: new Date().toISOString()
-      });
-      
-      document.getElementById('newBookModal').style.display = 'none';
-      document.getElementById('modalTitle').value = '';
-      renderMapa();
-      selectBrama(gateId);
-    }
-    
-    function saveMapa(){
-      localStorage.setItem(MAP_KEY, JSON.stringify(mapaData));
-    }
-    
-    /* === STRUCTURE === */
-    function renderStructure(){
-      const list = document.getElementById('structure-list');
-      list.innerHTML = structureData.length ? 
-        renderHierarchy(structureData) : 
-        '<div style="text-align:center;color:var(--muted);padding:40px;">Brak uniwersum<br><button onclick="addUniverse()">➕ Stwórz pierwsze</button></div>';
-    }
-    
-    function renderHierarchy(items){
-      return items.map(item => `
-        <li onclick="selectStructure('${item.id}')" 
-            class="${selectedStructureId === item.id ? 'selected' : ''}">
-          📁 [${item.type}] ${item.title || 'Nowy'}
-          ${item.children?.length ? `<ul>${renderHierarchy(item.children)}</ul>` : ''}
-        </li>
-      `).join('');
-    }
-    
-    function addUniverse(){
-      const newUniv = {
-        id: 'u'+Date.now(),
-        type: 'Uniwersum',
-        title: 'Nowe Uniwersum',
-        children: []
+    const STORAGE_KEY = 'eterniverse_assistant_data_profiles';
+    let data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    if (!data.amazon) data.amazon = { acceptedSuggestions: [] };
+    if (!data.wattpad) data.wattpad = { acceptedSuggestions: [] };
+
+    // ELEMENTS
+    const consoleEl = document.getElementById('console');
+    const editorEl = document.getElementById('editor');
+    const suggestionsEl = document.getElementById('suggestions');
+    const outputEl = document.getElementById('output');
+    const historyEl = document.getElementById('history');
+    const profileSelector = document.getElementById('profileSelector');
+    const startRecBtn = document.getElementById('startRecBtn');
+    const stopRecBtn = document.getElementById('stopRecBtn');
+    const executeBtn = document.getElementById('executeBtn');
+    const exportBtn = document.getElementById('exportBtn');
+
+    let currentProfile = profileSelector.value;
+    let recognition;
+    let recognizing = false;
+
+    // PROFILE SWITCH
+    profileSelector.onchange = () => {
+      currentProfile = profileSelector.value;
+      clearSuggestions();
+      showStatus(`Przełączono na profil: ${currentProfile.toUpperCase()}`);
+      speakText(`Przełączono na profil ${currentProfile}`);
+    };
+
+    // SPEECH RECOGNITION
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.lang = 'pl-PL';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript.trim();
+        consoleEl.value += (consoleEl.value ? ' ' : '') + transcript;
+        speakText(`Rozpoznano: ${transcript}`);
+        addHistory(`🎙️ ${transcript}`);
       };
-      structureData.push(newUniv);
-      selectedStructureId = newUniv.id;
-      renderStructure();
-      saveStructure();
+
+      recognition.onstart = () => {
+        recognizing = true;
+        startRecBtn.disabled = true;
+        stopRecBtn.disabled = false;
+        speakText('Rozpoczęto dyktowanie');
+      };
+
+      recognition.onend = () => {
+        recognizing = false;
+        startRecBtn.disabled = false;
+        stopRecBtn.disabled = true;
+      };
+    } else {
+      startRecBtn.style.display = 'none';
+      stopRecBtn.style.display = 'none';
     }
-    
-    function selectStructure(id){
-      selectedStructureId = id;
-      renderStructure();
-      // Load to editor
-      const item = findStructureItem(id);
-      if(item) document.getElementById('mainEditor').value = item.content || '';
+
+    // EVENT LISTENERS
+    startRecBtn.onclick = () => recognition?.start();
+    stopRecBtn.onclick = () => recognition?.stop();
+    executeBtn.onclick = () => processConsoleText(consoleEl.value);
+    exportBtn.onclick = exportCurrent;
+
+    // TTS
+    function speakText(text) {
+      if (!window.speechSynthesis) return;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'pl-PL';
+      utterance.rate = 0.9;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
     }
-    
-    function findStructureItem(id, items = structureData){
-      for(let item of items){
-        if(item.id === id) return item;
-        if(item.children) {
-          const found = findStructureItem(id, item.children);
-          if(found) return found;
+
+    // UI HELPERS
+    function showStatus(msg) {
+      outputEl.textContent = msg;
+      addHistory(`📋 ${msg}`);
+    }
+
+    function clearSuggestions() {
+      suggestionsEl.innerHTML = '';
+    }
+
+    function addHistory(msg) {
+      const time = new Date().toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
+      historyEl.innerHTML += `<div style="font-size:0.9em;opacity:0.8;margin:0.25rem 0;">[${time}] ${msg}</div>`;
+      historyEl.scrollTop = historyEl.scrollHeight;
+    }
+
+    // AMAZON SUGGESTIONS
+    function amazonSuggestions(text) {
+      const suggestions = [];
+      const words = text.toLowerCase().match(/\bw+\b/g) || [];
+      const wordCounts = {};
+      
+      words.forEach(w => wordCounts[w] = (wordCounts[w] || 0) + 1);
+      Object.entries(wordCounts).forEach(([word, count]) => {
+        if (count > 5) suggestions.push(`⚠️ "${word}" x${count} - użyj synonimów`);
+      });
+
+      const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+      sentences.forEach((s, i) => {
+        const len = s.trim().split(/s+/).length;
+        if (len > 25) suggestions.push(`📏 Zdanie ${i+1}: ${len} słów - podziel`);
+      });
+
+      const seoKeywords = ['darmowa wysyłka', 'gwarancja', 'promocja'];
+      seoKeywords.forEach(kw => {
+        if (!new RegExp(`\\b${kw}\\b`, 'i').test(text)) {
+          suggestions.push(`🔍 Dodaj SEO: "${kw}"`);
         }
+      });
+
+      return suggestions;
+    }
+
+    // WATTPAD SUGGESTIONS
+    function wattpadSuggestions(text) {
+      const suggestions = [];
+      const emotions = ['smutny', 'szczęśliwy', 'zły', 'zakocha', 'przeraż'];
+      let emotionCount = emotions.filter(e => new RegExp(`\\b${e}\\b`, 'i').test(text)).length;
+      
+      if (emotionCount < 2) suggestions.push('❤️ Więcej emocji dla Wattpad!');
+      
+      if (!/[„”"']/.test(text)) suggestions.push('💬 Dodaj dialogi!');
+      
+      const shortSentences = text.match(/[^.!?]+[.!?]+/g)?.filter(s => 
+        s.trim().split(/s+/).length < 4
+      ) || [];
+      if (shortSentences.length > 2) {
+        suggestions.push(`📝 ${shortSentences.length} krótkich zdań - rozwiń`);
+      }
+
+      return suggestions;
+    }
+
+    function getSuggestionsForProfile(text) {
+      return currentProfile === 'amazon' ? amazonSuggestions(text) : wattpadSuggestions(text);
+    }
+
+    // MAIN COMMAND PROCESSOR
+    function processConsoleText(input) {
+      const cmd = input.trim();
+      if (!cmd) return;
+
+      const parts = cmd.split(/s+/);
+      const cmdUpper = parts[0].toUpperCase();
+      addHistory(`⌨️ ${cmd.substring(0, 50)}${cmd.length > 50 ? '...' : ''}`);
+
+      switch(cmdUpper) {
+        case 'REDAGUJ':
+        case 'REDAGUJ TEKST':
+          editorEl.value = consoleEl.value;
+          showStatus('✅ Tekst w edytorze - wpisz PODPOWIEDŹ');
+          break;
+
+        case 'PODPOWIEDŹ':
+          const text = editorEl.value.trim();
+          if (!text) return showStatus('❌ Edytor pusty!');
+          
+          const suggestions = getSuggestionsForProfile(text)
+            .filter(s => !data[currentProfile].acceptedSuggestions.includes(s));
+          
+          clearSuggestions();
+          if (!suggestions.length) {
+            showStatus('🎉 Brak nowych sugestii - tekst idealny!');
+          } else {
+            suggestions.forEach(suggestion => {
+              const div = document.createElement('div');
+              div.className = 'suggestion';
+              div.innerHTML = `${suggestion} <button>Akceptuj</button>`;
+              div.querySelector('button').onclick = () => {
+                data[currentProfile].acceptedSuggestions.push(suggestion);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                div.style.opacity = '0.5';
+                div.innerHTML += ' ✓';
+                speakText('Zaakceptowano');
+              };
+              suggestionsEl.appendChild(div);
+            });
+            showStatus(`💡 ${suggestions.length} nowych sugestii`);
+            speakText(`${suggestions.length} sugestii`);
+          }
+          break;
+
+        case 'GENERUJ':
+        case 'GENERUJ TEKST':
+          editorEl.value = generateSampleText(currentProfile);
+          showStatus(`✨ Wygenerowano próbkę dla ${currentProfile}`);
+          speakText('Przykładowy tekst gotowy');
+          break;
+
+        case 'EKSPORTUJ':
+          exportCurrent();
+          break;
+
+        default:
+          editorEl.value = input;
+          showStatus('📝 Tekst załadowany do edycji');
+      }
+
+      consoleEl.value = '';
+    }
+
+    function generateSampleText(profile) {
+      return profile === 'amazon' ? 
+        `Ten produkt to doskonały wybór! ✅ Najwyższa jakość, darmowa wysyłka, gwarancja satysfakcji.` :
+        `Deszcz spływał po szybie, a w jej oczach odbijały się gwiazdy. "Czy to przeznaczenie?" - szepnęła.`;
+    }
+
+    async function exportCurrent() {
+      if (!editorEl.value.trim()) return showStatus('❌ Nic do eksportu!');
+
+      try {
+        const doc = new Document({
+          sections: [{
+            children: [
+              new Paragraph({
+                text: `ETERNIVERSE - ${currentProfile.toUpperCase()}`,
+                heading: HeadingLevel.HEADING_1,
+              }),
+              new Paragraph(editorEl.value),
+            ],
+          }],
+        });
+
+        const blob = await Packer.toBlob(doc);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `eterniverse_${currentProfile}_${Date.now()}.docx`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showStatus('📤 Eksport zakończony!');
+        speakText('Zapisano do Word');
+      } catch (e) {
+        showStatus('❌ Błąd eksportu: ' + e.message);
       }
     }
-    
-    function saveStructure(){
-      localStorage.setItem(STRUCT_KEY, JSON.stringify(structureData));
-    }
-    
-    /* === EDITOR === */
-    function setupEditor(){
-      // Toolbar
-      document.querySelectorAll('.editor-toolbar button').forEach(btn => {
-        btn.onclick = () => {
-          document.querySelectorAll('.editor-toolbar button').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          editorMode = btn.dataset.mode;
-        };
-      });
-      
-      // Profile switch
-      document.getElementById('profileSelect').onchange = (e) => {
-        // Bella logic here
-        console.log('Switched to profile:', e.target.value);
-      };
-    }
-    
-    /* === MODAL CONTROLS === */
-    document.querySelector('.modal-backdrop').onclick = (e) => {
-      if(e.target.classList.contains('modal-backdrop'))
-        e.target.style.display = 'none';
-    };
-    
-    /* === KEYBOARD SHORTCUTS === */
-    document.addEventListener('keydown', (e) => {
-      if(e.ctrlKey || e.metaKey){
-        switch(e.key){
-          case '1': switchTab('mapa'); break;
-          case '2': switchTab('editor'); break;
-          case '3': switchTab('structure'); break;
-          case 'n': openNewBookModal(); break;
-        }
+
+    // ENTER KEY SUPPORT
+    consoleEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.ctrlKey) {
+        e.preventDefault();
+        processConsoleText(consoleEl.value);
       }
     });
+
+    // WELCOME
+    speakText('Bella gotowa. Wpisz REDAGUJ lub użyj mikrofonu.');
+    addHistory('🚀 System zainicjowany');
+  })();
   </script>
 </body>
 </html>
