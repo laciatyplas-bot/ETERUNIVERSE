@@ -1,102 +1,124 @@
+// bella_author_mode_pro.js - Eterniverse Author Mode PRO v7.0
+// Profesjonalny tryb autora: pełna hierarchia, edycja, backup, eksport
+
 (() => {
-  // Model danych: Hierarchia Uniwersum
-  // Struktura: Uniwersum -> Świat -> Tom -> Rozdział -> Podrozdział/Fragment
-  // Każdy element: { id, parentId, type, title, dateCreated, version, language, content, notes, children: [] }
-  const STORAGE_KEY = 'bella_author_mode_universe';
+  'use strict';
 
-  // Globalny przełącznik fabular generation OFF - system nie generuje fabuły
-  const FABULAR_GENERATION = false; // permanentnie OFF w AUTHOR MODE
+  // === KONFIGURACJA ===
+  const STORAGE_KEY = 'bella_author_mode_universe_pro';
+  const HIERARCHY_ORDER = ['Uniwersum', 'Świat', 'Tom', 'Rozdział', 'Podrozdział', 'Fragment'];
 
-  // Obecny zaznaczony element
+  // === STAN GLOBALNY ===
+  let universeData = loadData();
   let selectedElementId = null;
 
-  // Dane całego uniwersum
-  let universeData = loadData();
+  // === ELEMENTY DOM ===
+  const els = {
+    universeList: document.getElementById('universeList'),
+    output: document.getElementById('output'),
+    archiveOutput: document.getElementById('archiveOutput'),
 
-  // Elementy DOM
-  const universeListEl = document.getElementById('universeList');
-  const outputEl = document.getElementById('output');
-  const archiveOutputEl = document.getElementById('archiveOutput');
+    type: document.getElementById('elementType'),
+    title: document.getElementById('elementTitle'),
+    date: document.getElementById('elementDate'),
+    version: document.getElementById('elementVersion'),
+    language: document.getElementById('elementLanguage'),
+    content: document.getElementById('elementContent'),
+    notes: document.getElementById('elementNotes'),
 
-  const elementTypeEl = document.getElementById('elementType');
-  const elementTitleEl = document.getElementById('elementTitle');
-  const elementDateEl = document.getElementById('elementDate');
-  const elementVersionEl = document.getElementById('elementVersion');
-  const elementLanguageEl = document.getElementById('elementLanguage');
-  const elementContentEl = document.getElementById('elementContent');
-  const elementNotesEl = document.getElementById('elementNotes');
+    saveBtn: document.getElementById('saveElementBtn'),
+    deleteBtn: document.getElementById('deleteElementBtn'),
+    addUniverseBtn: document.getElementById('addUniverseBtn'),
+    addChildBtn: document.getElementById('addChildBtn'),
 
-  const saveElementBtn = document.getElementById('saveElementBtn');
-  const deleteElementBtn = document.getElementById('deleteElementBtn');
-  const addUniverseBtn = document.getElementById('addUniverseBtn');
-  const addChildBtn = document.getElementById('addChildBtn');
+    backupBtn: document.getElementById('backupAllBtn'),
+    exportBtn: document.getElementById('exportBtn'),
+    exportFormat: document.getElementById('exportSelect')
+  };
 
-  const backupAllBtn = document.getElementById('backupAllBtn');
-  const exportBtn = document.getElementById('exportBtn');
-  const exportSelectEl = document.getElementById('exportSelect');
-
-  // Pomocnicze - unikalne ID
+  // === POMOCNICZE ===
   function generateId() {
-    return 'id-' + Math.random().toString(36).substr(2, 9);
+    return 'el_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
   }
 
-  // Załaduj dane z localStorage lub utwórz pustą strukturę
   function loadData() {
     try {
-      const json = localStorage.getItem(STORAGE_KEY);
-      if (json) return JSON.parse(json);
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
     } catch (e) {
-      console.error('Błąd ładowania danych:', e);
+      console.error('Błąd ładowania danych uniwersum:', e);
+      return [];
     }
-    return [];
   }
 
-  // Zapisz dane do localStorage
   function saveData() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(universeData));
     } catch (e) {
       console.error('Błąd zapisu danych:', e);
+      alert('Nie udało się zapisać danych (localStorage pełny?)');
     }
   }
 
-  // Znajdź element po ID w strukturze rekurencyjnie (zwraca obiekt oraz rodzica)
-  function findElementById(id, elements = universeData, parent = null) {
-    for (const el of elements) {
-      if (el.id === id) return { element: el, parent };
-      if (el.children && el.children.length) {
-        const found = findElementById(id, el.children, el);
+  // Rekurencyjne wyszukiwanie elementu po ID
+  function findElementById(id, nodes = universeData, parent = null) {
+    for (const node of nodes) {
+      if (node.id === id) return { node, parent };
+      if (node.children?.length) {
+        const found = findElementById(id, node.children, node);
         if (found) return found;
       }
     }
     return null;
   }
 
-  // Renderuj listę uniwersum w panelu struktury
-  function renderUniverseList() {
-    universeListEl.innerHTML = '';
-    if (!universeData.length) {
-      universeListEl.textContent = 'Brak Uniwersów. Dodaj nowy.';
-      return;
-    }
-    const ul = document.createElement('ul');
-    ul.className = 'hierarchy';
-    universeData.forEach(universe => {
-      ul.appendChild(renderElementNode(universe));
-    });
-    universeListEl.appendChild(ul);
+  // Określ następny typ w hierarchii
+  function getNextChildType(currentType) {
+    const idx = HIERARCHY_ORDER.indexOf(currentType);
+    return idx >= 0 && idx < HIERARCHY_ORDER.length - 1 ? HIERARCHY_ORDER[idx + 1] : 'Fragment';
   }
 
-  // Render pojedynczego elementu oraz jego dzieci
-  function renderElementNode(element) {
+  // === RENDEROWANIE ===
+  function renderUniverseTree() {
+    els.universeList.innerHTML = '';
+
+    if (universeData.length === 0) {
+      els.universeList.innerHTML = '<p style="padding:1.5rem; opacity:0.6; text-align:center;">Brak uniwersów – dodaj pierwsze</p>';
+      return;
+    }
+
+    const ul = document.createElement('ul');
+    ul.className = 'hierarchy-tree';
+
+    universeData.forEach(root => ul.appendChild(createTreeNode(root)));
+    els.universeList.appendChild(ul);
+  }
+
+  function createTreeNode(element) {
     const li = document.createElement('li');
-    li.textContent = `[element.type]{element.type}]element.type]{element.title || '(Bez tytułu)'}`;
-    li.title = `Wersja: element.version∣∣′v1′,Język:{element.version || 'v1'}, Język:element.version∣∣′v1′,Język:{element.language || 'pl'}`;
     li.dataset.id = element.id;
     li.tabIndex = 0;
+
+    const icon = {
+      'Uniwersum': '🌌',
+      'Świat': '🌍',
+      'Tom': '📚',
+      'Rozdział': '📖',
+      'Podrozdział': '📄',
+      'Fragment': '📜'
+    }[element.type] || '📄';
+
+    li.innerHTML = `
+      <span class="node-label">
+        \( {icon} <strong> \){escapeHtml(element.title || '(Bez tytułu)')}</strong>
+        <small style="opacity:0.7; margin-left:8px;">
+          v${element.version || '1'} • ${element.language || 'pl'}
+        </small>
+      </span>
+    `;
+
     if (element.id === selectedElementId) li.classList.add('selected');
 
-    // Kliknięcie zaznacza element
     li.addEventListener('click', (e) => {
       e.stopPropagation();
       selectElement(element.id);
@@ -109,113 +131,116 @@
       }
     });
 
-    if (element.children && element.children.length > 0) {
-      const ul = document.createElement('ul');
-      element.children.forEach(child => {
-        ul.appendChild(renderElementNode(child));
-      });
-      li.appendChild(ul);
+    if (element.children?.length > 0) {
+      const childUl = document.createElement('ul');
+      element.children.forEach(child => childUl.appendChild(createTreeNode(child)));
+      li.appendChild(childUl);
     }
+
     return li;
   }
 
-  // Zaznacz element i pokaż jego dane w formularzu
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // === EDYCJA ELEMENTU ===
   function selectElement(id) {
     selectedElementId = id;
-    renderUniverseList();
+    renderUniverseTree();
 
     const found = findElementById(id);
     if (!found) {
-      clearForm();
+      clearEditor();
       return;
     }
-    const { element } = found;
 
-    elementTypeEl.value = element.type || '';
-    elementTitleEl.value = element.title || '';
-    elementDateEl.value = element.dateCreated || '';
-    elementVersionEl.value = element.version || '';
-    elementLanguageEl.value = element.language || '';
-    elementContentEl.value = element.content || '';
-    elementNotesEl.value = element.notes || '';
+    const { node } = found;
 
-    // Włącz przyciski edycji i usuwania
-    saveElementBtn.disabled = false;
-    deleteElementBtn.disabled = false;
-    addChildBtn.disabled = false;
+    els.type.value = node.type || '';
+    els.title.value = node.title || '';
+    els.date.value = node.dateCreated || new Date().toISOString().split('T')[0];
+    els.version.value = node.version || 'v1';
+    els.language.value = node.language || 'pl';
+    els.content.value = node.content || '';
+    els.notes.value = node.notes || '';
+
+    // Aktywuj przyciski
+    els.saveBtn.disabled = false;
+    els.deleteBtn.disabled = false;
+    els.addChildBtn.disabled = false;
   }
 
-  // Wyczyść formularz edycji
-  function clearForm() {
+  function clearEditor() {
     selectedElementId = null;
-    elementTypeEl.value = '';
-    elementTitleEl.value = '';
-    elementDateEl.value = '';
-    elementVersionEl.value = '';
-    elementLanguageEl.value = '';
-    elementContentEl.value = '';
-    elementNotesEl.value = '';
-
-    saveElementBtn.disabled = true;
-    deleteElementBtn.disabled = true;
-    addChildBtn.disabled = true;
+    ['type', 'title', 'date', 'version', 'language', 'content', 'notes'].forEach(field => {
+      els[field].value = '';
+    });
+    els.saveBtn.disabled = true;
+    els.deleteBtn.disabled = true;
+    els.addChildBtn.disabled = true;
   }
 
-  // Zapisz zmiany w zaznaczonym elemencie
-  function saveElement() {
-    if (!selectedElementId) return alert('Nie wybrano elementu do zapisu.');
+  function saveCurrentElement() {
+    if (!selectedElementId) {
+      alert('Nie wybrano elementu do zapisu.');
+      return;
+    }
 
     const found = findElementById(selectedElementId);
-    if (!found) return alert('Nie znaleziono elementu.');
+    if (!found) {
+      alert('Element nie istnieje.');
+      return;
+    }
 
-    const { element } = found;
+    const { node } = found;
 
-    // Walidacja podstawowa
-    if (!elementTypeEl.value.trim()) return alert('Typ elementu jest wymagany.');
-    if (!elementTitleEl.value.trim()) return alert('Tytuł elementu jest wymagany.');
+    if (!els.type.value.trim() || !els.title.value.trim()) {
+      alert('Typ i tytuł są wymagane.');
+      return;
+    }
 
-    // Aktualizuj dane
-    element.type = elementTypeEl.value.trim();
-    element.title = elementTitleEl.value.trim();
-    element.dateCreated = elementDateEl.value.trim();
-    element.version = elementVersionEl.value.trim();
-    element.language = elementLanguageEl.value.trim();
-    element.content = elementContentEl.value.trim();
-    element.notes = elementNotesEl.value.trim();
+    node.type = els.type.value.trim();
+    node.title = els.title.value.trim();
+    node.dateCreated = els.date.value || new Date().toISOString().split('T')[0];
+    node.version = els.version.value.trim() || 'v1';
+    node.language = els.language.value.trim() || 'pl';
+    node.content = els.content.value;
+    node.notes = els.notes.value;
 
     saveData();
-    renderUniverseList();
-    alert('Element zapisany.');
+    renderUniverseTree();
+    alert('Element zapisany pomyślnie.');
   }
 
-  // Usuń zaznaczony element
-  function deleteElement() {
-    if (!selectedElementId) return alert('Nie wybrano elementu do usunięcia.');
+  function deleteCurrentElement() {
+    if (!selectedElementId) return alert('Nie wybrano elementu.');
 
     const found = findElementById(selectedElementId);
-    if (!found) return alert('Nie znaleziono elementu.');
+    if (!found) return alert('Element nie istnieje.');
 
-    const { element, parent } = found;
+    const { node, parent } = found;
+    const name = node.title || '(Bez tytułu)';
 
-    if (!confirm(`Usunąć element "${element.title || '(Bez tytułu)'}" i wszystkie jego dzieci?`)) return;
+    if (!confirm(`Czy na pewno usunąć "${name}" wraz ze wszystkimi dziećmi?`)) return;
 
     if (parent) {
-      parent.children = parent.children.filter(child => child.id !== element.id);
+      parent.children = parent.children.filter(child => child.id !== node.id);
     } else {
-      // Usuwamy element z root
-      universeData = universeData.filter(el => el.id !== element.id);
+      universeData = universeData.filter(el => el.id !== node.id);
     }
 
     saveData();
-    clearForm();
-    renderUniverseList();
+    clearEditor();
+    renderUniverseTree();
   }
 
-  // Dodaj nowy Uniwersum (root)
+  // === DODAWANIE ===
   function addUniverse() {
-    const newUniverse = {
+    const newUniv = {
       id: generateId(),
-      parentId: null,
       type: 'Uniwersum',
       title: 'Nowe Uniwersum',
       dateCreated: new Date().toISOString().split('T')[0],
@@ -225,45 +250,24 @@
       notes: '',
       children: []
     };
-    universeData.push(newUniverse);
+
+    universeData.push(newUniv);
     saveData();
-    renderUniverseList();
+    renderUniverseTree();
+    selectElement(newUniv.id);
   }
 
-  // Dodaj dziecko do zaznaczonego elementu
-  function addChild() {
-    if (!selectedElementId) return alert('Nie wybrano elementu, do którego dodać dziecko.');
+  function addChildToSelected() {
+    if (!selectedElementId) return alert('Wybierz element nadrzędny.');
 
-    const found = findElementById(selectedElementId);
-    if (!found) return alert('Nie znaleziono elementu.');
+    const parentFound = findElementById(selectedElementId);
+    if (!parentFound) return alert('Nie znaleziono rodzica.');
 
-    const { element } = found;
-
-    // Określamy typ dziecka na podstawie bieżącego typu (prosty przykład)
-    let childType = '';
-    switch (element.type) {
-      case 'Uniwersum':
-        childType = 'Świat';
-        break;
-      case 'Świat':
-        childType = 'Tom';
-        break;
-      case 'Tom':
-        childType = 'Rozdział';
-        break;
-      case 'Rozdział':
-        childType = 'Podrozdział';
-        break;
-      case 'Podrozdział':
-        childType = 'Fragment';
-        break;
-      default:
-        childType = 'Fragment';
-    }
+    const parent = parentFound.node;
+    const childType = getNextChildType(parent.type);
 
     const newChild = {
       id: generateId(),
-      parentId: element.id,
       type: childType,
       title: `Nowy ${childType}`,
       dateCreated: new Date().toISOString().split('T')[0],
@@ -274,82 +278,81 @@
       children: []
     };
 
-    element.children = element.children || [];
-    element.children.push(newChild);
+    parent.children = parent.children || [];
+    parent.children.push(newChild);
 
     saveData();
-    renderUniverseList();
+    renderUniverseTree();
     selectElement(newChild.id);
   }
 
-  // Backup całej bazy do pliku JSON
+  // === BACKUP & EXPORT ===
   function backupAll() {
-    const dataStr = JSON.stringify(universeData, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `universe_backup_${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-
-    URL.revokeObjectURL(url);
+    const data = JSON.stringify(universeData, null, 2);
+    downloadFile(data, `eterniverse_backup_${formatDate(new Date())}.json`, 'application/json');
   }
 
-  // Export danych wg wybranego formatu (prosty przykład)
   function exportData() {
-    if (!universeData.length) return alert('Brak danych do eksportu.');
+    if (universeData.length === 0) return alert('Brak danych do eksportu.');
 
-    const format = exportSelectEl.value;
-    let dataStr = '';
+    const format = els.exportFormat.value;
+    let content = '';
+    let filename = `eterniverse_${formatDate(new Date())}`;
+    let mime = 'text/plain';
 
-    switch(format) {
-      case 'json':
-        dataStr = JSON.stringify(universeData, null, 2);
-        break;
-      case 'txt':
-        dataStr = exportAsText(universeData);
-        break;
-      default:
-        alert('Nieznany format eksportu.');
-        return;
+    if (format === 'json') {
+      content = JSON.stringify(universeData, null, 2);
+      filename += '.json';
+      mime = 'application/json';
+    } else if (format === 'txt') {
+      content = exportToPlainText(universeData);
+      filename += '.txt';
     }
 
-    const blob = new Blob([dataStr], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
+    downloadFile(content, filename, mime);
+  }
 
+  function exportToPlainText(nodes, level = 0) {
+    let text = '';
+    nodes.forEach(node => {
+      const indent = '  '.repeat(level);
+      text += `\( {indent}( \){node.type}) ${node.title || '(Bez tytułu)'}\n`;
+      if (node.children?.length) {
+        text += exportToPlainText(node.children, level + 1);
+      }
+    });
+    return text;
+  }
+
+  function downloadFile(content, filename, mime) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `universe_export_newDate().toISOString().slice(0,10).{new Date().toISOString().slice(0,10)}.newDate().toISOString().slice(0,10).{format}`;
+    a.download = filename;
+    document.body.appendChild(a);
     a.click();
-
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
 
-  // Przykład eksportu jako tekst (rekurencyjny)
-  function exportAsText(elements, indent = 0) {
-    let result = '';
-    elements.forEach(el => {
-      result += ' '.repeat(indent) + `[el.type]{el.type}]el.type]{el.title || '(Bez tytułu)'}\n`;
-      if (el.children && el.children.length) {
-        result += exportAsText(el.children, indent + 2);
-      }
-    });
-    return result;
+  function formatDate(date) {
+    return date.toISOString().slice(0, 10);
   }
 
-  // Inicjalizacja UI i eventów
+  // === INICJALIZACJA ===
   function init() {
-    renderUniverseList();
-    clearForm();
+    renderUniverseTree();
+    clearEditor();
 
-    saveElementBtn.addEventListener('click', saveElement);
-    deleteElementBtn.addEventListener('click', deleteElement);
-    addUniverseBtn.addEventListener('click', addUniverse);
-    addChildBtn.addEventListener('click', addChild);
-    backupAllBtn.addEventListener('click', backupAll);
-    exportBtn.addEventListener('click', exportData);
+    els.saveBtn.addEventListener('click', saveCurrentElement);
+    els.deleteBtn.addEventListener('click', deleteCurrentElement);
+    els.addUniverseBtn.addEventListener('click', addUniverse);
+    els.addChildBtn.addEventListener('click', addChildToSelected);
+    els.backupBtn.addEventListener('click', backupAll);
+    els.exportBtn.addEventListener('click', exportData);
   }
 
+  // Start
   init();
 })();
