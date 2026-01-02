@@ -2,13 +2,13 @@
 
 /*
   =========================================
-  ETERNIVERSE — RENDER ENGINE
+  ETERNIVERSE — RENDER ENGINE v14.1
   Bella Author Mode Compatible
   =========================================
-  Odpowiedzialność:
+  ZASADY:
   - TYLKO render DOM
   - ZERO logiki danych
-  - ZERO globalnych onclick
+  - ZERO inline onclick
 */
 
 class Renderer {
@@ -26,18 +26,18 @@ class Renderer {
     };
   }
 
-  /* =====================================
+  /* =========================
      GŁÓWNY RENDER
-  ===================================== */
+  ========================= */
   renderAll() {
     this.renderStructure();
     this.renderMapa();
     this.renderEditPanel(this.app.currentElement || null);
   }
 
-  /* =====================================
+  /* =========================
      1. STRUKTURA / DRZEWO
-  ===================================== */
+  ========================= */
   renderStructure() {
     const container = this.elements.structureTree;
     if (!container) return;
@@ -68,12 +68,12 @@ class Renderer {
       Fragment: '📜'
     };
 
-    const selected =
+    const isSelected =
       this.app.currentElement &&
-      this.app.currentElement.id === node.id;
+      String(this.app.currentElement.id) === String(node.id);
 
     return `
-      <div class="tree-node ${selected ? 'selected' : ''}"
+      <div class="tree-node ${isSelected ? 'selected' : ''}"
            data-id="${node.id}"
            data-type="${node.type}">
         <span class="icon">${icons[node.type] || '📄'}</span>
@@ -83,7 +83,7 @@ class Renderer {
         ${
           node.children && node.children.length
             ? `<div class="nested">
-                ${node.children.map(c => this.buildTreeNode(c)).join('')}
+                ${node.children.map(child => this.buildTreeNode(child)).join('')}
                </div>`
             : ''
         }
@@ -91,9 +91,9 @@ class Renderer {
     `;
   }
 
-  /* =====================================
+  /* =========================
      2. MAPA BRAM
-  ===================================== */
+  ========================= */
   renderMapa() {
     const container = this.elements.mapaGrid;
     if (!container) return;
@@ -108,24 +108,24 @@ class Renderer {
       return;
     }
 
-    container.innerHTML = mapa.map((brama, i) => `
+    container.innerHTML = mapa.map((brama, index) => `
       <div class="brama-card"
            data-id="${brama.id}"
-           style="--order:${i}">
+           style="--order:${index}">
         <div class="brama-name">${this.escape(brama.name)}</div>
         <div class="brama-books">
           ${brama.books ? brama.books.length : 0} książek
         </div>
         <div class="brama-hint">
-          Kliknij, aby dodać do struktury
+          Kliknij, aby wstawić do treści
         </div>
       </div>
     `).join('');
   }
 
-  /* =====================================
+  /* =========================
      3. PANEL EDYCJI
-  ===================================== */
+  ========================= */
   renderEditPanel(element) {
     if (this.elements.elementTitle) {
       this.elements.elementTitle.value = element?.title || '';
@@ -153,9 +153,9 @@ class Renderer {
       .join(' → ');
   }
 
-  /* =====================================
+  /* =========================
      4. SUGESTIE AI
-  ===================================== */
+  ========================= */
   renderSuggestions(items = []) {
     const panel = this.elements.suggestions;
     if (!panel) return;
@@ -168,16 +168,16 @@ class Renderer {
       return;
     }
 
-    panel.innerHTML = items.map((item, i) => `
-      <div class="suggestion" style="--order:${i}">
+    panel.innerHTML = items.map((item, index) => `
+      <div class="suggestion" style="--order:${index}">
         ${this.escape(item.text || '')}
       </div>
     `).join('');
   }
 
-  /* =====================================
+  /* =========================
      5. STATUS
-  ===================================== */
+  ========================= */
   setStatus(message = 'Gotowy', timeout = 5000) {
     if (!this.elements.status) return;
 
@@ -192,9 +192,9 @@ class Renderer {
     }
   }
 
-  /* =====================================
+  /* =========================
      HELPERS
-  ===================================== */
+  ========================= */
   escape(text = '') {
     return String(text)
       .replace(/</g, '&lt;')
@@ -202,5 +202,7 @@ class Renderer {
   }
 }
 
-// eksport globalny (dla app.js)
+/* =========================
+   EKSPORT GLOBALNY
+========================= */
 window.Renderer = Renderer;
