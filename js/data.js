@@ -1,86 +1,146 @@
-// data.js — Eterniverse Master Premium PRO v14.1 (STABLE)
-// CENTRALNY DATA MASTER — PAMIĘĆ, MAPA BRAM, PROFIL, BACKUP
+// data.js — Eterniverse Master PRO — KANON BRAM
+// JEDYNE ŹRÓDŁO PRAWDY dla mapy Bram ETERNIVERSE
 
 'use strict';
 
 class DataMaster {
   constructor() {
-    // === WERSJA ===
-    this.VERSION = 'v14.1-data-master-stable';
+    this.VERSION = 'v14.1-kanon';
 
-    // === KLUCZE LOCALSTORAGE ===
     this.KEYS = {
       STRUCTURE: 'eterniverse_structure_v14',
       MAPA: 'eterniverse_mapa_v14',
       PROFILE: 'eterniverse_profile_v14',
-      SETTINGS: 'eterniverse_settings_v14',
-      BACKUP: 'eterniverse_backup_v14'
+      SETTINGS: 'eterniverse_settings_v14'
     };
 
     // === STAN ===
     this.structure = this.load(this.KEYS.STRUCTURE, []);
-    this.mapa = this.load(this.KEYS.MAPA, this.defaultMapa());
+    this.mapa = this.load(this.KEYS.MAPA, this.getCanonicalMapa());
     this.profile = this.load(this.KEYS.PROFILE, 'wattpad');
-    this.settings = this.load(this.KEYS.SETTINGS, { theme: 'quantum' });
+    this.settings = this.load(this.KEYS.SETTINGS, { theme: 'eter' });
 
-    console.log(`[DataMaster] Wersja ${this.VERSION}`);
-    console.log(`[DataMaster] Elementów struktury: ${this.structure.length}`);
-    console.log(`[DataMaster] Profil: ${this.profile.toUpperCase()}`);
-    console.log(`[DataMaster] Bram: ${this.mapa.length}`);
+    console.log('[DataMaster] Wersja:', this.VERSION);
+    console.log('[DataMaster] Elementów struktury:', this.structure.length);
+    console.log('[DataMaster] Bram:', this.mapa.length);
   }
 
   /* =========================
-     MAPA BRAM (10)
+     KANONICZNA MAPA BRAM
   ========================= */
-  defaultMapa() {
-    const names = [
-      'INTERSEEKER',
-      'ETERSEEKER',
-      'OBFITOSEEKER',
-      'THE KNOT',
-      'RELIGIOSEEKER',
-      'LUXSEEKER',
-      'UMBRASEEKER',
-      'AETHERSEEKER',
-      'CHRONOSEEKER',
-      'VOIDSEEKER'
+  getCanonicalMapa() {
+    return [
+      {
+        id: 1,
+        name: 'BRAMA 1 — INTERSEEKER',
+        books: [
+          'INTERSEEKER: Geneza',
+          'INTERSEEKER: Efekt Cienia',
+          'INTERSEEKER: Kod Jaźni'
+        ]
+      },
+      {
+        id: 2,
+        name: 'BRAMA 2 — ETERSEEKER',
+        books: [
+          'EterSeeker: Kronika Woli',
+          'Interfejs Świadomości',
+          'Protokół Reprogramowania'
+        ]
+      },
+      {
+        id: 3,
+        name: 'BRAMA 3 — OBFITOSEEKER',
+        books: [
+          'ObfitoSeeker – Kod Obfitości',
+          'Reguły Gry',
+          'Dla Nikosia'
+        ]
+      },
+      {
+        id: 4,
+        name: 'BRAMA 4 — THE KNOT',
+        books: [
+          'Kronika Splątania',
+          'Eterniony Tom I',
+          'Narodziny Eteriona³'
+        ]
+      },
+      {
+        id: 5,
+        name: 'BRAMA 5 — RELIGIOSEEKER',
+        books: [
+          'ReligioSeeker',
+          'Droga bez religii',
+          'Wiara w Siebie'
+        ]
+      },
+      {
+        id: 6,
+        name: 'BRAMA 6 — LUXSEEKER',
+        books: [
+          'LuxSeeker: Światło Wewnętrzne',
+          'Promień Przebudzenia'
+        ]
+      },
+      {
+        id: 7,
+        name: 'BRAMA 7 — UMBRASEEKER',
+        books: [
+          'UmbraSeeker: Cień Jaźni',
+          'Dialog z Cieniem'
+        ]
+      },
+      {
+        id: 8,
+        name: 'BRAMA 8 — AETHERSEEKER',
+        books: [
+          'AetherSeeker: Eteryczna Sieć',
+          'Splątanie Kwantowe'
+        ]
+      },
+      {
+        id: 9,
+        name: 'BRAMA 9 — CHRONOSEEKER',
+        books: [
+          'ChronoSeeker: Pętla Czasu',
+          'Paradoks Wieczności'
+        ]
+      },
+      {
+        id: 10,
+        name: 'BRAMA 10 — VOIDSEEKER',
+        books: [
+          'VoidSeeker: Pustka Potencjału',
+          'Narodziny z Nicości'
+        ]
+      }
     ];
-
-    return names.map((name, i) => ({
-      id: i + 1,
-      name: `BRAMA ${i + 1} — ${name}`,
-      books: [
-        `Księga ${i + 1}.1`,
-        `Księga ${i + 1}.2`,
-        `Księga ${i + 1}.3`
-      ]
-    }));
   }
 
   /* =========================
-     LOCALSTORAGE SAFE I/O
+     STORAGE
   ========================= */
   load(key, fallback) {
     try {
       const raw = localStorage.getItem(key);
       return raw ? JSON.parse(raw) : fallback;
     } catch (e) {
-      console.error(`[DataMaster] Błąd odczytu ${key}`, e);
+      console.warn('[DataMaster] Błąd load:', key, e);
       return fallback;
     }
   }
 
-  save(key, data) {
+  save(key, value) {
     try {
-      localStorage.setItem(key, JSON.stringify(data));
+      localStorage.setItem(key, JSON.stringify(value));
     } catch (e) {
-      console.error(`[DataMaster] Błąd zapisu ${key}`, e);
-      alert('Błąd zapisu danych (localStorage)');
+      console.error('[DataMaster] Błąd save:', key, e);
     }
   }
 
   /* =========================
-     STRUKTURA
+     API
   ========================= */
   getStructure() {
     return this.structure;
@@ -91,9 +151,6 @@ class DataMaster {
     this.save(this.KEYS.STRUCTURE, structure);
   }
 
-  /* =========================
-     MAPA
-  ========================= */
   getMapa() {
     return this.mapa;
   }
@@ -103,9 +160,6 @@ class DataMaster {
     this.save(this.KEYS.MAPA, mapa);
   }
 
-  /* =========================
-     PROFIL
-  ========================= */
   getProfile() {
     return this.profile;
   }
@@ -115,9 +169,6 @@ class DataMaster {
     this.save(this.KEYS.PROFILE, profile);
   }
 
-  /* =========================
-     SETTINGS
-  ========================= */
   getSettings() {
     return this.settings;
   }
@@ -126,77 +177,12 @@ class DataMaster {
     this.settings = { ...this.settings, ...partial };
     this.save(this.KEYS.SETTINGS, this.settings);
   }
-
-  /* =========================
-     BACKUP
-  ========================= */
-  createBackup() {
-    const snapshot = {
-      created: new Date().toISOString(),
-      structure: this.structure,
-      mapa: this.mapa,
-      profile: this.profile,
-      settings: this.settings
-    };
-
-    this.save(this.KEYS.BACKUP, snapshot);
-    console.log('[DataMaster] Backup utworzony');
-    return snapshot;
-  }
-
-  restoreBackup() {
-    const backup = this.load(this.KEYS.BACKUP, null);
-    if (!backup) {
-      alert('Brak backupu do przywrócenia');
-      return false;
-    }
-
-    this.structure = backup.structure || [];
-    this.mapa = backup.mapa || this.defaultMapa();
-    this.profile = backup.profile || 'wattpad';
-    this.settings = backup.settings || { theme: 'quantum' };
-
-    this.save(this.KEYS.STRUCTURE, this.structure);
-    this.save(this.KEYS.MAPA, this.mapa);
-    this.save(this.KEYS.PROFILE, this.profile);
-    this.save(this.KEYS.SETTINGS, this.settings);
-
-    console.log('[DataMaster] Backup przywrócony');
-    return true;
-  }
-
-  /* =========================
-     EXPORT (JSON)
-  ========================= */
-  exportAllData() {
-    const payload = {
-      version: this.VERSION,
-      exported: new Date().toISOString(),
-      structure: this.structure,
-      mapa: this.mapa,
-      profile: this.profile,
-      settings: this.settings
-    };
-
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {
-      type: 'application/json'
-    });
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Eterniverse_Backup.json';
-    a.click();
-    URL.revokeObjectURL(url);
-
-    console.log('[DataMaster] Eksport JSON zakończony');
-  }
 }
 
 /* =========================
-   START DATA MASTER
+   BOOT
 ========================= */
 const dataMaster = new DataMaster();
 window.dataMaster = dataMaster;
 
-console.log('DataMaster v14.1 uruchomiony — pamięć Eterniverse aktywna');
+console.log('ETERNIVERSE DataMaster — KANON BRAM ZAŁADOWANY');
