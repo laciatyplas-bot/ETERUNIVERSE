@@ -1,48 +1,62 @@
-// data.js - Eterniverse Master Premium PRO v12.0
-// Master Edition – Centralny moduł danych, pamięci i struktury Eterniverse
-// Pełna, samodzielna, nieograniczona i gotowa do integracji wersja master
-
-'use strict';
+// data.js - Eterniverse Master Premium PRO v13.0 – DataMaster Edition
+// Centralny, niezniszczalny moduł zarządzania danymi, pamięcią i backupami
 
 class EterniverseDataMaster {
   constructor() {
-    // === KONFIGURACJA PAMIĘCI ===
-    this.VERSION = 'v12.0-master';
-    this.MEMORY_KEYS = {
-      STRUCTURE: 'eterniverse_structure_master_v12',
-      MAPA: 'eterniverse_mapa_master_v12',
-      PROFILE: 'eterniverse_profile_master',
-      SETTINGS: 'eterniverse_settings_master',
-      BACKUP: 'eterniverse_backup_master'
+    // === WERSJA I KONFIGURACJA ===
+    this.VERSION = 'v13.0-data-master';
+    this.KEYS = {
+      STRUCTURE: 'eterniverse_structure_v13',
+      MAPA: 'eterniverse_mapa_v13',
+      PROFILE: 'eterniverse_profile_v13',
+      SETTINGS: 'eterniverse_settings_v13',
+      BACKUPS: 'eterniverse_backups_v13',
+      METADATA: 'eterniverse_metadata_v13'
     };
 
     // === STAN PAMIĘCI ===
-    this.memory = {
-      structure: this.load(this.MEMORY_KEYS.STRUCTURE, []),
-      mapa: this.load(this.MEMORY_KEYS.MAPA, this.defaultMapa()),
-      profile: this.load(this.MEMORY_KEYS.PROFILE, 'wattpad'),
-      settings: this.load(this.MEMORY_KEYS.SETTINGS, this.defaultSettings()),
-      backup: this.load(this.MEMORY_KEYS.BACKUP, [])
+    this.data = {
+      structure: this.load(this.KEYS.STRUCTURE, []),
+      mapa: this.load(this.KEYS.MAPA, this.defaultMapa()),
+      profile: this.load(this.KEYS.PROFILE, 'wattpad'),
+      settings: this.load(this.KEYS.SETTINGS, this.defaultSettings()),
+      backups: this.load(this.KEYS.BACKUPS, []),
+      metadata: this.load(this.KEYS.METADATA, { created: new Date().toISOString(), version: this.VERSION })
     };
 
     // === INICJALIZACJA ===
     this.init();
   }
 
-  // Domyślna mapa bram Eterniverse
+  // Domyślna mapa 10 bram Eterniverse
   defaultMapa() {
-    return [
-      { id: 1, name: "BRAMA 1 — INTERSEEKER", books: ["INTERSEEKER: Geneza", "INTERSEEKER: Efekt Cienia"] },
-      { id: 2, name: "BRAMA 2 — ETERSEEKER", books: ["EterSeeker: Kronika Woli", "Interfejs Świadomości"] },
-      { id: 3, name: "BRAMA 3 — OBFITOSEEKER", books: ["ObfitoSeeker – Kod Obfitości"] },
-      { id: 4, name: "BRAMA 4 — THE KNOT", books: ["Kronika Splątania", "Eterniony Tom I"] },
-      { id: 5, name: "BRAMA 5 — RELIGIOSEEKER", books: ["ReligioSeeker"] },
-      { id: 6, name: "BRAMA 6 — LUXSEEKER", books: ["LuxSeeker: Światło Wewnętrzne"] },
-      { id: 7, name: "BRAMA 7 — UMBRASEEKER", books: ["UmbraSeeker: Cień Jaźni"] },
-      { id: 8, name: "BRAMA 8 — AETHERSEEKER", books: ["AetherSeeker: Eteryczna Sieć"] },
-      { id: 9, name: "BRAMA 9 — CHRONOSEEKER", books: ["ChronoSeeker: Pętla Czasu"] },
-      { id: 10, name: "BRAMA 10 — VOIDSEEKER", books: ["VoidSeeker: Pustka Potencjału"] }
+    const gates = [];
+    const names = [
+      "INTERSEEKER", "ETERSEEKER", "OBFITOSEEKER", "THE KNOT",
+      "RELIGIOSEEKER", "LUXSEEKER", "UMBRASEEKER", "AETHERSEEKER",
+      "CHRONOSEEKER", "VOIDSEEKER"
     ];
+    const sampleBooks = [
+      ["INTERSEEKER: Geneza", "INTERSEEKER: Efekt Cienia", "INTERSEEKER: Kod Jaźni"],
+      ["EterSeeker: Kronika Woli", "Interfejs Świadomości", "Protokół Reprogramowania"],
+      ["ObfitoSeeker – Kod Obfitości", "Reguły Gry", "Dla Nikosia"],
+      ["Kronika Splątania", "Eterniony Tom I", "Narodziny Eteriona³"],
+      ["ReligioSeeker", "Droga bez religii", "Wiara w Siebie"],
+      ["LuxSeeker: Światło Wewnętrzne", "Promień Przebudzenia"],
+      ["UmbraSeeker: Cień Jaźni", "Dialog z Cieniem"],
+      ["AetherSeeker: Eteryczna Sieć", "Splątanie Kwantowe"],
+      ["ChronoSeeker: Pętla Czasu", "Paradoks Wieczności"],
+      ["VoidSeeker: Pustka Potencjału", "Narodziny z Nicości"]
+    ];
+
+    for (let i = 1; i <= 10; i++) {
+      gates.push({
+        id: i,
+        name: `BRAMA ${i} — ${names[i-1]}`,
+        books: sampleBooks[i-1]
+      });
+    }
+    return gates;
   }
 
   // Domyślne ustawienia
@@ -50,19 +64,22 @@ class EterniverseDataMaster {
     return {
       theme: 'quantum',
       autosave: true,
+      autosaveInterval: 1000, // ms
+      backupInterval: 3600000, // 1h
+      maxBackups: 20,
       dictationLang: 'pl-PL',
       aiStrength: 'high',
       consoleEnabled: true,
-      backupInterval: 3600000 // 1 godzina
+      notifications: true
     };
   }
 
-  // === OPERACJE NA PAMIĘCI ===
+  // === OPERACJE NA LOCALSTORAGE ===
   load(key, fallback) {
     try {
-      const data = localStorage.getItem(key);
-      if (data === null) return fallback;
-      return JSON.parse(data);
+      const raw = localStorage.getItem(key);
+      if (raw === null) return fallback;
+      return JSON.parse(raw);
     } catch (e) {
       console.error(`[DataMaster] Błąd odczytu ${key}:`, e);
       return fallback;
@@ -72,182 +89,200 @@ class EterniverseDataMaster {
   save(key, data) {
     try {
       localStorage.setItem(key, JSON.stringify(data));
-      this.log(`Zapisano dane: ${key}`);
     } catch (e) {
       console.error(`[DataMaster] Błąd zapisu ${key}:`, e);
-      alert('Błąd zapisu pamięci – localStorage może być pełny');
+      this.notify('Błąd zapisu – pamięć może być pełna', 'error');
     }
   }
 
   // === DOSTĘP DO DANYCH ===
-  getStructure() {
-    return this.memory.structure;
+  getStructure() { return this.data.structure; }
+  setStructure(val) { this.data.structure = val; this.save(this.KEYS.STRUCTURE, val); }
+
+  getMapa() { return this.data.mapa; }
+  setMapa(val) { this.data.mapa = val; this.save(this.KEYS.MAPA, val); }
+
+  getProfile() { return this.data.profile; }
+  setProfile(val) { this.data.profile = val; this.save(this.KEYS.PROFILE, val); }
+
+  getSettings() { return this.data.settings; }
+  updateSettings(partial) {
+    this.data.settings = { ...this.data.settings, ...partial };
+    this.save(this.KEYS.SETTINGS, this.data.settings);
   }
 
-  setStructure(structure) {
-    this.memory.structure = structure;
-    this.save(this.MEMORY_KEYS.STRUCTURE, structure);
-  }
+  getMetadata() { return this.data.metadata; }
 
-  getMapa() {
-    return this.memory.mapa;
-  }
-
-  getCurrentProfile() {
-    return this.memory.profile;
-  }
-
-  setCurrentProfile(profile) {
-    this.memory.profile = profile;
-    this.save(this.MEMORY_KEYS.PROFILE, profile);
-  }
-
-  getSettings() {
-    return this.memory.settings;
-  }
-
-  updateSettings(newSettings) {
-    this.memory.settings = { ...this.memory.settings, ...newSettings };
-    this.save(this.MEMORY_KEYS.SETTINGS, this.memory.settings);
-  }
-
-  // === BACKUP SYSTEM ===
-  createBackup() {
+  // === SYSTEM BACKUPÓW ===
+  createBackup(name = null) {
     const backup = {
+      id: this.generateId(),
+      name: name || `Backup ${new Date().toLocaleString('pl-PL')}`,
       timestamp: new Date().toISOString(),
       version: this.VERSION,
+      size: JSON.stringify(this.data).length,
       data: {
-        structure: this.memory.structure,
-        mapa: this.memory.mapa,
-        profile: this.memory.profile,
-        settings: this.memory.settings
+        structure: JSON.parse(JSON.stringify(this.data.structure)),
+        mapa: JSON.parse(JSON.stringify(this.data.mapa)),
+        profile: this.data.profile,
+        settings: JSON.parse(JSON.stringify(this.data.settings))
       }
     };
 
-    this.memory.backup.push(backup);
-    if (this.memory.backup.length > 10) {
-      this.memory.backup.shift(); // max 10 backupów
+    this.data.backups.unshift(backup);
+    if (this.data.backups.length > this.data.settings.maxBackups) {
+      this.data.backups.pop();
     }
 
-    this.save(this.MEMORY_KEYS.BACKUP, this.memory.backup);
-    this.log('Utworzono backup pamięci', 'success');
-  }
-
-  restoreBackup(index) {
-    if (index < 0 || index >= this.memory.backup.length) {
-      this.log('Nieprawidłowy indeks backupu', 'error');
-      return false;
-    }
-
-    const backup = this.memory.backup[index];
-    this.memory.structure = backup.data.structure;
-    this.memory.mapa = backup.data.mapa;
-    this.memory.profile = backup.data.profile;
-    this.memory.settings = backup.data.settings;
-
-    // Zapisz przywrócone dane
-    this.save(this.MEMORY_KEYS.STRUCTURE, this.memory.structure);
-    this.save(this.MEMORY_KEYS.MAPA, this.memory.mapa);
-    this.save(this.MEMORY_KEYS.PROFILE, this.memory.profile);
-    this.save(this.MEMORY_KEYS.SETTINGS, this.memory.settings);
-
-    this.log(`Przywrócono backup z ${new Date(backup.timestamp).toLocaleString('pl-PL')}`, 'success');
-    return true;
+    this.save(this.KEYS.BACKUPS, this.data.backups);
+    this.notify(`Backup utworzony: ${backup.name}`, 'success');
+    return backup;
   }
 
   getBackups() {
-    return this.memory.backup;
+    return this.data.backups.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
   }
 
+  restoreBackup(id) {
+    const backup = this.data.backups.find(b => b.id === id);
+    if (!backup) {
+      this.notify('Backup nie znaleziony', 'error');
+      return false;
+    }
+
+    if (confirm(`Przywrócić backup "${backup.name}" z ${new Date(backup.timestamp).toLocaleString('pl-PL')}?`)) {
+      this.data.structure = backup.data.structure;
+      this.data.mapa = backup.data.mapa;
+      this.data.profile = backup.data.profile;
+      this.data.settings = backup.data.settings;
+
+      // Zapisz przywrócone dane
+      this.save(this.KEYS.STRUCTURE, this.data.structure);
+      this.save(this.KEYS.MAPA, this.data.mapa);
+      this.save(this.KEYS.PROFILE, this.data.profile);
+      this.save(this.KEYS.SETTINGS, this.data.settings);
+
+      this.notify(`Przywrócono backup: ${backup.name}`, 'success');
+      setTimeout(() => location.reload(), 1000);
+      return true;
+    }
+    return false;
+  }
+
+  deleteBackup(id) {
+    this.data.backups = this.data.backups.filter(b => b.id !== id);
+    this.save(this.KEYS.BACKUPS, this.data.backups);
+    this.notify('Backup usunięty', 'info');
+  }
+
+  // === EKSPORT / IMPORT ===
   exportAllData() {
-    const exportData = {
+    const exportPackage = {
       eterniverse_version: this.VERSION,
-      export_date: new Date().toISOString(),
-      structure: this.memory.structure,
-      mapa: this.memory.mapa,
-      profile: this.memory.profile,
-      settings: this.memory.settings,
-      backups: this.memory.backup
+      export_timestamp: new Date().toISOString(),
+      export_name: `Eterniverse_Full_Export_${new Date().toISOString().slice(0,10)}`,
+      structure: this.data.structure,
+      mapa: this.data.mapa,
+      profile: this.data.profile,
+      settings: this.data.settings,
+      backups: this.data.backups,
+      metadata: this.data.metadata
     };
 
-    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataStr = JSON.stringify(exportPackage, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement('a');
     a.href = url;
-    a.download = `eterniverse_full_export_${new Date().toISOString().slice(0,10)}.json`;
+    a.download = `${exportPackage.export_name}.json`;
+    document.body.appendChild(a);
     a.click();
-
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    this.log('Pełny eksport danych zakończony', 'success');
+
+    this.notify('Pełny eksport danych zakończony', 'success');
   }
 
-  importAllData(jsonString) {
-    try {
-      const imported = JSON.parse(jsonString);
+  importAllData(fileInputElementId = 'import-file-input') {
+    const input = document.getElementById(fileInputElementId) || document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
 
-      if (confirm('Zaimportować wszystkie dane? To nadpisze bieżącą pamięć.')) {
-        this.memory.structure = imported.structure || [];
-        this.memory.mapa = imported.mapa || this.defaultMapa();
-        this.memory.profile = imported.profile || 'wattpad';
-        this.memory.settings = imported.settings || this.defaultSettings();
-        this.memory.backup = imported.backups || [];
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const imported = JSON.parse(ev.target.result);
 
-        // Zapisz wszystko
-        Object.keys(this.MEMORY_KEYS).forEach(keyName => {
-          const key = this.MEMORY_KEYS[keyName];
-          this.save(key, this.memory[keyName.toLowerCase()] || []);
-        });
+          if (confirm(`Zaimportować dane z ${file.name}? Nadpisze bieżącą pamięć.`)) {
+            this.data.structure = imported.structure || [];
+            this.data.mapa = imported.mapa || this.defaultMapa();
+            this.data.profile = imported.profile || 'wattpad';
+            this.data.settings = imported.settings || this.defaultSettings();
+            this.data.backups = imported.backups || [];
 
-        this.log('Pełny import danych zakończony', 'success');
-        location.reload(); // przeładuj, by zastosować zmiany
+            // Zapisz wszystko
+            Object.values(this.KEYS).forEach(key => {
+              const value = this.data[key.toLowerCase().replace(/_v13/g, '')] || [];
+              this.save(key, value);
+            });
+
+            this.notify('Import danych zakończony – restart', 'success');
+            setTimeout(() => location.reload(), 1500);
+          }
+        } catch (err) {
+          this.notify('Błąd importu – nieprawidłowy plik JSON', 'error');
+          console.error(err);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }
+
+  // === CZYSZCZENIE PAMIĘCI ===
+  clearAllData() {
+    if (confirm('!!! OSTZEŻENIE !!!\nCzy na pewno wyczyścić CAŁĄ pamięć Eterniverse?\nTo działanie jest nieodwracalne!')) {
+      if (confirm('Potwierdź ponownie – to zniszczy wszystkie dane')) {
+        Object.values(this.KEYS).forEach(key => localStorage.removeItem(key));
+        this.notify('Cała pamięć wyczyszczona – czysta tablica', 'warning');
+        setTimeout(() => location.reload(), 1000);
       }
-    } catch (e) {
-      this.log('Błąd importu – nieprawidłowy format JSON', 'error');
-      console.error(e);
     }
   }
 
   // === INICJALIZACJA ===
   init() {
-    this.log(`Eterniverse DataMaster ${this.VERSION} uruchomiony`);
-    this.log(`Załadowano ${this.memory.structure.length} elementów hierarchii`);
-    this.log(`Profil: ${this.memory.profile.toUpperCase()}`);
-    this.log(`Bram eterycznych: ${this.memory.mapa.length}`);
+    console.log(`[DataMaster] Eterniverse DataMaster ${this.VERSION} uruchomiony`);
+    console.log(`Struktura: ${this.data.structure.length} elementów`);
+    console.log(`Bram: ${this.data.mapa.length}`);
+    console.log(`Profil: ${this.data.profile.toUpperCase()}`);
+    console.log(`Backupów: ${this.data.backups.length}`);
 
-    // Automatyczny backup co godzinę
-    if (this.memory.settings.autosave) {
-      setInterval(() => this.createBackup(), this.memory.settings.backupInterval);
+    // Automatyczne backupy
+    if (this.data.settings.autosave && this.data.settings.backupInterval > 0) {
+      setInterval(() => this.createBackup(), this.data.settings.backupInterval);
     }
+
+    // Powiadomienie startowe
+    this.notify(`DataMaster v13.0 aktywny – pamięć świadoma`, 'success');
   }
 
-  // === LOGGING ===
-  log(message, type = 'info') {
-    console.log(`[DataMaster] ${message}`);
+  // === POWIADOMIENIA ===
+  notify(message, type = 'info') {
+    console.log(`[DataMaster:${type}] ${message}`);
 
-    // Przekaż log do konsoli Bella jeśli istnieje
-    if (window.bellaConsole) {
-      window.bellaConsole.log(message, type);
-    }
-
-    // Przekaż do statusu UI jeśli renderer istnieje
     if (window.renderer && window.renderer.setStatus) {
-      window.renderer.setStatus(message, 5000);
+      window.renderer.setStatus(message, type === 'error' ? 8000 : 5000);
     }
   }
 
   // === POMOCNICZE ===
   generateId() {
-    return 'data_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
-  }
-
-  clearAllData() {
-    if (confirm('Czy na pewno wyczyścić całą pamięć Eterniverse? To nieodwracalne!')) {
-      Object.values(this.MEMORY_KEYS).forEach(key => localStorage.removeItem(key));
-      this.log('Cała pamięć wyczyszczona – czysta tablica', 'warning');
-      location.reload();
-    }
+    return 'dm_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
   }
 }
 
@@ -255,7 +290,4 @@ class EterniverseDataMaster {
 const dataMaster = new EterniverseDataMaster();
 window.dataMaster = dataMaster;
 
-// Eksport dla innych modułów
-window.EterniverseDataMaster = EterniverseDataMaster;
-
-console.log('Eterniverse DataMaster PRO v12.0 – pamięć świadoma i nieskończona');
+console.log('Eterniverse DataMaster PRO v13.0 – pamięć nieśmiertelna i nieskończona');
