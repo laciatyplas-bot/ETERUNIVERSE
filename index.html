@@ -11,22 +11,22 @@
         <h1>Master Strona Redakcji Książek</h1>
         <nav>
             <ul>
-                <li><a href="#library">Biblioteka</a></li>
-                <li><a href="#editor">Edytor</a></li>
-                <li><a href="#audiobooks">Audiobooki</a></li>
-                <li><a href="#store">Sklep</a></li>
+                <li><a href="#" data-section="library">Biblioteka</a></li>
+                <li><a href="#" data-section="editor">Edytor</a></li>
+                <li><a href="#" data-section="audiobooks">Audiobooki</a></li>
+                <li><a href="#" data-section="store">Sklep</a></li>
             </ul>
         </nav>
     </header>
 
     <main>
-        <section id="library">
+        <section id="library" class="active">
             <h2>Biblioteka książek</h2>
             <div id="book-list"></div>
             <button id="add-book-btn">Dodaj nową książkę</button>
         </section>
 
-        <section id="editor" style="display:none;">
+        <section id="editor">
             <h2>Edytor książki</h2>
             <input type="text" id="book-title" placeholder="Tytuł książki" />
             <textarea id="book-content" placeholder="Treść książki..."></textarea>
@@ -36,13 +36,13 @@
             <input type="file" id="import-file" style="display:none;" accept=".json,.txt" />
         </section>
 
-        <section id="audiobooks" style="display:none;">
+        <section id="audiobooks">
             <h2>Audiobooki</h2>
             <div id="audiobook-list"></div>
             <button id="add-audiobook-btn">Dodaj audiobook</button>
         </section>
 
-        <section id="store" style="display:none;">
+        <section id="store">
             <h2>Sklep</h2>
             <div id="store-list"></div>
         </section>
