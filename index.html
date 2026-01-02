@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eterniverse – Lazy Loading Drzewa</title>
+  <title>Eterniverse – Zoptymalizowana Mapa Bram</title>
 
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js"></script>
 
@@ -21,25 +21,53 @@
     #current-path { margin-bottom:8px; font-size:0.9rem; color:#c0a0ff; }
     #element-title { width:100%; padding:10px; font-size:1.6rem; background:transparent; border:none; border-bottom:2px solid #0cf; color:#eee; margin-bottom:12px; text-align:center; }
     textarea { flex:1; background:#222; border:1px solid #444; border-radius:6px; padding:12px; color:#eee; font-size:1rem; resize:none; }
-    .tree-node {
-      padding:10px;
-      margin:6px 0;
-      background:#282828;
-      border-left:4px solid #555;
-      border-radius:4px;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-    }
+    .tree-node { padding:10px; margin:6px 0; background:#282828; border-left:4px solid #555; border-radius:4px; cursor:pointer; }
     .tree-node:hover { background:#333; border-left-color:#0cf; }
     .tree-node.selected { border-left-color:#0cf; background:#003366; }
-    .tree-expander {
-      margin-right:8px;
+    .nested { margin-left:18px; }
+
+    /* Zoptymalizowana mapa bram – siatka kart */
+    #mapa-grid {
+      flex:1;
+      overflow-y:auto;
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+      gap:12px;
+      padding:8px 0;
+    }
+    .brama-card {
+      background:#1a1a2e;
+      border:1px solid #444;
+      border-radius:8px;
+      padding:14px;
+      cursor:pointer;
+      transition:background 0.2s, border-color 0.2s;
+      display:flex;
+      flex-direction:column;
+    }
+    .brama-card:hover {
+      background:#203050;
+      border-color:#0cf;
+    }
+    .brama-name {
       font-weight:bold;
-      width:16px;
+      margin-bottom:8px;
+      color:#0cf;
+      font-size:1.05rem;
+    }
+    .brama-books {
+      flex:1;
+      font-size:0.9rem;
+      opacity:0.9;
+      line-height:1.4;
+    }
+    .brama-hint {
+      margin-top:10px;
+      font-size:0.8rem;
+      opacity:0.6;
       text-align:center;
     }
-    .nested { margin-left:24px; }
+
     .status { background:#222; padding:12px; text-align:center; border-top:1px solid #444; font-size:0.95rem; }
 
     @media (min-width:768px) { .layout { grid-template-columns:1fr 1fr; } .section:nth-child(3){grid-column:span 2;} }
@@ -64,9 +92,9 @@
   </div>
 
   <div class="layout">
-    <div class="section"><h2>Hierarchia (Lazy Loading)</h2><div id="current-path"></div><div id="structure-tree" style="flex:1;overflow-y:auto;"></div></div>
+    <div class="section"><h2>Hierarchia</h2><div id="current-path"></div><div id="structure-tree" style="flex:1;overflow-y:auto;"></div></div>
     <div class="section"><h2>Edytor</h2><input type="text" id="element-title" placeholder="Tytuł..."><textarea id="element-content" placeholder="Treść..."></textarea></div>
-    <div class="section"><h2>Brama & Sugestie</h2><div id="mapa-grid" style="flex:1;overflow-y:auto;"></div><div id="suggestions" style="margin-top:15px;"></div></div>
+    <div class="section"><h2>Zoptymalizowana Mapa Bram</h2><div id="mapa-grid"></div><div id="suggestions" style="margin-top:15px;"></div></div>
   </div>
 
   <div class="status" id="status">Gotowy</div>
@@ -113,33 +141,35 @@
         const s=this.app.data.getStructure();
         if(s.length===0){c.innerHTML='<p style="text-align:center;padding:30px;opacity:0.6;">+ Nowe Uniwersum</p>';return;}
         let html='';
-        for(let i=0;i<s.length;i++) html+=this.buildLazyNode(s[i]);
+        for(let i=0;i<s.length;i++) html+=this.buildNode(s[i]);
         c.innerHTML=html;
       }
-      buildLazyNode(n){
+      buildNode(n){
         const sel=this.app.currentElement?.id===n.id;
-        const hasChildren=n.children?.length>0;
-        const expander=hasChildren ? '<span class="tree-expander" onclick="event.stopPropagation();master.toggleChildren(this.parentNode.dataset.id)">+</span>' : '<span class="tree-expander"></span>';
-        let h=`<div class="tree-node \( {sel?'selected':''}" data-id=" \){n.id}" onclick="master.selectElement('${n.id}')">
-          \( {expander}<strong> \){n.title||'(bez tytułu)'}</strong> <small>${n.type||''}</small>
+        let h=`<div class="tree-node \( {sel?'selected':''}" onclick="master.selectElement(' \){n.id}')">
+          <strong>\( {n.title||'(bez tytułu)'}</strong> <small> \){n.type||''}</small>
         </div>`;
-        if(hasChildren){
-          h+=`<div class="nested" style="display:none;"></div>`;
+        if(n.children?.length){
+          h+='<div class="nested">';
+          for(let i=0;i<n.children.length;i++) h+=this.buildNode(n.children[i]);
+          h+='</div>';
         }
         return h;
       }
-      renderChildren(parentNode,n){
-        let html='';
-        for(let i=0;i<n.children.length;i++) html+=this.buildLazyNode(n.children[i]);
-        parentNode.nextElementSibling.innerHTML=html;
-      }
+      // ZOPTYMALIZOWANA MAPA BRAM – karty w siatce
       renderMapa(){
         const c=this.e.mapa;
         const m=this.app.data.getMapa();
         let html='';
-        for(let i=0;i<m.length;i++) html+=`<div class="tree-node" onclick="master.insertBrama(${m[i].id})">
-          <strong>\( {m[i].name}</strong> <small> \){m[i].books.length} ksiąg</small>
-        </div>`;
+        for(let i=0;i<m.length;i++){
+          const b=m[i];
+          const booksHtml=b.books.map(book=>`<div>• ${book}</div>`).join('');
+          html+=`<div class="brama-card" onclick="master.insertBrama(${b.id})">
+            <div class="brama-name">${b.name}</div>
+            <div class="brama-books">${booksHtml}</div>
+            <div class="brama-hint">Kliknij, by wstawić</div>
+          </div>`;
+        }
         c.innerHTML=html;
       }
       renderEdit(){
@@ -168,7 +198,6 @@
         this.currentElement=null;
         this.currentProfile=this.data.getProfile();
         this.recognition=null;
-        this.expandedNodes=new Set();
         this.init();
       }
       init(){
@@ -207,10 +236,7 @@
         const c={id:this.generateUniqueId(),type,title:`Nowy ${type}`,content:'',children:[]};
         this.currentElement.children.push(c);
         this.data.setStructure(this.data.getStructure());
-        this.currentElement=c;
-        const parentNode=document.querySelector(`.tree-node[data-id="${this.currentElement.id}"]`);
-        if(parentNode && parentNode.nextElementSibling) parentNode.nextElementSibling.style.display='block';
-        this.renderer.renderAll();
+        this.currentElement=c;this.renderer.renderAll();
       }
       selectElement(id){
         this.currentElement=this.findElementById(id,this.data.getStructure());
@@ -240,7 +266,7 @@
         const b=this.data.getMapa().find(x=>x.id===id);
         if(!b||!this.currentElement)return;
         const l=b.books.map(t=>`• ${t}`).join('\n');
-        document.getElementById('element-content').value+=`\n\n=== \( {b.name} ===\n \){l}\n\n`;
+        document.getElementById('element-content').value+=`\n\n✦ === \( {b.name} === ✦\n \){l}\n\n`;
         this.autoSaveCurrent();
       }
       generateAIContent(){
@@ -278,21 +304,6 @@
           }catch{this.renderer.setStatus('Błąd pliku');}
         };
         r.readAsText(file);
-      }
-      toggleChildren(id){
-        const node=document.querySelector(`.tree-node[data-id="${id}"]`);
-        if(!node) return;
-        const childrenContainer=node.nextElementSibling;
-        if(!childrenContainer) return;
-        const isExpanded=childrenContainer.style.display==='block';
-        childrenContainer.style.display=isExpanded?'none':'block';
-        node.querySelector('.tree-expander').textContent=isExpanded?'+':'−';
-        if(!isExpanded && childrenContainer.innerHTML===''){
-          const element=this.findElementById(id,this.data.getStructure());
-          if(element && element.children?.length){
-            this.renderer.renderChildren(node,element);
-          }
-        }
       }
       initSpeechRecognition(){
         if(!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) return;
