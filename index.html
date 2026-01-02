@@ -1,204 +1,57 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>ETERNIVERSE — 10 ŚWIATÓW</title>
-
-<style>
-:root{
-  --bg:#040b12;
-  --card:#071622;
-  --text:#e6f6f5;
-  --border:rgba(255,255,255,.08);
-  --accent:#28d3c6;
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:linear-gradient(180deg,#020812,#05111a);
-  color:var(--text);
-}
-.wrap{
-  max-width:1200px;
-  margin:0 auto;
-  padding:30px 20px 80px;
-}
-h1{
-  color:var(--accent);
-  letter-spacing:1px;
-  margin-bottom:10px;
-}
-.intro{
-  color:#9abfb7;
-  max-width:800px;
-  font-size:14px;
-  line-height:1.6;
-  margin-bottom:30px;
-}
-.controls{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:30px;
-}
-input,select,button{
-  background:var(--card);
-  border:1px solid var(--border);
-  color:var(--text);
-  padding:10px 14px;
-  border-radius:8px;
-}
-button{cursor:pointer}
-.grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:20px;
-}
-@media(min-width:900px){
-  .grid{grid-template-columns:1fr 1fr}
-}
-.world{
-  border:1px solid var(--border);
-  border-radius:16px;
-  background:#08121c;
-  overflow:hidden;
-}
-.world-header{
-  padding:16px;
-  border-left:4px solid var(--accent);
-  background:linear-gradient(90deg,rgba(40,211,198,.12),transparent);
-}
-.world-title{
-  font-weight:800;
-  letter-spacing:.6px;
-}
-.world-sub{
-  font-size:12px;
-  opacity:.7;
-  margin-top:4px;
-}
-.book-list{
-  list-style:none;
-  margin:0;
-  padding:12px;
-  max-height:520px;
-  overflow:auto;
-}
-.book{
-  padding:12px;
-  border-radius:8px;
-  border:1px solid transparent;
-  background:rgba(255,255,255,.03);
-  margin-bottom:8px;
-  cursor:pointer;
-}
-.book:hover{
-  background:rgba(255,255,255,.06);
-  border-color:var(--border);
-}
-.book.open{
-  background:rgba(0,0,0,.4);
-}
-.book-title{
-  font-weight:600;
-}
-.book-desc{
-  display:none;
-  margin-top:10px;
-  font-size:13px;
-  line-height:1.6;
-  color:#b0ccc7;
-}
-.book.open .book-desc{display:block}
-footer{
-  margin-top:50px;
-  padding-top:20px;
-  border-top:1px solid var(--border);
-  font-size:12px;
-  text-align:center;
-  color:#5a7a75;
-}
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Master Strona Redakcji Książek</title>
+    <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
-<div class="wrap">
+    <header>
+        <h1>Master Strona Redakcji Książek</h1>
+        <nav>
+            <ul>
+                <li><a href="#library">Biblioteka</a></li>
+                <li><a href="#editor">Edytor</a></li>
+                <li><a href="#audiobooks">Audiobooki</a></li>
+                <li><a href="#store">Sklep</a></li>
+            </ul>
+        </nav>
+    </header>
 
-<h1>ETERNIVERSE — 10 ŚWIATÓW</h1>
-<div class="intro">
-Jeden silnik. Dziesięć światów. Osiemdziesiąt ksiąg.  
-To jest CZYSTA MAPA. Bez magii. Bez chaosu. Bez eksperymentów.
-</div>
+    <main>
+        <section id="library">
+            <h2>Biblioteka książek</h2>
+            <div id="book-list"></div>
+            <button id="add-book-btn">Dodaj nową książkę</button>
+        </section>
 
-<div class="controls">
-  <input id="search" placeholder="Szukaj książki...">
-  <select id="filter">
-    <option value="all">Wszystkie światy</option>
-  </select>
-</div>
+        <section id="editor" style="display:none;">
+            <h2>Edytor książki</h2>
+            <input type="text" id="book-title" placeholder="Tytuł książki" />
+            <textarea id="book-content" placeholder="Treść książki..."></textarea>
+            <button id="save-book-btn">Zapisz książkę</button>
+            <button id="export-book-btn">Eksportuj książkę</button>
+            <button id="import-book-btn">Importuj książkę</button>
+            <input type="file" id="import-file" style="display:none;" accept=".json,.txt" />
+        </section>
 
-<section class="grid" id="grid"></section>
+        <section id="audiobooks" style="display:none;">
+            <h2>Audiobooki</h2>
+            <div id="audiobook-list"></div>
+            <button id="add-audiobook-btn">Dodaj audiobook</button>
+        </section>
 
-<footer>
-SYSTEM ETERNIVERSE • SILNIK POD 10 ŚWIATÓW
-</footer>
+        <section id="store" style="display:none;">
+            <h2>Sklep</h2>
+            <div id="store-list"></div>
+        </section>
+    </main>
 
-</div>
+    <footer>
+        <p>&copy; 2024 Master Strona Redakcji Książek</p>
+    </footer>
 
-<script>
-const DATA = Array.from({length:10},(_,i)=>({
-  id:`world${i+1}`,
-  name:`ŚWIAT ${i+1}`,
-  sub:`Brama ${i+1} • Poziom ${i+1}`,
-  books:Array.from({length:8},(_,b)=>({
-    title:`Księga ${b+1} — Świat ${i+1}`,
-    desc:`Opis roboczy księgi ${b+1} w Świecie ${i+1}.`
-  }))
-}));
-
-const grid=document.getElementById('grid');
-const filter=document.getElementById('filter');
-const search=document.getElementById('search');
-
-DATA.forEach(w=>{
-  const opt=document.createElement('option');
-  opt.value=w.id;
-  opt.textContent=w.name;
-  filter.appendChild(opt);
-});
-
-function render(){
-  grid.innerHTML='';
-  const q=search.value.toLowerCase();
-  DATA.forEach(w=>{
-    if(filter.value!=='all' && filter.value!==w.id) return;
-    const world=document.createElement('article');
-    world.className='world';
-    const h=document.createElement('div');
-    h.className='world-header';
-    h.innerHTML=`<div class="world-title">${w.name}</div><div class="world-sub">${w.sub}</div>`;
-    world.appendChild(h);
-    const ul=document.createElement('ul');
-    ul.className='book-list';
-    w.books.forEach(b=>{
-      if(!b.title.toLowerCase().includes(q)) return;
-      const li=document.createElement('li');
-      li.className='book';
-      li.innerHTML=`<div class="book-title">${b.title}</div><div class="book-desc">${b.desc}</div>`;
-      li.onclick=()=>li.classList.toggle('open');
-      ul.appendChild(li);
-    });
-    world.appendChild(ul);
-    grid.appendChild(world);
-  });
-}
-
-search.oninput=render;
-filter.onchange=render;
-render();
-</script>
-
+    <script src="script.js"></script>
 </body>
 </html>
