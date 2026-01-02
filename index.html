@@ -3,438 +3,628 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eterniverse - Bella Asystent Redakcyjny</title>
+  <title>Eterniverse - Bella Asystent Redakcyjny v2.1</title>
   <style>
     :root {
-      --bg-primary: #121212;
-      --bg-secondary: #1e1e1e;
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1a1a1a;
       --bg-panel: #222;
       --bg-hover: #333;
-      --text-primary: #eee;
-      --text-secondary: #bbb;
+      --bg-accent: #4a90e2;
+      --text-primary: #f0f0f0;
+      --text-secondary: #b0b0b0;
       --accent: #4a90e2;
       --success: #50c878;
       --warning: #f39c12;
       --danger: #e74c3c;
-      --border: #444;
+      --border: #404040;
+      --shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: var(--bg-primary);
+      background: linear-gradient(135deg, var(--bg-primary) 0%, #1a1a2e 50%, #16213e 100%);
       color: var(--text-primary);
-      font-family: 'Segoe UI', Tahoma, sans-serif;
+      font-family: 'Segoe UI', -apple-system, sans-serif;
       height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
     header {
-      background: var(--bg-secondary);
-      padding: 1.5rem;
+      background: rgba(26,26,46,0.95);
+      backdrop-filter: blur(20px);
+      padding: 1.5rem 2rem;
       text-align: center;
-      font-size: 1.6rem;
-      font-weight: bold;
-      border-bottom: 2px solid var(--border);
+      font-size: 1.8rem;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), transparent);
     }
 
     .controls {
-      padding: 1rem;
-      background: var(--bg-panel);
+      padding: 1.25rem 2rem;
+      background: rgba(34,34,34,0.9);
+      backdrop-filter: blur(10px);
       display: flex;
       gap: 1rem;
       justify-content: center;
       flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
     }
 
-    select, button {
-      padding: 0.75rem 1.25rem;
+    .control-group {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    select, button, input {
+      padding: 0.875rem 1.5rem;
       background: var(--bg-hover);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 12px;
       color: var(--text-primary);
       cursor: pointer;
-      font-size: 1rem;
-      transition: all 0.2s;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
     }
 
-    button:hover:not(:disabled) {
-      background: var(--accent);
+    select:hover, button:hover:not(:disabled), input:hover {
+      background: var(--bg-accent);
       border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(74,144,226,0.3);
     }
 
     button:disabled {
-      opacity: 0.5;
+      opacity: 0.4;
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    button.success { background: var(--success); border-color: var(--success); color: #000; }
+    button.danger { background: var(--danger); border-color: var(--danger); color: white; }
+
+    .main-container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr auto;
+      gap: 1.5rem;
+      padding: 2rem;
+      overflow: hidden;
     }
 
     textarea {
-      flex: 1;
-      margin: 1rem;
-      padding: 1.25rem;
-      background: var(--bg-panel);
-      color: var(--text-primary);
+      background: rgba(34,34,34,0.85);
+      backdrop-filter: blur(15px);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      font-size: 1rem;
-      font-family: inherit;
-      resize: vertical;
+      border-radius: 16px;
+      padding: 1.75rem;
+      font-size: 1.05rem;
+      font-family: 'Consolas', 'Monaco', monospace;
+      line-height: 1.65;
+      transition: all 0.3s;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
     }
 
     textarea:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+      box-shadow: 0 0 0 4px rgba(74,144,226,0.15), inset 0 1px 5px rgba(74,144,226,0.1);
+      transform: translateY(-1px);
+    }
+
+    #console { grid-column: 1; grid-row: 1; min-height: 300px; }
+    #editor { grid-column: 2; grid-row: 1 / 3; min-height: 500px; }
+    #suggestions { 
+      grid-column: 1; 
+      grid-row: 2; 
+      background: rgba(74,144,226,0.08); 
+      border: 2px solid rgba(74,144,226,0.2);
+      max-height: 250px;
+    }
+
+    .suggestion {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border-left: 4px solid var(--accent);
+      padding: 1.25rem;
+      margin: 1rem 0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .suggestion::before {
+      content: '💡';
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.7;
+    }
+
+    .suggestion:hover {
+      transform: translateX(8px);
+      box-shadow: var(--shadow);
+    }
+
+    .suggestion button {
+      position: absolute;
+      bottom: 0.75rem;
+      right: 0.75rem;
+      padding: 0.5rem 1rem;
+      background: var(--success);
+      color: #000;
+      border: none;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: all 0.2s;
+    }
+
+    .suggestion:hover button {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .suggestion.accepted {
+      opacity: 0.6;
+      border-left-color: var(--success);
     }
 
     .output-section {
-      padding: 1rem;
-      background: var(--bg-secondary);
+      padding: 1.5rem 2rem;
+      background: rgba(26,26,46,0.9);
+      backdrop-filter: blur(20px);
       border-top: 1px solid var(--border);
     }
 
     .dual-panel {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1rem;
+      gap: 1.5rem;
     }
 
-    .panel {
-      background: var(--bg-panel);
-      padding: 1rem;
-      border-radius: 8px;
-      min-height: 120px;
+    .status-panel {
+      background: rgba(34,34,34,0.7);
+      backdrop-filter: blur(15px);
+      padding: 1.5rem;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      min-height: 140px;
+      position: relative;
+      overflow: hidden;
     }
 
-    .suggestion {
-      background: rgba(74, 144, 226, 0.1);
-      border-left: 4px solid var(--accent);
-      padding: 1rem;
-      margin: 0.5rem 0;
-      border-radius: 6px;
-      cursor: pointer;
+    .status-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--success), var(--warning));
     }
 
-    .suggestion button {
-      margin-left: 1rem;
-      padding: 0.5rem 1rem;
-      background: var(--success);
-      color: #000;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+    .status-header {
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    @media (max-width: 768px) {
+    #history {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      max-height: 100px;
+      overflow-y: auto;
+      opacity: 0.9;
+    }
+
+    .history-item {
+      margin: 0.25rem 0;
+      padding: 0.25rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.8rem;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in { animation: fadeInUp 0.4s ease-out; }
+
+    @media (max-width: 1024px) {
+      .main-container { 
+        grid-template-columns: 1fr; 
+        grid-template-rows: auto 1fr auto;
+        padding: 1rem;
+        gap: 1rem;
+      }
+      #suggestions { order: 3; }
       .dual-panel { grid-template-columns: 1fr; }
-      .controls { flex-direction: column; }
+      .controls { padding: 1rem; gap: 0.75rem; }
+    }
+
+    @media (max-width: 480px) {
+      header { font-size: 1.4rem; padding: 1rem; }
+      .controls { flex-direction: column; align-items: stretch; }
+      select, button { flex: 1; }
     }
   </style>
 </head>
 <body>
-  <header>Eterniverse - Bella Asystent Redakcyjny</header>
+  <header>
+    <div>Eterniverse</div>
+    <div style="font-size: 0.7em; opacity: 0.8; font-weight: 300;">Bella Asystent Redakcyjny v2.1</div>
+  </header>
 
   <div class="controls">
-    <label>Profil:</label>
-    <select id="profileSelector">
-      <option value="amazon">Amazon</option>
-      <option value="wattpad">Wattpad</option>
-    </select>
+    <div class="control-group">
+      <label style="font-size: 0.9em; opacity: 0.8;">Profil:</label>
+      <select id="profileSelector">
+        <option value="amazon">🛒 Amazon</option>
+        <option value="wattpad" selected>📖 Wattpad</option>
+      </select>
+    </div>
     
-    <button id="startRecBtn">🎙️ Rozpocznij dyktowanie</button>
-    <button id="stopRecBtn" disabled>⏹️ Zatrzymaj</button>
-    <button id="executeBtn">✨ Wykonaj / Podpowiedź</button>
-    <button id="exportBtn">📤 Eksport DOCX</button>
+    <div class="control-group">
+      <button id="startRecBtn" class="success">🎙️ Dyktowanie</button>
+      <button id="stopRecBtn" disabled>⏹️ Stop</button>
+    </div>
+    
+    <button id="executeBtn">✨ Wykonaj / AI</button>
+    <button id="exportBtn" class="success">📤 DOCX</button>
   </div>
 
-  <div style="flex: 1; display: flex; gap: 1rem; padding: 1rem; overflow: hidden;">
+  <div class="main-container">
     <textarea id="console" 
-              placeholder="Wpisz polecenia: REDAGUJ, PODPOWIEDŹ, GENERUJ TEKST, EKSPORTUJ&#10;lub tekst do analizy..."></textarea>
+              placeholder="🎙️ Dyktuj lub wpisz:&#10;• REDAGUJ [tekst]&#10;• PODPOWIEDŹ&#10;• GENERUJ TEKST&#10;• EKSPORTUJ&#10;&#10;Ctrl+Enter = Wykonaj"
+              class="fade-in"></textarea>
     
-    <div style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
       <textarea id="editor" 
-                placeholder="Edytor tekstu - tutaj edytuj i eksportuj..."></textarea>
+                placeholder="📝 Twój tekst tutaj... Edytuj, analizuj, eksportuj&#10;(Bella automatycznie analizuje styl pod wybrany profil)"
+                class="fade-in"></textarea>
       
-      <div id="suggestions" style="flex: 1; overflow: auto;"></div>
+      <div id="suggestions" class="fade-in">
+        💡 Bella czeka na Twój tekst...
+      </div>
     </div>
   </div>
 
   <div class="output-section">
     <div class="dual-panel">
-      <div class="panel">
-        <strong>📋 Status:</strong>
-        <div id="output">Bella gotowa do pracy! Mów "rozpocznij dyktowanie" lub wpisz polecenie.</div>
+      <div class="status-panel fade-in">
+        <div class="status-header">📊 Status</div>
+        <div id="output">Witaj! Bella gotowa do pracy ✨</div>
       </div>
-      <div class="panel">
-        <strong>💾 Historia:</strong>
-        <div id="history">Czekam na pierwsze polecenie...</div>
+      
+      <div class="status-panel fade-in">
+        <div class="status-header">📜 Historia</div>
+        <div id="history"></div>
       </div>
     </div>
   </div>
 
-  <!-- DOCX Library -->
+  <!-- DOCX -->
   <script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.min.js"></script>
   
-  <!-- APP LOGIC - Poprawiona wersja -->
+  <!-- MASTER SCRIPT v2.1 -->
   <script>
-  (async () => {
+  (async function() {
+    'use strict';
+    
     const { Document, Packer, Paragraph, HeadingLevel } = docx;
-
-    const STORAGE_KEY = 'eterniverse_assistant_data_profiles';
-    let data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-    if (!data.amazon) data.amazon = { acceptedSuggestions: [] };
-    if (!data.wattpad) data.wattpad = { acceptedSuggestions: [] };
-
+    
+    // STORAGE
+    const PROFILES_KEY = 'bella_profiles_v21';
+    let profiles = JSON.parse(localStorage.getItem(PROFILES_KEY) || '{}');
+    ['amazon', 'wattpad'].forEach(p => {
+      if (!profiles[p]) profiles[p] = { suggestions: [], accepted: [] };
+    });
+    
     // ELEMENTS
-    const consoleEl = document.getElementById('console');
-    const editorEl = document.getElementById('editor');
-    const suggestionsEl = document.getElementById('suggestions');
-    const outputEl = document.getElementById('output');
-    const historyEl = document.getElementById('history');
-    const profileSelector = document.getElementById('profileSelector');
-    const startRecBtn = document.getElementById('startRecBtn');
-    const stopRecBtn = document.getElementById('stopRecBtn');
-    const executeBtn = document.getElementById('executeBtn');
-    const exportBtn = document.getElementById('exportBtn');
-
-    let currentProfile = profileSelector.value;
-    let recognition;
-    let recognizing = false;
-
-    // PROFILE SWITCH
-    profileSelector.onchange = () => {
-      currentProfile = profileSelector.value;
-      clearSuggestions();
-      showStatus(`Przełączono na profil: ${currentProfile.toUpperCase()}`);
-      speakText(`Przełączono na profil ${currentProfile}`);
+    const els = {
+      console: document.getElementById('console'),
+      editor: document.getElementById('editor'),
+      suggestions: document.getElementById('suggestions'),
+      output: document.getElementById('output'),
+      history: document.getElementById('history'),
+      profile: document.getElementById('profileSelector'),
+      startRec: document.getElementById('startRecBtn'),
+      stopRec: document.getElementById('stopRecBtn'),
+      execute: document.getElementById('executeBtn'),
+      export: document.getElementById('exportBtn')
+    };
+    
+    let state = {
+      profile: els.profile.value,
+      recognition: null,
+      dictating: false,
+      history: []
     };
 
-    // SPEECH RECOGNITION
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      recognition.lang = 'pl-PL';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
+    // === INIT ===
+    initSpeech();
+    bindEvents();
+    welcome();
 
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript.trim();
-        consoleEl.value += (consoleEl.value ? ' ' : '') + transcript;
-        speakText(`Rozpoznano: ${transcript}`);
-        addHistory(`🎙️ ${transcript}`);
-      };
-
-      recognition.onstart = () => {
-        recognizing = true;
-        startRecBtn.disabled = true;
-        stopRecBtn.disabled = false;
-        speakText('Rozpoczęto dyktowanie');
-      };
-
-      recognition.onend = () => {
-        recognizing = false;
-        startRecBtn.disabled = false;
-        stopRecBtn.disabled = true;
-      };
-    } else {
-      startRecBtn.style.display = 'none';
-      stopRecBtn.style.display = 'none';
-    }
-
-    // EVENT LISTENERS
-    startRecBtn.onclick = () => recognition?.start();
-    stopRecBtn.onclick = () => recognition?.stop();
-    executeBtn.onclick = () => processConsoleText(consoleEl.value);
-    exportBtn.onclick = exportCurrent;
-
-    // TTS
-    function speakText(text) {
-      if (!window.speechSynthesis) return;
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'pl-PL';
-      utterance.rate = 0.9;
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
-    }
-
-    // UI HELPERS
-    function showStatus(msg) {
-      outputEl.textContent = msg;
-      addHistory(`📋 ${msg}`);
-    }
-
-    function clearSuggestions() {
-      suggestionsEl.innerHTML = '';
-    }
-
-    function addHistory(msg) {
-      const time = new Date().toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
-      historyEl.innerHTML += `<div style="font-size:0.9em;opacity:0.8;margin:0.25rem 0;">[${time}] ${msg}</div>`;
-      historyEl.scrollTop = historyEl.scrollHeight;
-    }
-
-    // AMAZON SUGGESTIONS
-    function amazonSuggestions(text) {
-      const suggestions = [];
-      const words = text.toLowerCase().match(/\bw+\b/g) || [];
-      const wordCounts = {};
-      
-      words.forEach(w => wordCounts[w] = (wordCounts[w] || 0) + 1);
-      Object.entries(wordCounts).forEach(([word, count]) => {
-        if (count > 5) suggestions.push(`⚠️ "${word}" x${count} - użyj synonimów`);
-      });
-
-      const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
-      sentences.forEach((s, i) => {
-        const len = s.trim().split(/s+/).length;
-        if (len > 25) suggestions.push(`📏 Zdanie ${i+1}: ${len} słów - podziel`);
-      });
-
-      const seoKeywords = ['darmowa wysyłka', 'gwarancja', 'promocja'];
-      seoKeywords.forEach(kw => {
-        if (!new RegExp(`\\b${kw}\\b`, 'i').test(text)) {
-          suggestions.push(`🔍 Dodaj SEO: "${kw}"`);
+    function bindEvents() {
+      els.profile.onchange = () => switchProfile(els.profile.value);
+      els.execute.onclick = execute;
+      els.export.onclick = exportDoc;
+      els.console.onkeydown = e => {
+        if (e.ctrlKey && e.key === 'Enter') {
+          e.preventDefault();
+          execute();
         }
+      };
+    }
+
+    // === SPEECH ===
+    function initSpeech() {
+      if (!('webkitSpeechRecognition' in window)) {
+        els.startRec.style.display = 'none';
+        els.stopRec.style.display = 'none';
+        return;
+      }
+
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      state.recognition = new SpeechRec();
+      
+      state.recognition.lang = 'pl-PL';
+      state.recognition.continuous = false;
+      
+      state.recognition.onresult = e => {
+        const text = e.results[0][0].transcript;
+        els.console.value += (els.console.value ? ' ' : '') + text;
+        speak(`Rozpoznano: ${text}`);
+        logHistory(`🎙️ ${text}`);
+      };
+
+      state.recognition.onstart = () => {
+        state.dictating = true;
+        els.startRec.disabled = true;
+        els.stopRec.disabled = false;
+        speak('Dyktowanie rozpoczęte');
+      };
+
+      state.recognition.onend = () => {
+        state.dictating = false;
+        els.startRec.disabled = false;
+        els.stopRec.disabled = true;
+      };
+
+      els.startRec.onclick = () => state.recognition.start();
+      els.stopRec.onclick = () => state.recognition.stop();
+    }
+
+    // === CORE FUNCTIONS ===
+    function execute() {
+      const input = els.console.value.trim();
+      if (!input) return;
+
+      logHistory(`💭 ${input.substring(0, 40)}${input.length > 40 ? '...' : ''}`);
+      
+      const cmd = input.split(/s+/)[0].toUpperCase();
+      switch(cmd) {
+        case 'REDAGUJ':
+          els.editor.value = input.slice(7);
+          status('✅ Tekst załadowany - wpisz PODPOWIEDŹ');
+          break;
+          
+        case 'PODPOWIEDŹ':
+          analyzeText();
+          break;
+          
+        case 'GENERUJ':
+          generateSample();
+          break;
+          
+        case 'EKSPORTUJ':
+          exportDoc();
+          break;
+          
+        default:
+          els.editor.value = input;
+          status('📝 Tekst w edytorze');
+      }
+      
+      els.console.value = '';
+    }
+
+    function analyzeText() {
+      const text = els.editor.value.trim();
+      if (!text) return status('❌ Brak tekstu do analizy');
+
+      const suggestions = getSuggestions(text, state.profile)
+        .filter(s => !profiles[state.profile].accepted.includes(s));
+
+      clearSuggestions();
+      
+      if (!suggestions.length) {
+        status('🎉 Tekst perfekcyjny - brak sugestii!');
+        return;
+      }
+
+      suggestions.forEach(suggestion => {
+        const div = document.createElement('div');
+        div.className = 'suggestion';
+        div.innerHTML = suggestion;
+        
+        const acceptBtn = document.createElement('button');
+        acceptBtn.textContent = '✓ Akceptuj';
+        acceptBtn.onclick = () => {
+          profiles[state.profile].accepted.push(suggestion);
+          localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
+          div.classList.add('accepted');
+          speak('Zaakceptowano');
+        };
+        
+        div.appendChild(acceptBtn);
+        els.suggestions.appendChild(div);
       });
 
-      return suggestions;
+      status(`💡 ${suggestions.length} sugestii Bella`);
+      speak(`${suggestions.length} nowych sugestii`);
     }
 
-    // WATTPAD SUGGESTIONS
-    function wattpadSuggestions(text) {
+    function getSuggestions(text, profile) {
+      const words = text.toLowerCase().match(/\bw+\b/g) || [];
+      const sentences = text.split(/[.!?]+/).filter(s => s.trim());
+      
       const suggestions = [];
-      const emotions = ['smutny', 'szczęśliwy', 'zły', 'zakocha', 'przeraż'];
-      let emotionCount = emotions.filter(e => new RegExp(`\\b${e}\\b`, 'i').test(text)).length;
-      
-      if (emotionCount < 2) suggestions.push('❤️ Więcej emocji dla Wattpad!');
-      
-      if (!/[„”"']/.test(text)) suggestions.push('💬 Dodaj dialogi!');
-      
-      const shortSentences = text.match(/[^.!?]+[.!?]+/g)?.filter(s => 
-        s.trim().split(/s+/).length < 4
-      ) || [];
-      if (shortSentences.length > 2) {
-        suggestions.push(`📝 ${shortSentences.length} krótkich zdań - rozwiń`);
+
+      // Profile-specific
+      if (profile === 'amazon') {
+        const repeats = {};
+        words.forEach(w => repeats[w] = (repeats[w] || 0) + 1);
+        Object.entries(repeats).forEach(([word, count]) => {
+          if (count > 4) suggestions.push(`🔄 "${word}" (${count}x) → synonimy`);
+        });
+        
+        if (!/(darmowa.*wysyłka|gwarancja)/i.test(text)) {
+          suggestions.push('📦 SEO: "darmowa wysyłka" / "gwarancja"');
+        }
+      } else {
+        const emotions = words.filter(w => /(smutn|szczęśliw|zakocha|przeraż|radość)/i.test(w));
+        if (emotions.length < 3) suggestions.push('❤️ Więcej emocji!');
+        
+        if (!/"|„|”/.test(text)) suggestions.push('💬 Dialogi zwiększają zaangażowanie');
       }
 
-      return suggestions;
+      // Universal
+      const avgSentence = sentences.reduce((sum, s) => sum + s.trim().split(/s+/).length, 0) / sentences.length;
+      if (avgSentence > 25) suggestions.push('📏 Długie zdania → podziel na krótsze');
+      
+      return suggestions.slice(0, 8);
     }
 
-    function getSuggestionsForProfile(text) {
-      return currentProfile === 'amazon' ? amazonSuggestions(text) : wattpadSuggestions(text);
+    function generateSample() {
+      const samples = {
+        amazon: `🚀 REWOLUCYJNY PRODUKT! Najwyższa jakość, darmowa wysyłka 24h, 100% gwarancja satysfakcji. Zamów teraz!`,
+        wattpad: `🌙 Deszcz bębnił o parapet. Jej serce biło jak oszalałe. "On odchodzi..." - szepnęła, patrząc w dal.`
+      };
+      els.editor.value = samples[state.profile];
+      status(`✨ Przykładowy tekst ${state.profile}`);
+      speak('Przykładowy tekst gotowy');
     }
 
-    // MAIN COMMAND PROCESSOR
-    function processConsoleText(input) {
-      const cmd = input.trim();
-      if (!cmd) return;
-
-      const parts = cmd.split(/s+/);
-      const cmdUpper = parts[0].toUpperCase();
-      addHistory(`⌨️ ${cmd.substring(0, 50)}${cmd.length > 50 ? '...' : ''}`);
-
-      switch(cmdUpper) {
-        case 'REDAGUJ':
-        case 'REDAGUJ TEKST':
-          editorEl.value = consoleEl.value;
-          showStatus('✅ Tekst w edytorze - wpisz PODPOWIEDŹ');
-          break;
-
-        case 'PODPOWIEDŹ':
-          const text = editorEl.value.trim();
-          if (!text) return showStatus('❌ Edytor pusty!');
-          
-          const suggestions = getSuggestionsForProfile(text)
-            .filter(s => !data[currentProfile].acceptedSuggestions.includes(s));
-          
-          clearSuggestions();
-          if (!suggestions.length) {
-            showStatus('🎉 Brak nowych sugestii - tekst idealny!');
-          } else {
-            suggestions.forEach(suggestion => {
-              const div = document.createElement('div');
-              div.className = 'suggestion';
-              div.innerHTML = `${suggestion} <button>Akceptuj</button>`;
-              div.querySelector('button').onclick = () => {
-                data[currentProfile].acceptedSuggestions.push(suggestion);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-                div.style.opacity = '0.5';
-                div.innerHTML += ' ✓';
-                speakText('Zaakceptowano');
-              };
-              suggestionsEl.appendChild(div);
-            });
-            showStatus(`💡 ${suggestions.length} nowych sugestii`);
-            speakText(`${suggestions.length} sugestii`);
-          }
-          break;
-
-        case 'GENERUJ':
-        case 'GENERUJ TEKST':
-          editorEl.value = generateSampleText(currentProfile);
-          showStatus(`✨ Wygenerowano próbkę dla ${currentProfile}`);
-          speakText('Przykładowy tekst gotowy');
-          break;
-
-        case 'EKSPORTUJ':
-          exportCurrent();
-          break;
-
-        default:
-          editorEl.value = input;
-          showStatus('📝 Tekst załadowany do edycji');
-      }
-
-      consoleEl.value = '';
-    }
-
-    function generateSampleText(profile) {
-      return profile === 'amazon' ? 
-        `Ten produkt to doskonały wybór! ✅ Najwyższa jakość, darmowa wysyłka, gwarancja satysfakcji.` :
-        `Deszcz spływał po szybie, a w jej oczach odbijały się gwiazdy. "Czy to przeznaczenie?" - szepnęła.`;
-    }
-
-    async function exportCurrent() {
-      if (!editorEl.value.trim()) return showStatus('❌ Nic do eksportu!');
+    async function exportDoc() {
+      if (!els.editor.value.trim()) return status('❌ Brak treści');
 
       try {
         const doc = new Document({
           sections: [{
             children: [
               new Paragraph({
-                text: `ETERNIVERSE - ${currentProfile.toUpperCase()}`,
+                text: `ETERNIVERSE • ${state.profile.toUpperCase()}`,
                 heading: HeadingLevel.HEADING_1,
+                alignment: 'center'
               }),
-              new Paragraph(editorEl.value),
-            ],
-          }],
+              new Paragraph({
+                text: new Date().toLocaleDateString('pl-PL', { 
+                  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+                }),
+                alignment: 'center'
+              }),
+              new Paragraph(''),
+              new Paragraph(els.editor.value)
+            ]
+          }]
         });
 
         const blob = await Packer.toBlob(doc);
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `eterniverse_${currentProfile}_${Date.now()}.docx`;
+        a.download = `eterniverse_${state.profile}_${Date.now().toString(36)}.docx`;
+        document.body.appendChild(a);
         a.click();
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        showStatus('📤 Eksport zakończony!');
-        speakText('Zapisano do Word');
+        
+        status('✅ Eksport DOCX zakończony!');
+        speak('Dokument zapisany');
       } catch (e) {
-        showStatus('❌ Błąd eksportu: ' + e.message);
+        status(`❌ Błąd: ${e.message}`);
       }
     }
 
-    // ENTER KEY SUPPORT
-    consoleEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && e.ctrlKey) {
-        e.preventDefault();
-        processConsoleText(consoleEl.value);
-      }
-    });
+    // === UI HELPERS ===
+    function status(msg) {
+      els.output.textContent = msg;
+      logHistory(msg);
+    }
 
-    // WELCOME
-    speakText('Bella gotowa. Wpisz REDAGUJ lub użyj mikrofonu.');
-    addHistory('🚀 System zainicjowany');
+    function clearSuggestions() {
+      els.suggestions.innerHTML = '';
+    }
+
+    function logHistory(msg) {
+      const time = new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      item.innerHTML = `<span style="color: var(--accent);">[${time}]</span> ${msg}`;
+      els.history.appendChild(item);
+      els.history.scrollTop = els.history.scrollHeight;
+      
+      // Keep last 20
+      if (els.history.children.length > 20) {
+        els.history.removeChild(els.history.firstChild);
+      }
+    }
+
+    function switchProfile(profile) {
+      state.profile = profile;
+      clearSuggestions();
+      status(`🔄 Przełączono: ${profile.toUpperCase()}`);
+      speak(`Profil ${profile}`);
+    }
+
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'pl-PL';
+        utterance.rate = 1.1;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utterance);
+      }
+    }
+
+    function welcome() {
+      status('🚀 Bella v2.1 gotowa!');
+      speak('Bella gotowa do pracy');
+      logHistory('System zainicjowany');
+    }
   })();
   </script>
 </body>
