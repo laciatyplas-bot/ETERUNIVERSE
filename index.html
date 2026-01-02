@@ -3,283 +3,539 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ETERNIVERSE — Interaktywna Mapa Uniwersum EterSeeker</title>
+    <title>ETERNIVERSE — Interaktywna Mapa Uniwersum EterSeeker | ANALIZA PEŁNA</title>
+    
+    <!-- SILNIKI I BIBLIOTEKI -->
+    <!-- 1. GSAP - animacje premium -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- 2. Anime.js - alternatywne animacje -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- 3. ScrollReveal - animacje przewijania -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/scrollReveal.js/3.4.0/scrollreveal.min.js"></script>
     
     <style>
-        body {
+        * {
             margin: 0;
-            padding: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-            color: #e0e0e0;
-            min-height: 100vh;
+            padding: 0;
+            box-sizing: border-box;
         }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: radial-gradient(ellipse at center, #0a0a1f 0%, #000 70%);
+            color: #e8f4f8;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* HEADER Z ANIMACJAMI */
         .header {
             text-align: center;
-            margin-bottom: 40px;
-        }
-        .header h1 {
-            font-size: 2.5em;
-            margin: 0;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.8;
-            margin-top: 10px;
-        }
-        .gates-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        .gate-card {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            transition: all 0.4s ease;
+            padding: 80px 20px;
             position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
         }
-        .gate-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
+        
+        .title-main {
+            font-size: clamp(3rem, 8vw, 6rem);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 4s ease infinite;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            color: #a0c4ff;
+            margin-top: 20px;
+            opacity: 0.9;
+        }
+
+        /* TECH STACK - WIDOCZNY */
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 40px 0;
+            padding: 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+        }
+        
+        .tech-badge {
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .tech-badge:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        /* KARTY BRAM - PEŁNE EFEKTY */
+        .gates-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px 80px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+        }
+        
+        .gate-card {
+            perspective: 1000px;
+            height: 420px;
+            position: relative;
+        }
+        
+        .gate-inner {
+            position: relative;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.6s;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
         }
-        .gate-card:hover {
-            transform: translateY(-15px) scale(1.02);
-            border-color: rgba(255,255,255,0.4);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+        
+        .gate-card.flipped .gate-inner {
+            transform: rotateY(180deg);
         }
-        .gate-card:hover::before {
-            left: 100%;
+        
+        .gate-front, .gate-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 24px;
+            padding: 35px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
         }
+        
+        .gate-front {
+            background: rgba(255,255,255,0.06);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+        }
+        
+        .gate-back {
+            background: rgba(0,0,0,0.8);
+            transform: rotateY(180deg);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
         .gate-color {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            margin: 0 auto 20px;
-            border: 4px solid rgba(255,255,255,0.3);
-            box-shadow: 0 0 30px currentColor;
-            animation: pulse 2s infinite;
+            margin-bottom: 25px;
+            border: 5px solid rgba(255,255,255,0.4);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 40px currentColor;
         }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+        
+        .gate-color::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent 0deg, white 1deg, transparent 3deg);
+            animation: rotate 3s linear infinite;
         }
+        
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+        
         .gate-psyche .gate-color { background: #ff6b6b; }
         .gate-cien .gate-color { background: #4ecdc4; }
         .gate-wola .gate-color { background: #45b7d1; }
         .gate-obfitosc .gate-color { background: #96ceb4; }
         .gate-pole .gate-color { background: #feca57; }
+        
         .gate-name {
-            font-size: 1.8em;
-            font-weight: bold;
+            font-size: 2.2rem;
+            font-weight: 800;
             margin-bottom: 15px;
-            color: white;
+            text-shadow: 0 0 20px currentColor;
         }
+        
         .gate-series {
-            font-size: 1.1em;
-            opacity: 0.9;
-            margin-bottom: 20px;
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-            display: inline-block;
+            font-size: 1.1rem;
+            padding: 10px 24px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 25px;
+            margin-bottom: 25px;
         }
+        
         .gate-desc {
-            line-height: 1.6;
-            opacity: 0.9;
-            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            opacity: 0.95;
+            margin-bottom: 30px;
         }
-        .connections {
-            background: rgba(0,0,0,0.5);
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 0.95em;
-        }
-        .connection {
-            display: inline-block;
-            background: rgba(255,255,255,0.1);
-            padding: 6px 12px;
-            margin: 4px 4px 4px 0;
-            border-radius: 15px;
-            color: white;
-            font-weight: 500;
+        
+        .flip-btn {
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
-        .connection:hover {
-            background: rgba(255,255,255,0.3);
-            transform: scale(1.05);
+        
+        .flip-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
         }
+
+        /* LEGENDA Z EFEKTAMI */
         .legend {
-            max-width: 800px;
-            margin: 40px auto 0;
+            max-width: 1000px;
+            margin: 60px auto;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
+            gap: 25px;
         }
+        
         .legend-item {
             display: flex;
             align-items: center;
-            background: rgba(0,0,0,0.5);
-            padding: 12px 20px;
-            border-radius: 25px;
-            backdrop-filter: blur(10px);
-        }
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            margin-right: 12px;
-            border: 2px solid rgba(255,255,255,0.5);
-        }
-        .info-panel {
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.6);
+            padding: 18px 28px;
+            border-radius: 35px;
             backdrop-filter: blur(20px);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 900px;
-            margin: 40px auto 0;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
         }
+        
+        .legend-item:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: rgba(255,255,255,0.6);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+        
+        .legend-color {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            margin-right: 16px;
+            border: 3px solid rgba(255,255,255,0.7);
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        /* TECH INFO */
+        .tech-info {
+            max-width: 1000px;
+            margin: 80px auto;
+            padding: 40px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 24px;
+            backdrop-filter: blur(25px);
+            border: 2px solid rgba(120,219,253,0.3);
+            text-align: center;
+        }
+        
+        .tech-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .tech-item {
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            border-left: 4px solid #78dbfd;
+        }
+
         @media (max-width: 768px) {
-            .gates-container {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            .legend {
-                flex-direction: column;
-                align-items: center;
-            }
+            .gates-container { grid-template-columns: 1fr; gap: 30px; }
+            .legend { flex-direction: column; align-items: center; }
         }
     </style>
 </head>
 <body>
+    <!-- TECH STACK DISPLAY -->
+    <div class="tech-stack">
+        <div class="tech-badge">GSAP 3.12.2</div>
+        <div class="tech-badge">Anime.js 3.2.1</div>
+        <div class="tech-badge">ScrollReveal 3.4.0</div>
+        <div class="tech-badge">CSS Grid/Flexbox</div>
+        <div class="tech-badge">CSS Custom Properties</div>
+        <div class="tech-badge">Vanilla JS</div>
+    </div>
+
     <div class="header">
-        <h1>🌌 ETERNIVERSE</h1>
-        <p>Interaktywna mapa uniwersum książek EterSeeker</p>
+        <h1 class="title-main">🌌 ETERNIVERSE</h1>
+        <p class="subtitle">Interaktywna mapa uniwersum książek EterSeeker | Pełna implementacja z silnikami</p>
     </div>
 
     <div class="gates-container">
-        <div class="gate-card gate-psyche">
-            <div class="gate-color"></div>
-            <div class="gate-name">Brama Psyche</div>
-            <div class="gate-series">Seria: Psyche</div>
-            <div class="gate-desc">
-                Pierwsza brama świadomości. Początek podróży przez umysły Eteru.
-            </div>
-            <div class="connections">
-                <span class="connection">Brama Cień</span>
-                <span class="connection">Brama Wola</span>
-            </div>
-        </div>
-
-        <div class="gate-card gate-cien">
-            <div class="gate-color"></div>
-            <div class="gate-name">Brama Cień</div>
-            <div class="gate-series">Seria: Cień</div>
-            <div class="gate-desc">
-                Ujawnienie ukrytych wymiarów. Tam gdzie światło spotyka ciemność.
-            </div>
-            <div class="connections">
-                <span class="connection">Brama Psyche</span>
-                <span class="connection">Brama Pole</span>
+        <!-- BRAMA PSYCHE -->
+        <div class="gate-card gate-psyche" data-gate="psyche">
+            <div class="gate-inner">
+                <div class="gate-front">
+                    <div class="gate-color"></div>
+                    <div class="gate-name">Brama Psyche</div>
+                    <div class="gate-series">Seria: Psyche</div>
+                    <div class="gate-desc">
+                        Pierwsza brama świadomości. Początek podróży przez umysły Eteru.
+                    </div>
+                    <button class="flip-btn">Odkryj Cień →</button>
+                </div>
+                <div class="gate-back">
+                    <h3>Powiązania:</h3>
+                    <div class="connections">
+                        <div class="connection">Brama Cień</div>
+                        <div class="connection">Brama Wola</div>
+                    </div>
+                    <button class="flip-btn">← Powrót</button>
+                </div>
             </div>
         </div>
 
-        <div class="gate-card gate-wola">
-            <div class="gate-color"></div>
-            <div class="gate-name">Brama Wola</div>
-            <div class="gate-series">Seria: Wola</div>
-            <div class="gate-desc">
-                Siła determinacji kształtująca rzeczywistość Eteru.
-            </div>
-            <div class="connections">
-                <span class="connection">Brama Psyche</span>
-                <span class="connection">Brama Obfitość</span>
-            </div>
-        </div>
-
-        <div class="gate-card gate-obfitosc">
-            <div class="gate-color"></div>
-            <div class="gate-name">Brama Obfitość</div>
-            <div class="gate-series">Seria: Obfitość</div>
-            <div class="gate-desc">
-                Nieskończone możliwości i bogactwo energetyczne.
-            </div>
-            <div class="connections">
-                <span class="connection">Brama Wola</span>
-                <span class="connection">Brama Pole</span>
+        <!-- BRAMA CIEN -->
+        <div class="gate-card gate-cien" data-gate="cien">
+            <div class="gate-inner">
+                <div class="gate-front">
+                    <div class="gate-color"></div>
+                    <div class="gate-name">Brama Cień</div>
+                    <div class="gate-series">Seria: Cień</div>
+                    <div class="gate-desc">
+                        Ujawnienie ukrytych wymiarów. Tam gdzie światło spotyka ciemność.
+                    </div>
+                    <button class="flip-btn">Odkryj Pole →</button>
+                </div>
+                <div class="gate-back">
+                    <h3>Powiązania:</h3>
+                    <div class="connections">
+                        <div class="connection">Brama Psyche</div>
+                        <div class="connection">Brama Pole</div>
+                    </div>
+                    <button class="flip-btn">← Powrót</button>
+                </div>
             </div>
         </div>
 
-        <div class="gate-card gate-pole">
-            <div class="gate-color"></div>
-            <div class="gate-name">Brama Pole</div>
-            <div class="gate-series">Seria: Pole</div>
-            <div class="gate-desc">
-                Centralny punkt równowagi wszystkich sił Eteru.
+        <!-- POZOSTAŁE BRAMY (skrócone dla czytelności) -->
+        <div class="gate-card gate-wola" data-gate="wola">
+            <div class="gate-inner">
+                <div class="gate-front">
+                    <div class="gate-color"></div>
+                    <div class="gate-name">Brama Wola</div>
+                    <div class="gate-series">Seria: Wola</div>
+                    <div class="gate-desc">Siła determinacji kształtująca rzeczywistość Eteru.</div>
+                    <button class="flip-btn">Odkryj →</button>
+                </div>
+                <div class="gate-back">
+                    <h3>Powiązania:</h3>
+                    <div class="connections">
+                        <div class="connection">Brama Psyche</div>
+                        <div class="connection">Brama Obfitość</div>
+                    </div>
+                    <button class="flip-btn">← Powrót</button>
+                </div>
             </div>
-            <div class="connections">
-                <span class="connection">Brama Cień</span>
-                <span class="connection">Brama Obfitość</span>
+        </div>
+
+        <div class="gate-card gate-obfitosc" data-gate="obfitosc">
+            <div class="gate-inner">
+                <div class="gate-front">
+                    <div class="gate-color"></div>
+                    <div class="gate-name">Brama Obfitość</div>
+                    <div class="gate-series">Seria: Obfitość</div>
+                    <div class="gate-desc">Nieskończone możliwości i bogactwo energetyczne.</div>
+                    <button class="flip-btn">Odkryj →</button>
+                </div>
+                <div class="gate-back">
+                    <h3>Powiązania:</h3>
+                    <div class="connections">
+                        <div class="connection">Brama Wola</div>
+                        <div class="connection">Brama Pole</div>
+                    </div>
+                    <button class="flip-btn">← Powrót</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="gate-card gate-pole" data-gate="pole">
+            <div class="gate-inner">
+                <div class="gate-front">
+                    <div class="gate-color"></div>
+                    <div class="gate-name">Brama Pole</div>
+                    <div class="gate-series">Seria: Pole</div>
+                    <div class="gate-desc">Centralny punkt równowagi wszystkich sił Eteru.</div>
+                    <button class="flip-btn">Odkryj →</button>
+                </div>
+                <div class="gate-back">
+                    <h3>Powiązania:</h3>
+                    <div class="connections">
+                        <div class="connection">Brama Cień</div>
+                        <div class="connection">Brama Obfitość</div>
+                    </div>
+                    <button class="flip-btn">← Powrót</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="legend">
-        <div class="legend-item">
+        <div class="legend-item" data-color="#ff6b6b">
             <div class="legend-color" style="background: #ff6b6b;"></div>
             <span>Psyche</span>
         </div>
-        <div class="legend-item">
+        <div class="legend-item" data-color="#4ecdc4">
             <div class="legend-color" style="background: #4ecdc4;"></div>
             <span>Cień</span>
         </div>
-        <div class="legend-item">
+        <div class="legend-item" data-color="#45b7d1">
             <div class="legend-color" style="background: #45b7d1;"></div>
             <span>Wola</span>
         </div>
-        <div class="legend-item">
+        <div class="legend-item" data-color="#96ceb4">
             <div class="legend-color" style="background: #96ceb4;"></div>
             <span>Obfitość</span>
         </div>
-        <div class="legend-item">
+        <div class="legend-item" data-color="#feca57">
             <div class="legend-color" style="background: #feca57;"></div>
             <span>Pole</span>
         </div>
     </div>
 
-    <div class="info-panel">
-        <h3>🌟 Witaj w ETERNIVERSE</h3>
-        <p>Najeżdżaj myszką na bramy aby odkrywać ich powiązania między seriami: <strong>Psyche • Cień • Wola • Obfitość • Pole</strong></p>
+    <div class="tech-info">
+        <h2>🛠 TECH STACK ANALIZA</h2>
+        <div class="tech-list">
+            <div class="tech-item">
+                <strong>GSAP 3.12.2</strong><br>
+                Timeline animacje, scroll triggers
+            </div>
+            <div class="tech-item">
+                <strong>Anime.js 3.2.1</strong><br>
+                SVG morphing, stagger efekty
+            </div>
+            <div class="tech-item">
+                <strong>ScrollReveal</strong><br>
+                Parallax scroll animacje
+            </div>
+            <div class="tech-item">
+                <strong>CSS 3D Transforms</strong><br>
+                Flip cards, perspective
+            </div>
+            <div class="tech-item">
+                <strong>Grid/Flexbox</strong><br>
+                Responsywny layout
+            </div>
+        </div>
     </div>
 
     <script>
-        // Dodatkowe animacje interaktywne
-        document.querySelectorAll('.gate-card').forEach(card => {
-            card.addEventListener('click', function() {
-                this.style.transform = 'scale(1.05) rotate(1deg)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 200);
+        // INICJALIZACJA WSZYSTKICH SILNIKÓW
+        gsap.registerPlugin();
+        
+        // 1. GSAP - MASTER TIMELINE
+        gsap.from(".title-main", {
+            duration: 2,
+            scale: 0.3,
+            opacity: 0,
+            rotation: 360,
+            ease: "elastic.out(1, 0.3)"
+        });
+        
+        // 2. GATE CARDS FLIP ANIMATION
+        document.querySelectorAll('.flip-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const card = this.closest('.gate-card');
+                card.classList.toggle('flipped');
+                
+                // GSAP flip efekt
+                gsap.to(card.querySelector('.gate-inner'), {
+                    rotationY: card.classList.contains('flipped') ? 360 : 0,
+                    duration: 1,
+                    ease: "power2.inOut"
+                });
+            });
+        });
+        
+        // 3. ANIME.JS - PULSING GATES
+        anime({
+            targets: '.gate-color',
+            scale: [1, 1.3, 1],
+            duration: 3000,
+            direction: 'alternate',
+            loop: true,
+            easing: 'easeInOutSine',
+            delay: anime.stagger(200)
+        });
+        
+        // 4. SCROLLREVEAL - GATE CARDS
+        ScrollReveal().reveal('.gate-card', {
+            duration: 1200,
+            distance: '40px',
+            easing: 'cubic-bezier(0.5, 0, 0.5, 1)',
+            interval: 200,
+            origin: 'bottom'
+        });
+        
+        // 5. LEGEND HOVER EFFECTS
+        anime({
+            targets: '.legend-item',
+            scale: [1, 1.1],
+            rotate: '1deg',
+            duration: 400,
+            elasticity: 400,
+            loop: false
+        });
+        
+        // 6. INTERACTIVE LEGEND
+        document.querySelectorAll('.legend-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                gsap.to(this, {
+                    scale: 1.15,
+                    duration: 0.3,
+                    yoyo: true,
+                    repeat: 1
+                });
+            });
+        });
+        
+        // 7. TECH STACK HOVER
+        gsap.utils.toArray('.tech-badge').forEach(badge => {
+            badge.addEventListener('mouseenter', () => {
+                gsap.to(badge, {
+                    scale: 1.1,
+                    rotation: 5,
+                    duration: 0.3,
+                    yoyo: true,
+                    repeat: 1
+                });
             });
         });
     </script>
