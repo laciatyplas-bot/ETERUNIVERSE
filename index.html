@@ -1,135 +1,203 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<title>ETERNIVERSE — FINAL</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ETERNIVERSE — Wydawnictwo</title>
+
 <style>
-body {
+:root{
+  --bg:#0b0f14;
+  --panel:#121826;
+  --card:#182033;
+  --text:#e8f1ff;
+  --accent:#5eead4;
+  --gold:#f5c97a;
+}
+*{box-sizing:border-box}
+body{
   margin:0;
-  font-family: Arial, sans-serif;
-  background:#0a0a1a;
-  color:#e8f1f8;
-}
-header {
-  padding:30px;
-  text-align:center;
-  font-size:2rem;
-  border-bottom:2px solid #3a6ea5;
-}
-#app {
+  font-family:Inter,system-ui,Arial;
+  background:var(--bg);
+  color:var(--text);
   display:grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap:20px;
-  padding:20px;
+  grid-template-columns:320px 1fr;
+  height:100vh;
 }
-.panel {
-  background:#111827;
-  border:1px solid #3a6ea5;
-  border-radius:10px;
+aside{
+  background:#0e1422;
   padding:15px;
   overflow:auto;
-  max-height:80vh;
+  border-right:1px solid #1f2937;
 }
-.item {
+main{
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+}
+h1,h2,h3{margin:0 0 10px 0}
+button{
+  background:#1f2937;
+  border:1px solid #374151;
+  color:var(--text);
+  padding:6px 10px;
+  cursor:pointer;
+}
+button:hover{background:#374151}
+input,select,textarea{
+  width:100%;
+  background:#0f172a;
+  border:1px solid #334155;
+  color:var(--text);
+  padding:6px;
+}
+.world, .book{
+  background:var(--card);
   padding:10px;
   margin-bottom:8px;
-  border-radius:6px;
   cursor:pointer;
-  background:#1f2933;
+  border:1px solid #334155;
 }
-.item:hover {
-  background:#2563eb;
+.world:hover,.book:hover{background:#1f2937}
+.active{outline:2px solid var(--accent)}
+.editor{
+  display:grid;
+  grid-template-columns:1fr 300px;
+  height:100%;
 }
-h2 {
-  margin-top:0;
-  font-size:1.2rem;
-  color:#7dd3fc;
+textarea{
+  height:100%;
+  resize:none;
+}
+.panel{
+  background:var(--panel);
+  padding:10px;
+  border-left:1px solid #1f2937;
+}
+.status{
+  font-size:12px;
+  opacity:.7;
 }
 </style>
 </head>
+
 <body>
 
-<header>🌌 ETERNIVERSE — SYSTEM FINALNY</header>
+<aside>
+  <h2>🌌 ŚWIATY</h2>
+  <div id="worlds"></div>
 
-<div id="app">
-  <div class="panel">
-    <h2>BRAMY</h2>
-    <div id="gates"></div>
+  <hr>
+  <input id="newWorldName" placeholder="Nowy świat">
+  <button onclick="addWorld()">➕ Dodaj świat</button>
+</aside>
+
+<main>
+  <header style="padding:10px;border-bottom:1px solid #1f2937">
+    <h1 id="currentTitle">ETERNIVERSE</h1>
+    <div class="status" id="currentStatus"></div>
+  </header>
+
+  <div class="editor">
+    <textarea id="editor" placeholder="Pisz tutaj…"></textarea>
+
+    <div class="panel">
+      <h3>📘 Książka</h3>
+      <input id="bookTitle" placeholder="Tytuł książki">
+      <input id="bookCover" placeholder="URL okładki">
+      <select id="bookStatus">
+        <option>idea</option>
+        <option>writing</option>
+        <option>ready</option>
+        <option>published</option>
+      </select>
+
+      <hr>
+
+      <h3>✍️ Profil</h3>
+      <select id="profile">
+        <option value="wattpad">Wattpad</option>
+        <option value="amazon">Amazon</option>
+      </select>
+
+      <button onclick="saveBook()">💾 Zapisz</button>
+      <button onclick="exportDoc()">📄 Eksport DOCX</button>
+    </div>
   </div>
+</main>
 
-  <div class="panel">
-    <h2>KSIĄŻKI</h2>
-    <div id="books"></div>
-  </div>
-
-  <div class="panel">
-    <h2>ROZDZIAŁY</h2>
-    <div id="chapters"></div>
-  </div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.min.js"></script>
 <script>
-const DATA = [
-  {
-    id:1,
-    name:"BRAMA 1 — INTERSEEKER",
-    books:[
-      { title:"InterSeeker: Tom 1 — Przebudzenie", chapters:["Ogień wybrał Macieja","Spod pieca","Pierwsze pytania"] },
-      { title:"InterSeeker: Tom 2 — Efekt Cienia", chapters:["Test na nowe życie","Cień odpowiada"] }
-    ]
-  },
-  {
-    id:2,
-    name:"BRAMA 2 — ETERSEEKER",
-    books:[
-      { title:"EterSeeker: Kronika Woli", chapters:["Kronika Woli","Protokół reprogramowania"] },
-      { title:"Interfejs Świadomości", chapters:["Język znaków rzeczywistości"] }
-    ]
-  },
-  {
-    id:3,
-    name:"BRAMA 3 — OBFITOSEEKER",
-    books:[
-      { title:"ObfitoSeeker — Kod Obfitości", chapters:["Reguły gry","Dla Nikosia"] }
-    ]
-  }
-];
+const STORAGE="ETERNIVERSE_MASTER";
+let data=JSON.parse(localStorage.getItem(STORAGE)||"[]");
+let currentWorld=null,currentBook=null;
 
-const gatesEl = document.getElementById('gates');
-const booksEl = document.getElementById('books');
-const chaptersEl = document.getElementById('chapters');
+function save(){
+  localStorage.setItem(STORAGE,JSON.stringify(data));
+}
 
-DATA.forEach(gate=>{
-  const div = document.createElement('div');
-  div.className='item';
-  div.textContent=gate.name;
-  div.onclick=()=>showBooks(gate);
-  gatesEl.appendChild(div);
-});
-
-function showBooks(gate){
-  booksEl.innerHTML='';
-  chaptersEl.innerHTML='';
-  gate.books.forEach(book=>{
-    const div=document.createElement('div');
-    div.className='item';
-    div.textContent=book.title;
-    div.onclick=()=>showChapters(book);
-    booksEl.appendChild(div);
+function render(){
+  const w=document.getElementById("worlds");
+  w.innerHTML="";
+  data.forEach((world,wi)=>{
+    const d=document.createElement("div");
+    d.className="world"+(currentWorld===world?" active":"");
+    d.textContent=world.name;
+    d.onclick=()=>{currentWorld=world;currentBook=null;render()};
+    w.appendChild(d);
+    if(currentWorld===world){
+      world.books.forEach(book=>{
+        const b=document.createElement("div");
+        b.className="book"+(currentBook===book?" active":"");
+        b.textContent="– "+book.title;
+        b.onclick=()=>{currentBook=book;loadBook();render()};
+        w.appendChild(b);
+      });
+      const add=document.createElement("button");
+      add.textContent="+ Dodaj książkę";
+      add.onclick=()=>{world.books.push({title:"Nowa książka",text:"",status:"idea"});save();render()};
+      w.appendChild(add);
+    }
   });
 }
 
-function showChapters(book){
-  chaptersEl.innerHTML='';
-  book.chapters.forEach(ch=>{
-    const div=document.createElement('div');
-    div.className='item';
-    div.textContent=ch;
-    chaptersEl.appendChild(div);
-  });
+function addWorld(){
+  const n=document.getElementById("newWorldName").value.trim();
+  if(!n)return;
+  data.push({name:n,books:[]});
+  save();render();
 }
+
+function loadBook(){
+  if(!currentBook)return;
+  editor.value=currentBook.text||"";
+  bookTitle.value=currentBook.title;
+  bookStatus.value=currentBook.status||"idea";
+  currentTitle.textContent=currentBook.title;
+}
+
+function saveBook(){
+  if(!currentBook)return;
+  currentBook.title=bookTitle.value;
+  currentBook.status=bookStatus.value;
+  currentBook.text=editor.value;
+  save();render();
+}
+
+async function exportDoc(){
+  if(!currentBook)return;
+  const {Document,Packer,Paragraph}=docx;
+  const doc=new Document({
+    sections:[{children:[new Paragraph(currentBook.title),new Paragraph(currentBook.text)]}]
+  });
+  const blob=await Packer.toBlob(doc);
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=currentBook.title.replace(/\s+/g,"_")+".docx";
+  a.click();
+}
+
+render();
 </script>
-
 </body>
 </html>
