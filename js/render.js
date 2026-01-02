@@ -1,243 +1,176 @@
-// render.js - Eterniverse UI Rendering Engine v3.0
-// Obsługuje: Bella Asystent, Książki, Strukturę Universum, Mapę, Sugestie
+// render.js - Eterniverse Master Premium Rendering Engine v6.0
+// Modularny silnik UI: Książki + Struktura + Mapa Bram + Sugestie Bella
 
 class EterniverseRenderer {
   constructor(app) {
-    this.app = app; // odniesienie do głównej instancji aplikacji (np. EterniverseMaster lub EterniverseApp)
-    this.elements = {};
-    this.cacheDOM();
+    this.app = app; // odniesienie do instancji EterniverseMaster
+    this.elements = this.cacheElements();
   }
 
-  cacheDOM() {
-    this.elements = {
-      header: document.querySelector('header'),
-      profileSelect: document.getElementById('profileSelector') || document.getElementById('profile-select'),
-      console: document.getElementById('console') || document.getElementById('console-input'),
-      editor: document.getElementById('editor') || document.getElementById('book-content'),
-      suggestions: document.getElementById('suggestions'),
-      output: document.getElementById('output'),
-      history: document.getElementById('history'),
-      booksList: document.getElementById('books-list') || document.getElementById('book-list'),
-      structureTree: document.getElementById('structure-tree') || document.getElementById('struct-list'),
+  cacheElements() {
+    return {
+      booksList: document.getElementById('books-list'),
+      structureTree: document.getElementById('structure-tree'),
       mapaGrid: document.getElementById('mapa-grid'),
+      suggestions: document.getElementById('suggestions'),
       bookTitle: document.getElementById('book-title'),
-      bookStatus: document.getElementById('book-status'),
+      bookContent: document.getElementById('book-content'),
+      status: document.getElementById('status')
     };
   }
 
   // === GŁÓWNE RENDEROWANIE ===
-
   renderAll() {
     this.renderBooks();
     this.renderStructure();
     this.renderMapa();
     this.renderSuggestions([]);
-    this.updateStatus('🚀 Eterniverse gotowy');
-    this.renderHistory();
   }
 
-  // === KSIĄŻKI ===
+  // === KSIĘGI ===
   renderBooks() {
-    const list = this.elements.booksList;
-    if (!list) return;
+    const { booksList } = this.elements;
+    if (!booksList) return;
 
-    const books = this.app.books || this.app.currentBook ? [this.app.currentBook] : [];
-
-    if (books.length === 0) {
-      list.innerHTML = '<div class="empty">➕ Dodaj pierwszą książkę</div>';
+    if (this.app.books.length === 0) {
+      booksList.innerHTML = '<p style="opacity:0.6;text-align:center;padding:2rem;">Brak ksiąg – utwórz pierwszą</p>';
       return;
     }
 
-    list.innerHTML = books.map(book => {
+    booksList.innerHTML = this.app.books.map(book => {
       const isActive = this.app.currentBook && this.app.currentBook.id === book.id;
       const wordCount = this.wordCount(book.content || '');
       return `
-        <div class="book-card \( {isActive ? 'active' : ''}" onclick="app.openBook( \){book.id})">
-          <div class="book-title">📖 ${this.escapeHtml(book.title || 'Bez tytułu')}</div>
-          <div class="book-stats">${wordCount} słów • ${book.status || 'IDEA'}</div>
+        <div class="item \( {isActive ? 'active' : ''}" onclick="master.openBook( \){book.id})">
+          <strong>📖 ${this.escape(book.title || 'Bez tytułu')}</strong>
+          <div style="font-size:0.9rem;opacity:0.8;margin-top:0.4rem;">
+            ${wordCount} słów
+          </div>
         </div>
       `;
     }).join('');
-  }
-
-  renderCurrentBook() {
-    if (!this.app.currentBook) return;
-
-    if (this.elements.bookTitle) this.elements.bookTitle.value = this.app.currentBook.title || '';
-    if (this.elements.editor) this.elements.editor.value = this.app.currentBook.content || '';
-    if (this.elements.bookStatus) this.elements.bookStatus.value = this.app.currentBook.status || 'IDEA';
-
-    this.renderBooks(); // podświetl aktywną
   }
 
   // === STRUKTURA UNIWERSUM ===
   renderStructure() {
-    const container = this.elements.structureTree;
-    if (!container) return;
+    const { structureTree } = this.elements;
+    if (!structureTree) return;
 
-    const structure = this.app.structure || [];
-
-    if (structure.length === 0) {
-      container.innerHTML = '<div class="empty-state">🏗️ Stwórz pierwsze uniwersum</div>';
+    if (this.app.structure.length === 0) {
+      structureTree.innerHTML = '<p style="opacity:0.6;text-align:center;padding:1rem;">Brak struktur – dodaj pierwsze uniwersum</p>';
       return;
     }
 
-    container.innerHTML = this.buildTreeNode(structure);
+    structureTree.innerHTML = this.app.structure.map(item => this.buildTreeNode(item)).join('');
   }
 
-  buildTreeNode(items) {
-    return items.map(item => {
-      const isActive = this.app.currentStruct && this.app.currentStruct.id === item.id;
-      const icon = this.getTypeIcon(item.type);
-      const children = item.children && item.children.length 
-        ? `<div class="children">${this.buildTreeNode(item.children)}</div>` 
-        : '';
-      return `
-        <div class="struct-node \( {isActive ? 'active' : ''}" onclick="app.selectStruct( \){item.id})">
-          ${icon} ${this.escapeHtml(item.title)}
-          ${children}
-        </div>
-      `;
-    }).join('');
+  buildTreeNode(item) {
+    const icon = this.getIcon(item.type || 'Uniwersum');
+    const children = item.children?.length
+      ? `<div class="nested">${item.children.map(c => this.buildTreeNode(c)).join('')}</div>`
+      : '';
+
+    return `
+      <div class="item" onclick="master.selectStruct(${item.id})">
+        ${icon} ${this.escape(item.title)}
+        ${children}
+      </div>
+    `;
+  }
+
+  getIcon(type) {
+    const icons = {
+      'Uniwersum': '🌌',
+      'Świat': '🌍',
+      'Tom': '📚',
+      'Rozdział': '📖',
+      'Fragment': '📄'
+    };
+    return icons[type] || '📄';
   }
 
   // === MAPA BRAM ===
   renderMapa() {
-    const grid = this.elements.mapaGrid;
-    if (!grid) return;
+    const { mapaGrid } = this.elements;
+    if (!mapaGrid) return;
 
-    const mapa = this.app.mapa || [];
-
-    if (mapa.length === 0) {
-      grid.innerHTML = '<div class="empty">🌌 Brak bram – stwórz pierwsze połączenie</div>';
+    if (this.app.mapa.length === 0) {
+      mapaGrid.innerHTML = '<p style="opacity:0.6;text-align:center;padding:1rem;">Brak bram</p>';
       return;
     }
 
-    grid.innerHTML = mapa.map(brama => `
-      <div class="brama-card" onclick="app.selectBrama(${brama.id})">
-        <div class="brama-title">🔮 ${this.escapeHtml(brama.name)}</div>
-        <div class="brama-tag">${brama.books?.length || 0} ksiąg</div>
+    mapaGrid.innerHTML = this.app.mapa.map(brama => `
+      <div class="item" onclick="master.insertBrama(${brama.id})">
+        <strong>🔮 ${this.escape(brama.name)}</strong>
+        <div style="font-size:0.9rem;opacity:0.8;margin-top:0.4rem;">
+          ${brama.books?.length || 0} tytułów
+        </div>
       </div>
     `).join('');
   }
 
   // === SUGESTIE BELLA ===
   renderSuggestions(suggestions = []) {
-    const panel = this.elements.suggestions;
+    const { suggestions: panel } = this.elements;
     if (!panel) return;
 
     if (suggestions.length === 0) {
-      panel.innerHTML = '💡 Bella czeka na Twój tekst...';
+      panel.innerHTML = '<p style="text-align:center;opacity:0.7;padding:2rem;">Kliknij „Bella AI”, by otrzymać sugestie</p>';
       return;
     }
 
-    panel.innerHTML = suggestions.map(suggestion => {
-      const isAccepted = this.app.profiles?.[this.app.currentProfile]?.accepted?.includes(suggestion);
-      return `
-        <div class="suggestion ${isAccepted ? 'accepted' : ''}">
-          ${suggestion}
-          ${!isAccepted ? `
-            <button onclick="app.acceptSuggestion('${this.escapeJs(suggestion)}')">✓ Akceptuj</button>
-          ` : ''}
-        </div>
-      `;
-    }).join('');
+    panel.innerHTML = suggestions.map(s => `
+      <div class="suggestion">${s}</div>
+    `).join('');
   }
 
-  // === STATUS I HISTORIA ===
-  updateStatus(message) {
-    if (this.elements.output) {
-      this.elements.output.textContent = message;
+  // === EDYCJA KSIĘGI ===
+  renderCurrentBook() {
+    const { bookTitle, bookContent } = this.elements;
+    if (!this.app.currentBook) {
+      if (bookTitle) bookTitle.value = '';
+      if (bookContent) bookContent.value = '';
+      return;
     }
-    this.logHistory(message);
+
+    if (bookTitle) bookTitle.value = this.app.currentBook.title || '';
+    if (bookContent) bookContent.value = this.app.currentBook.content || '';
   }
 
-  logHistory(message) {
-    if (!this.elements.history) return;
+  // === STATUS ===
+  setStatus(message, timeout = 5000) {
+    const { status } = this.elements;
+    if (!status) return;
 
-    const time = new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
-    const item = document.createElement('div');
-    item.className = 'history-item';
-    item.innerHTML = `<span style="color: var(--accent);">[${time}]</span> ${this.escapeHtml(message)}`;
-
-    this.elements.history.appendChild(item);
-    this.elements.history.scrollTop = this.elements.history.scrollHeight;
-
-    // Zachowaj tylko ostatnie 20 wpisów
-    while (this.elements.history.children.length > 20) {
-      this.elements.history.removeChild(this.elements.history.firstChild);
+    status.textContent = message;
+    if (timeout > 0) {
+      setTimeout(() => {
+        if (status.textContent === message) {
+          status.textContent = 'Gotowy';
+        }
+      }, timeout);
     }
-  }
-
-  renderHistory() {
-    if (this.elements.history) this.elements.history.innerHTML = '';
   }
 
   // === POMOCNICZE ===
-  getTypeIcon(type) {
-    const icons = {
-      '🌌': '🌌', 'Uniwersum': '🌌',
-      '🌍': '🌍', 'Świat': '🌍',
-      '📚': '📚', 'Tom': '📚',
-      '📖': '📖', 'Rozdział': '📖',
-      '📄': '📄', 'Fragment': '📄'
-    };
-    return icons[type] || '📄';
-  }
-
   wordCount(text = '') {
     return (text.match(/\b\w+\b/g) || []).length;
   }
 
-  escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+  escape(text = '') {
+    return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  escapeJs(text) {
-    return text.replace(/'/g, "\\'");
-  }
-
-  // === MODALE ===
-  showModal(title, content, buttons = []) {
-    const modal = document.createElement('div');
-    modal.className = 'bella-modal fade-in';
-    modal.innerHTML = `
-      <div class="modal-inner">
-        <h3>${title}</h3>
-        <div class="modal-content">${content}</div>
-        <div class="modal-actions">
-          \( {buttons.map(b => `<button onclick=" \){b.action}">${b.label}</button>`).join('')}
-          <button onclick="this.closest('.bella-modal').remove()">Zamknij</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modal);
-  }
-
-  showSuggestionsModal(suggestions) {
-    const content = suggestions.length 
-      ? suggestions.map(s => `<div class="sug-item">${s}</div>`).join('')
-      : '<p>🎉 Brak sugestii – tekst idealny!</p>';
-
-    this.showModal(
-      `💡 Sugestie Bella [${(this.app.currentProfile || 'wattpad').toUpperCase()}]`,
-      content
-    );
-  }
-
-  toast(message, duration = 3000) {
-    const toast = document.createElement('div');
-    toast.textContent = message;
-    toast.style.cssText = `
-      position: fixed; top: 20px; right: 20px; z-index: 10000;
-      padding: 16px 24px; background: var(--success); color: #000;
-      border-radius: 12px; box-shadow: var(--shadow); font-weight: 600;
-      animation: fadeInUp 0.3s ease-out;
-    `;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), duration);
+  // === ANIMACJE / EFEKTY (opcjonalne rozszerzenia) ===
+  highlightElement(selector) {
+    const el = document.querySelector(selector);
+    if (el) {
+      el.style.transition = 'background 0.4s';
+      el.style.background = 'rgba(0,208,255,0.2)';
+      setTimeout(() => {
+        el.style.background = '';
+      }, 800);
+    }
   }
 }
 
