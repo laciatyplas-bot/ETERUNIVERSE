@@ -3,398 +3,318 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Eterniverse - Asystent Redagowania z Profilami</title>
+<title>Eterniverse - Bella Author Mode + Asystent Redakcyjny</title>
 <style>
-  body {
-    background: #121212;
-    color: #eee;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh;
+  :root {
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e1e;
+    --bg-panel: #222;
+    --bg-hover: #333;
+    --text-primary: #eee;
+    --text-secondary: #bbb;
+    --accent: #4a90e2;
+    --accent-hover: #5aa0f2;
+    --success: #50c878;
+    --warning: #f39c12;
+    --danger: #e74c3c;
   }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 0; height: 100vh;
+    overflow: hidden;
+  }
+
+  .app-container {
+    display: flex; 
+    flex-direction: row; 
+    height: 100vh;
+  }
+
+  /* Panel struktury uniwersum */
+  .universe-panel {
+    width: 300px;
+    background: var(--bg-secondary);
+    border-right: 2px solid var(--bg-panel);
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  .panel-header {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--bg-panel);
+  }
+
+  .hierarchy {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .hierarchy li {
+    padding: 0.5rem;
+    margin: 0.2rem 0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .hierarchy li:hover {
+    background: var(--bg-hover);
+  }
+
+  .hierarchy li.selected {
+    background: var(--accent);
+    color: #000;
+  }
+
+  .hierarchy li > ul {
+    margin-left: 1rem;
+    border-left: 2px solid var(--accent);
+    padding-left: 1rem;
+  }
+
+  /* Główny panel */
+  .main-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
   header {
-    background: #1e1e1e;
+    background: var(--bg-secondary);
     padding: 1rem;
     text-align: center;
     font-size: 1.5rem;
     font-weight: bold;
+    border-bottom: 2px solid var(--bg-panel);
   }
-  #console, #editor {
-    width: 90%;
-    margin: 1rem auto;
-    background: #222;
-    color: #eee;
-    border: none;
-    border-radius: 5px;
-    padding: 10px;
-    font-size: 1rem;
-    resize: vertical;
-    min-height: 100px;
+
+  /* Profile i kontrolki */
+  .controls {
+    padding: 1rem;
+    background: var(--bg-panel);
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
   }
-  #output, #suggestions {
-    width: 90%;
-    margin: 0 auto 1rem auto;
-    background: #1a1a1a;
-    padding: 10px;
-    border-radius: 5px;
-    min-height: 60px;
-    overflow-y: auto;
-  }
-  button {
-    margin: 0.5rem 0.3rem;
+
+  select, button {
     padding: 0.5rem 1rem;
-    background: #3a3a3a;
-    border: none;
+    background: var(--bg-hover);
+    border: 1px solid var(--bg-panel);
     border-radius: 4px;
-    color: #eee;
+    color: var(--text-primary);
     cursor: pointer;
+    font-size: 1rem;
   }
+
   button:hover {
-    background: #555;
+    background: var(--accent);
+    border-color: var(--accent-hover);
   }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  button.danger {
+    background: var(--danger);
+  }
+
+  button.danger:hover {
+    background: #c0392b;
+  }
+
+  button.success {
+    background: var(--success);
+  }
+
+  /* Edytory */
+  .editor-section {
+    flex: 1;
+    padding: 1rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    border: 1px solid var(--bg-hover);
+    border-radius: 5px;
+    padding: 1rem;
+    font-size: 1rem;
+    resize: none;
+    font-family: inherit;
+  }
+
+  #console, #elementContent {
+    height: 120px;
+    margin-bottom: 1rem;
+  }
+
+  #elementContent {
+    flex: 1;
+    margin-bottom: 1rem;
+  }
+
+  /* Sekcje elementu */
+  .element-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .element-meta input, .element-meta select {
+    padding: 0.5rem;
+    height: 40px;
+  }
+
+  /* Sugestie i output */
+  .output-section {
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--bg-panel);
+    height: 150px;
+  }
+
   .suggestion {
-    background: #333;
-    padding: 5px;
-    margin: 3px 0;
-    border-radius: 3px;
+    background: var(--bg-hover);
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    border-radius: 4px;
+    border-left: 4px solid var(--accent);
   }
-  .suggestion button {
-    margin-left: 1rem;
+
+  .dual-output {
+    display: flex;
+    gap: 1rem;
+    height: 100%;
+  }
+
+  .output-box, .archive-box {
+    flex: 1;
+    background: var(--bg-panel);
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-y: auto;
     font-size: 0.9rem;
   }
-  #profileSelector {
-    margin: 1rem auto;
-    width: 200px;
-    background: #222;
-    color: #eee;
-    border: none;
-    border-radius: 5px;
-    padding: 5px;
-    font-size: 1rem;
-    cursor: pointer;
+
+  @media (max-width: 768px) {
+    .app-container {
+      flex-direction: column;
+    }
+    .universe-panel {
+      width: 100%;
+      height: 200px;
+      order: 2;
+    }
+    .main-panel {
+      order: 1;
+    }
   }
 </style>
 </head>
 <body>
-<header>Eterniverse - Bella Asystent Redakcyjny</header>
+<div class="app-container">
+  <!-- Panel struktury uniwersum -->
+  <div class="universe-panel">
+    <div class="panel-header">🌌 Struktura Uniwersum</div>
+    <div id="universeList">Ładowanie...</div>
+    
+    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #333;">
+      <button id="addUniverseBtn" class="success">➕ Nowe Uniwersum</button>
+      <button id="addChildBtn" disabled>➕ Dodaj Podrzędny</button>
+      <button id="deleteElementBtn" class="danger" disabled>🗑️ Usuń</button>
+    </div>
+  </div>
 
-<div style="text-align:center;">
-  <label for="profileSelector">Wybierz profil redakcyjny: </label>
-  <select id="profileSelector" title="Wybierz profil redakcyjny">
-    <option value="amazon">Amazon</option>
-    <option value="wattpad">Wattpad</option>
-  </select>
+  <!-- Główny panel -->
+  <div class="main-panel">
+    <header>Eterniverse - Bella Author Mode + Asystent Redakcyjny</header>
+
+    <div class="controls">
+      <label>Profil redakcyjny:</label>
+      <select id="profileSelector">
+        <option value="amazon">Amazon</option>
+        <option value="wattpad">Wattpad</option>
+      </select>
+      
+      <button id="startRecBtn">🎙️ Dyktowanie</button>
+      <button id="stopRecBtn" disabled>⏹️ Stop</button>
+      <button id="executeBtn">✨ Wykonaj / Sprawdź</button>
+      <button id="exportBtn">📤 Eksport</button>
+      
+      <select id="exportSelect">
+        <option value="txt">TXT</option>
+        <option value="docx">DOCX</option>
+        <option value="pdf">PDF</option>
+      </select>
+      
+      <button id="backupAllBtn">💾 Backup Wszystkie</button>
+      <button id="clearEditorBtn">🧹 Wyczyść</button>
+    </div>
+
+    <div class="editor-section">
+      <!-- Meta elementu -->
+      <div class="element-meta" id="elementMeta" style="display: none;">
+        <input id="elementType" placeholder="Typ" readonly />
+        <input id="elementTitle" placeholder="Tytuł" />
+        <input id="elementVersion" placeholder="Wersja" value="v1" />
+        <select id="elementLanguage">
+          <option value="pl">PL</option>
+          <option value="en">EN</option>
+        </select>
+        <input id="elementDate" placeholder="Data utworzenia" readonly />
+      </div>
+
+      <!-- Konsola poleceń -->
+      <textarea id="console" placeholder="Wpisz polecenie (REDAGUJ, PODPOWIEDŹ, GENERUJ TEKST, EKSPORTUJ) lub tekst..."></textarea>
+
+      <!-- Główny edytor -->
+      <textarea id="elementContent" placeholder="Treść elementu / Edytor tekstu..."></textarea>
+
+      <!-- Notatki autora -->
+      <textarea id="elementNotes" placeholder="Notatki autora / Komentarze..." style="height: 80px;"></textarea>
+    </div>
+
+    <!-- Podwójny output -->
+    <div class="output-section">
+      <div class="dual-output">
+        <div>
+          <h4>📋 Status & Sugestie</h4>
+          <div id="output" class="output-box"></div>
+        </div>
+        <div>
+          <h4>📦 Archiwum</h4>
+          <div id="archiveOutput" class="archive-box"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<textarea id="console" placeholder="Wpisz polecenie lub tekst do redagowania..."></textarea>
-<div style="text-align:center;">
-  <button id="startRecBtn">🎙️ Rozpocznij dyktowanie</button>
-  <button id="stopRecBtn" disabled>⏹️ Zatrzymaj dyktowanie</button>
-  <button id="executeBtn">Wykonaj polecenie / Sprawdź tekst</button>
-  <button id="exportBtn">Eksportuj do Word (.docx)</button>
-</div>
-
-<h3 style="text-align:center;">Edytowany tekst:</h3>
-<textarea id="editor" placeholder="Tutaj pojawi się i będzie można edytować tekst..."></textarea>
-
-<h3 style="text-align:center;">Sugestie i podpowiedzi:</h3>
-<div id="suggestions"></div>
-
-<div id="output"></div>
-
+<!-- Zależności -->
 <script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.min.js"></script>
-<script>
-(async () => {
-  const { Document, Packer, Paragraph, HeadingLevel } = docx;
-
-  const STORAGE_KEY = 'eterniverse_assistant_data_profiles';
-  let data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-  if (!data.amazon) data.amazon = { acceptedSuggestions: [] };
-  if (!data.wattpad) data.wattpad = { acceptedSuggestions: [] };
-
-  const consoleEl = document.getElementById('console');
-  const editorEl = document.getElementById('editor');
-  const suggestionsEl = document.getElementById('suggestions');
-  const outputEl = document.getElementById('output');
-  const profileSelector = document.getElementById('profileSelector');
-
-  let currentProfile = profileSelector.value;
-
-  profileSelector.onchange = () => {
-    currentProfile = profileSelector.value;
-    suggestionsEl.innerHTML = '';
-    outputEl.textContent = `Przełączono na profil: ${currentProfile.charAt(0).toUpperCase() + currentProfile.slice(1)}`;
-    speakText(`Przełączono na profil ${currentProfile}`);
-  };
-
-  // Rozpoznawanie mowy
-  let recognition;
-  let recognizing = false;
-  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SpeechRecognition();
-    recognition.lang = 'pl-PL';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript.trim();
-      consoleEl.value += (consoleEl.value ? ' ' : '') + transcript;
-      speakText(`Rozpoznano: ${transcript}`);
-    };
-
-    recognition.onstart = () => {
-      recognizing = true;
-      startRecBtn.disabled = true;
-      stopRecBtn.disabled = false;
-      speakText('Rozpoczęto dyktowanie');
-    };
-
-    recognition.onend = () => {
-      recognizing = false;
-      startRecBtn.disabled = false;
-      stopRecBtn.disabled = true;
-      speakText('Zatrzymano dyktowanie');
-    };
-
-    recognition.onerror = (event) => {
-      speakText('Wystąpił błąd rozpoznawania mowy: ' + event.error);
-    };
-  } else {
-    alert('Twoja przeglądarka nie wspiera rozpoznawania mowy.');
-  }
-
-  document.getElementById('startRecBtn').onclick = () => {
-    if (!recognizing) recognition.start();
-  };
-  document.getElementById('stopRecBtn').onclick = () => {
-    if (recognizing) recognition.stop();
-  };
-
-  function speakText(text) {
-    if (!window.speechSynthesis) return;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'pl-PL';
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
-  }
-
-  function amazonSuggestions(text) {
-    const suggestions = [];
-
-    const words = text.toLowerCase().match(/\b\w+\b/g) || [];
-    const wordCounts = {};
-    words.forEach(w => wordCounts[w] = (wordCounts[w] || 0) + 1);
-    Object.entries(wordCounts).forEach(([word, count]) => {
-      if (count > 5) {
-        suggestions.push(`Słowo "word"powtarzasię{word}" powtarza sięword"powtarzasię{count} razy - rozważ użycie synonimów.`);
-      }
-    });
-
-    const sentences = text.match(/[^\.!\?]+[\.!\?]+/g) || [];
-    sentences.forEach((s, i) => {
-      const len = s.trim().split(/\s+/).length;
-      if (len > 25) {
-        suggestions.push(`Zdanie nr i+1jestbardzodługie({i+1} jest bardzo długie (i+1jestbardzodługie({len} słów) - rozważ podział na krótsze.`);
-      }
-    });
-
-    const marketingPhrases = [
-      'najlepszy',
-      'idealny',
-      'unikalny',
-      'niezwykły',
-      'doskonały',
-      'rewolucyjny',
-      'ekskluzywny',
-      'najwyższej jakości',
-    ];
-    marketingPhrases.forEach(phrase => {
-      const reg = new RegExp(`\\b${phrase}\\b`, 'i');
-      if (reg.test(text)) {
-        suggestions.push(`Użyto frazy marketingowej: "${phrase}". Upewnij się, że jest adekwatna.`);
-      }
-    });
-
-    const seoKeywords = ['darmowa wysyłka', 'gwarancja', 'bezpieczne zakupy', 'promocja', 'nowość'];
-    seoKeywords.forEach(keyword => {
-      const reg = new RegExp(`\\b${keyword}\\b`, 'i');
-      if (!reg.test(text)) {
-        suggestions.push(`Brak frazy SEO: "${keyword}". Rozważ dodanie dla lepszej widoczności.`);
-      }
-    });
-
-    return suggestions;
-  }
-
-  function wattpadSuggestions(text) {
-    const suggestions = [];
-
-    const emotionWords = ['smutny', 'szczęśliwy', 'zły', 'zaskoczony', 'przerażony', 'zakochany'];
-    let emotionCount = 0;
-    emotionWords.forEach(word => {
-      const reg = new RegExp(`\\b${word}\\b`, 'i');
-      if (reg.test(text)) emotionCount++;
-    });
-    if (emotionCount < 2) {
-      suggestions.push('Dodaj więcej emocji i opisów uczuć, by zaangażować czytelnika.');
-    }
-
-    const sentences = text.match(/[^\.!\?]+[\.!\?]+/g) || [];
-    sentences.forEach((s, i) => {
-      const len = s.trim().split(/\s+/).length;
-      if (len < 4) {
-        suggestions.push(`Zdanie nr i+1jestbardzokroˊtkie({i+1} jest bardzo krótkie (i+1jestbardzokroˊtkie({len} słowa) - rozważ rozwinięcie.`);
-      }
-    });
-
-    if (!/[„”"']/.test(text)) {
-      suggestions.push('Dodaj dialogi, by tekst był bardziej dynamiczny i angażujący.');
-    }
-
-    if (!/metafora|porównanie|symbolika/i.test(text)) {
-      suggestions.push('Rozważ użycie metafor, porównań lub symboliki dla wzbogacenia stylu.');
-    }
-
-    return suggestions;
-  }
-
-  function generateSampleText(profile) {
-    if (profile === 'amazon') {
-      return `Ten produkt to doskonały wybór dla każdego, kto szuka najwyższej jakości i niezawodności. Zapewnia wyjątkową trwałość oraz komfort użytkowania. Skorzystaj z naszej promocji i ciesz się darmową wysyłką!`;
-    }
-    if (profile === 'wattpad') {
-      return `Był to smutny wieczór, gdy Anna spojrzała w dal. W jej oczach kryła się tęsknota, której nie potrafiła wyrazić słowami. "Co jeśli wszystko się zmieni?" — zastanawiała się cicho, czując chłód na skórze.`;
-    }
-    return '';
-  }
-
-  function addAcceptedSuggestion(sug) {
-    if (!data[currentProfile].acceptedSuggestions.includes(sug)) {
-      data[currentProfile].acceptedSuggestions.push(sug);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-  }
-
-  function getSuggestionsForProfile(text) {
-    if (currentProfile === 'amazon') return amazonSuggestions(text);
-    if (currentProfile === 'wattpad') return wattpadSuggestions(text);
-    return [];
-  }
-
-  function processConsoleText(input) {
-    const cmd = input.trim();
-    if (!cmd) return;
-
-    const parts = cmd.split(/\s+/);
-    const cmdUpper = parts[0].toUpperCase();
-
-    if (cmdUpper === 'REDAGUJ' || cmdUpper === 'REDAGUJ TEKST') {
-      editorEl.value = consoleEl.value;
-      suggestionsEl.innerHTML = '';
-      outputEl.textContent = 'Tekst przeniesiony do edytora. Kliknij "Wykonaj polecenie / Sprawdź tekst", aby zobaczyć sugestie.';
-      speakText('Tekst przeniesiony do edytora. Możesz teraz sprawdzić sugestie.');
-      return;
-    }
-
-    if (cmdUpper === 'PODPOWIEDŹ') {
-      const text = editorEl.value.trim();
-      if (!text) {
-        outputEl.textContent = 'Edytor jest pusty. Wpisz tekst do redagowania.';
-        speakText('Edytor jest pusty. Wpisz tekst do redagowania.');
-        return;
-      }
-      let sug = getSuggestionsForProfile(text);
-      sug = sug.filter(s => !data[currentProfile].acceptedSuggestions.includes(s));
-      suggestionsEl.innerHTML = '';
-      if (sug.length === 0) {
-        suggestionsEl.textContent = 'Brak nowych sugestii.';
-        speakText('Brak nowych sugestii.');
-      } else {
-        sug.forEach(str => {
-          const div = document.createElement('div');
-          div.classList.add('suggestion');
-          div.textContent = str;
-          const acceptBtn = document.createElement('button');
-          acceptBtn.textContent = 'Akceptuj';
-          acceptBtn.onclick = () => {
-            addAcceptedSuggestion(str);
-            div.style.opacity = '0.5';
-            speakText('Sugestia zaakceptowana.');
-          };
-          div.appendChild(acceptBtn);
-          suggestionsEl.appendChild(div);
-        });
-        speakText(`Znaleziono ${sug.length} sugestii.`);
-      }
-      return;
-    }
-
-    if (cmdUpper === 'EKSPORTUJ') {
-      if (!editorEl.value.trim()) {
-        outputEl.textContent = 'Edytor jest pusty. Nie można eksportować.';
-        speakText('Edytor jest pusty. Nie można eksportować.');
-        return;
-      }
-      exportToWord(`Opis_${currentProfile.charAt(0).toUpperCase() + currentProfile.slice(1)}`, editorEl.value.trim());
-      return;
-    }
-
-    if (cmdUpper === 'GENERUJ') {
-      if (parts[1] && parts[1].toUpperCase() === 'TEKST') {
-        const sampleText = generateSampleText(currentProfile);
-        editorEl.value = sampleText;
-        suggestionsEl.innerHTML = '';
-        outputEl.textContent = `Wygenerowano przykładowy tekst dla profilu ${currentProfile}.`;
-        speakText(`Wygenerowano przykładowy tekst dla profilu ${currentProfile}.`);
-        return;
-      }
-    }
-
-    editorEl.value = input;
-    suggestionsEl.innerHTML = '';
-    outputEl.textContent = 'Tekst załadowany do edytora.';
-    speakText('Tekst załadowany do edytora.');
-  }
-
-  document.getElementById('executeBtn').onclick = () => {
-    processConsoleText(consoleEl.value);
-  };
-
-  document.getElementById('exportBtn').onclick = () => {
-    if (!editorEl.value.trim()) {
-      outputEl.textContent = 'Edytor jest pusty. Nie można eksportować.';
-      speakText('Edytor jest pusty. Nie można eksportować.');
-      return;
-    }
-    exportToWord(`Opis_${currentProfile.charAt(0).toUpperCase() + currentProfile.slice(1)}`, editorEl.value.trim());
-  };
-
-  async function exportToWord(title, text) {
-    const doc = new Document({
-      sections: [{
-        children: [
-          new Paragraph({
-            text: title,
-            heading: HeadingLevel.HEADING_1,
-            thematicBreak: true,
-          }),
-          new Paragraph(text),
-        ],
-      }],
-    });
-    const blob = await Packer.toBlob(doc);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${title.replace(/\s+/g, '_')}.docx`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    outputEl.textContent = `Eksportowano plik ${a.download}`;
-    speakText('Plik został wyeksportowany.');
-  }
-})();
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
