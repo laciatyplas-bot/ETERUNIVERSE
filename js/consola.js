@@ -1,4 +1,4 @@
-// consola.js - Eterniverse Master Premium Console Commands v6.0
+// consola.js - Eteruniverse Master Premium Console Commands v6.0
 // Moduł konsoli poleceń tekstowych i głosowych
 
 class EterniverseConsole {
