@@ -1,14 +1,14 @@
-// Pełny kod renderowania struktury – Eterniverse Master Premium PRO v13.0
-// Funkcje do renderowania hierarchii (Uniwersum → Świat → Tom → Rozdział → Podrozdział → Fragment)
+// Pełny kod renderowania Mapy Bram – Eterniverse Master Premium PRO v13.0
+// Renderuje 10 eterycznych bram z książkami, ikonami i interakcją
 
-function renderStructure(structure, currentElementId = null, containerId = 'structure-tree') {
+function renderMapa(mapaData, containerId = 'mapa-grid') {
   const container = document.getElementById(containerId);
   if (!container) {
-    console.error('Nie znaleziono kontenera:', containerId);
+    console.error('Kontener mapy nie znaleziony:', containerId);
     return;
   }
 
-  if (!structure || structure.length === 0) {
+  if (!mapaData || mapaData.length === 0) {
     container.innerHTML = `
       <p style="
         opacity:0.6;
@@ -17,55 +17,70 @@ function renderStructure(structure, currentElementId = null, containerId = 'stru
         font-size:1.1rem;
         color:var(--text-ethereal);
       ">
-        Brak uniwersów w strukturze<br><br>
-        Kliknij „+ Nowe Uniwersum”, by rozpocząć kreację
+        Brak eterycznych bram w pamięci<br><br>
+        Struktura mapy zostanie przywrócona przy następnym uruchomieniu
       </p>`;
     return;
   }
 
-  container.innerHTML = structure.map(root => buildTreeNode(root, currentElementId)).join('');
+  // Sortuj bramy po ID (1-10)
+  const sortedMapa = [...mapaData].sort((a, b) => a.id - b.id);
+
+  container.innerHTML = sortedMapa.map(brama => buildBramaCard(brama)).join('');
 }
 
-// Główna funkcja budująca węzeł drzewa (rekurencyjna)
-function buildTreeNode(node, currentElementId) {
-  const icons = {
-    'Uniwersum': '🌌',
-    'Świat': '🌍',
-    'Tom': '📚',
-    'Rozdział': '📖',
-    'Podrozdział': '📄',
-    'Fragment': '📜'
-  };
+// Buduje pojedynczą kartę bramy
+function buildBramaCard(brama) {
+  const bookCount = brama.books?.length || 0;
+  const bookList = brama.books 
+    ? brama.books.map(book => `• ${escapeHtml(book)}`).join('<br>')
+    : '<em style="opacity:0.6;">Brak opublikowanych tytułów</em>';
 
-  const icon = icons[node.type] || '📄';
-  const isSelected = node.id === currentElementId;
-
-  let html = `
-    <div class="tree-node \( {isSelected ? 'selected' : ''}" onclick="master.selectElement(' \){node.id}')">
-      <span class="icon">${icon}</span>
-      <strong>${escapeHtml(node.title || '(Bez tytułu)')}</strong>
-      <small style="margin-left:8px; opacity:0.7; color:var(--quantum-gold);">
-        ${node.type || 'Element'}
-      </small>
-  `;
-
-  // Dzieci (rekurencja)
-  if (node.children && node.children.length > 0) {
-    html += `
-      <div class="nested">
-        ${node.children.map(child => buildTreeNode(child, currentElementId)).join('')}
+  return `
+    <div class="tree-node brama-card" onclick="master.insertBrama(${brama.id})">
+      <div style="display:flex; align-items:center; margin-bottom:1rem;">
+        <span class="icon" style="font-size:1.8rem; margin-right:1rem;">🔮</span>
+        <strong style="font-size:1.4rem; color:var(--aether-glow); text-shadow:0 0 15px rgba(0,224,255,0.4);">
+          ${escapeHtml(brama.name)}
+        </strong>
       </div>
-    `;
-  }
+      
+      <div style="
+        background:rgba(30,20,80,0.4);
+        border-radius:14px;
+        padding:1.2rem;
+        margin-top:1rem;
+        border-left:4px solid var(--quantum-gold);
+        font-size:0.95rem;
+        line-height:1.6;
+      ">
+        <div style="margin-bottom:0.8rem; opacity:0.8;">
+          <strong>${bookCount} opublikowanych ksiąg</strong>
+        </div>
+        <div style="opacity:0.9;">
+          ${bookList}
+        </div>
+      </div>
 
-  html += `</div>`;
-  return html;
+      <div style="
+        margin-top:1.2rem;
+        font-size:0.9rem;
+        opacity:0.7;
+        text-align:center;
+        padding:0.8rem;
+        background:rgba(0,224,255,0.05);
+        border-radius:12px;
+      ">
+        Kliknij, aby wstawić do bieżącego elementu
+      </div>
+    </div>
+  `;
 }
 
-// Funkcja wyboru elementu (z app.js lub globalna)
-function selectElement(id) {
+// Funkcja wstawiania treści bramy do edytora (z app.js lub globalna)
+function insertBrama(bramaId) {
   if (window.master) {
-    window.master.selectElement(id);
+    window.master.insertBrama(bramaId);
   } else {
     console.error('Master nie załadowany');
   }
@@ -78,55 +93,13 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// Aktualizacja ścieżki bieżącego elementu
-function updateCurrentPath(element, pathContainerId = 'current-path') {
-  const pathEl = document.getElementById(pathContainerId);
-  if (!pathEl) return;
-
-  if (!element) {
-    pathEl.textContent = '';
-    return;
-  }
-
-  const path = getPathToElement(element, window.master?.data?.structure || []);
-  pathEl.textContent = path.map(n => n.title || n.type).join(' → ');
-}
-
-// Pomocnicza funkcja do znajdowania ścieżki
-function getPathToElement(target, structure) {
-  const path = [];
-
-  function traverse(nodes) {
-    for (const node of nodes) {
-      if (node.id === target.id) {
-        path.unshift(node);
-        return true;
-      }
-      if (node.children?.length) {
-        if (traverse(node.children)) {
-          path.unshift(node);
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  traverse(structure);
-  return path;
-}
-
-// Przykład użycia (po załadowaniu danych)
+// Przykład użycia po załadowaniu danych
 document.addEventListener('DOMContentLoaded', () => {
-  // Zakładamy, że master jest już zainicjowany i ma strukturę
   if (window.master && window.master.data) {
-    renderStructure(window.master.data.structure, window.master.currentElement?.id);
-    updateCurrentPath(window.master.currentElement);
+    renderMapa(window.master.data.mapa);
   }
 });
 
 // Eksport funkcji dla globalnego dostępu
-window.renderStructure = renderStructure;
-window.buildTreeNode = buildTreeNode;
-window.updateCurrentPath = updateCurrentPath;
-window.escapeHtml = escapeHtml;
+window.renderMapa = renderMapa;
+window.buildBramaCard = buildBramaCard;
