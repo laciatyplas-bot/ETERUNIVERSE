@@ -1,164 +1,134 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ETERNIVERSE — Interaktywna Mapa EterSeeker</title>
-
-  <!-- ANIMATIONS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/scrollReveal.js/3.4.0/scrollreveal.min.js"></script>
-
-  <!-- DOCX -->
-  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
-
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-
-    body {
-      font-family: Inter, system-ui, sans-serif;
-      background: radial-gradient(ellipse at center, #0a0a1f 0%, #000 70%);
-      color: #e8f4f8;
-      overflow-x: hidden;
-    }
-
-    header {
-      text-align:center;
-      padding:70px 20px 50px;
-    }
-
-    .title-main {
-      font-size:clamp(3rem,8vw,6rem);
-      font-weight:800;
-      background:linear-gradient(45deg,#ff6b6b,#4ecdc4,#45b7d1,#96ceb4,#feca57);
-      background-size:400% 400%;
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      animation:gradientShift 5s ease infinite;
-    }
-
-    @keyframes gradientShift {
-      0% { background-position:0% 50%; }
-      50% { background-position:100% 50%; }
-      100% { background-position:0% 50%; }
-    }
-
-    .subtitle {
-      margin-top:15px;
-      font-size:1.2rem;
-      color:#a0c4ff;
-      opacity:.9;
-    }
-
-    .app-container {
-      display:flex;
-      max-width:1600px;
-      margin:0 auto;
-      padding:20px;
-      gap:20px;
-    }
-
-    aside {
-      width:320px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.1);
-      border-radius:18px;
-      padding:15px;
-      backdrop-filter:blur(20px);
-    }
-
-    main {
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      gap:16px;
-    }
-
-    button, select, input, textarea {
-      background:#111827;
-      color:#e8f4f8;
-      border:1px solid rgba(255,255,255,.2);
-      border-radius:10px;
-      padding:10px;
-    }
-
-    textarea { min-height:180px; resize:vertical; }
-
-    #mapa-grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-      gap:16px;
-    }
-
-    footer#status {
-      text-align:center;
-      opacity:.7;
-      padding:12px;
-      font-size:.9rem;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>ETERNIVERSE — FINAL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#0a0a1a;
+  color:#e8f1f8;
+}
+header {
+  padding:30px;
+  text-align:center;
+  font-size:2rem;
+  border-bottom:2px solid #3a6ea5;
+}
+#app {
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap:20px;
+  padding:20px;
+}
+.panel {
+  background:#111827;
+  border:1px solid #3a6ea5;
+  border-radius:10px;
+  padding:15px;
+  overflow:auto;
+  max-height:80vh;
+}
+.item {
+  padding:10px;
+  margin-bottom:8px;
+  border-radius:6px;
+  cursor:pointer;
+  background:#1f2933;
+}
+.item:hover {
+  background:#2563eb;
+}
+h2 {
+  margin-top:0;
+  font-size:1.2rem;
+  color:#7dd3fc;
+}
+</style>
 </head>
 <body>
 
-<header>
-  <h1 class="title-main">ETERNIVERSE</h1>
-  <div class="subtitle">Interaktywna mapa uniwersum EterSeeker</div>
-</header>
+<header>🌌 ETERNIVERSE — SYSTEM FINALNY</header>
 
-<div class="app-container">
+<div id="app">
+  <div class="panel">
+    <h2>BRAMY</h2>
+    <div id="gates"></div>
+  </div>
 
-  <!-- PANEL STRUKTURY -->
-  <aside>
-    <select id="profile-select">
-      <option value="wattpad">Wattpad</option>
-      <option value="amazon">Amazon</option>
-    </select>
+  <div class="panel">
+    <h2>KSIĄŻKI</h2>
+    <div id="books"></div>
+  </div>
 
-    <div style="display:flex;gap:6px;margin:10px 0;">
-      <button id="add-universe">+ Uniwersum</button>
-      <button id="add-child">+ Element</button>
-    </div>
-
-    <div id="structure-tree"></div>
-  </aside>
-
-  <!-- PANEL GŁÓWNY -->
-  <main>
-
-    <!-- MAPA BRAM -->
-    <section id="mapa-grid"></section>
-
-    <!-- EDYTOR -->
-    <section>
-      <div id="current-path" style="opacity:.6;font-size:.85rem;"></div>
-      <input id="element-title" placeholder="Tytuł"/>
-      <textarea id="element-content" placeholder="Treść..."></textarea>
-
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button id="bella-analyze">Bella Analiza</button>
-        <button id="generate-story">AI Generuj</button>
-        <button id="export-docx">DOCX</button>
-        <button id="start-dictate">🎤</button>
-        <button id="stop-dictate" disabled>⏹</button>
-      </div>
-    </section>
-
-    <!-- SUGESTIE -->
-    <section id="suggestions"></section>
-
-    <footer id="status">Gotowy</footer>
-  </main>
+  <div class="panel">
+    <h2>ROZDZIAŁY</h2>
+    <div id="chapters"></div>
+  </div>
 </div>
 
-<!-- KOLEJNOŚĆ KRYTYCZNA -->
-<script src="js/data.js"></script>
-<script src="js/renderer.js"></script>
-<script src="js/app.js"></script>
-<script src="js/bella_console.js"></script>
-
 <script>
-  gsap.from(".title-main",{duration:1.6,scale:.6,opacity:0,ease:"power3.out"});
-  ScrollReveal().reveal(".app-container > *",{distance:"40px",duration:900,interval:120});
+const DATA = [
+  {
+    id:1,
+    name:"BRAMA 1 — INTERSEEKER",
+    books:[
+      { title:"InterSeeker: Tom 1 — Przebudzenie", chapters:["Ogień wybrał Macieja","Spod pieca","Pierwsze pytania"] },
+      { title:"InterSeeker: Tom 2 — Efekt Cienia", chapters:["Test na nowe życie","Cień odpowiada"] }
+    ]
+  },
+  {
+    id:2,
+    name:"BRAMA 2 — ETERSEEKER",
+    books:[
+      { title:"EterSeeker: Kronika Woli", chapters:["Kronika Woli","Protokół reprogramowania"] },
+      { title:"Interfejs Świadomości", chapters:["Język znaków rzeczywistości"] }
+    ]
+  },
+  {
+    id:3,
+    name:"BRAMA 3 — OBFITOSEEKER",
+    books:[
+      { title:"ObfitoSeeker — Kod Obfitości", chapters:["Reguły gry","Dla Nikosia"] }
+    ]
+  }
+];
+
+const gatesEl = document.getElementById('gates');
+const booksEl = document.getElementById('books');
+const chaptersEl = document.getElementById('chapters');
+
+DATA.forEach(gate=>{
+  const div = document.createElement('div');
+  div.className='item';
+  div.textContent=gate.name;
+  div.onclick=()=>showBooks(gate);
+  gatesEl.appendChild(div);
+});
+
+function showBooks(gate){
+  booksEl.innerHTML='';
+  chaptersEl.innerHTML='';
+  gate.books.forEach(book=>{
+    const div=document.createElement('div');
+    div.className='item';
+    div.textContent=book.title;
+    div.onclick=()=>showChapters(book);
+    booksEl.appendChild(div);
+  });
+}
+
+function showChapters(book){
+  chaptersEl.innerHTML='';
+  book.chapters.forEach(ch=>{
+    const div=document.createElement('div');
+    div.className='item';
+    div.textContent=ch;
+    chaptersEl.appendChild(div);
+  });
+}
 </script>
 
 </body>
