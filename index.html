@@ -3,538 +3,239 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eterniverse Master Premium PRO v8.0</title>
-  <meta name="description" content="Profesjonalny system kreacji literackiej z pełną hierarchią i Bella AI">
-  
-  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js"></script>
-  
+  <title>Eterniverse — Biblioteka 10 Bram</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;600&display=swap');
 
     :root {
-      --bg: #0a0a10;
-      --panel: #121218;
-      --border: #252530;
+      --bg: #0a0a12;
+      --panel: #12121a;
       --accent: #00e0ff;
-      --gold: #f0d040;
-      --text: #f8f8fc;
-      --muted: #a8b0d0;
-      --shadow: 0 12px 40px rgba(0,0,0,0.6);
+      --gold: #f0c040;
+      --text: #f0f8ff;
+      --muted: #a0c0e0;
+      --border: #283040;
+      --shadow: 0 15px 40px rgba(0,0,0,0.6);
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--bg);
+      background: linear-gradient(135deg, #0a0a12, #1a1a2e);
       color: var(--text);
-      height: 100vh;
-      display: grid;
-      grid-template-rows: auto auto 1fr auto;
-      overflow: hidden;
+      min-height: 100vh;
+      padding: 2rem;
     }
 
     header {
-      padding: 2.2rem;
       text-align: center;
-      background: rgba(18,18,24,0.95);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(12px);
+      padding: 3rem 0 4rem;
     }
 
     header h1 {
       font-family: 'Orbitron', sans-serif;
-      font-size: 3.2rem;
-      color: var(--accent);
-      letter-spacing: 4px;
-      text-shadow: 0 0 20px rgba(0,224,255,0.4);
+      font-size: 4rem;
+      background: linear-gradient(90deg, var(--accent), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(0,224,255,0.3);
     }
 
     header p {
-      margin-top: 0.6rem;
+      font-size: 1.4rem;
       color: var(--muted);
-      font-weight: 300;
-      font-size: 1.1rem;
+      margin-top: 1rem;
     }
 
-    .toolbar {
-      padding: 1.3rem 2rem;
-      background: rgba(18,18,24,0.9);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.2rem;
-      justify-content: center;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-    }
-
-    button, select {
-      padding: 0.9rem 1.8rem;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      color: var(--text);
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    button:hover, select:hover {
-      background: rgba(0,224,255,0.15);
-      border-color: var(--accent);
-      transform: translateY(-3px);
-    }
-
-    button.primary { background: var(--accent); color: #000; font-weight: 600; border: none; }
-    button.gold { background: var(--gold); color: #000; font-weight: 600; border: none; }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 360px 1fr 400px;
-      gap: 2rem;
-      padding: 2rem;
-      overflow: hidden;
-    }
-
-    .section {
-      background: var(--panel);
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .section h2 {
-      font-size: 1.5rem;
-      color: var(--accent);
-      margin-bottom: 1.4rem;
-      font-weight: 600;
-    }
-
-    .scrollable {
-      overflow-y: auto;
-      flex: 1;
-      padding-right: 0.5rem;
-    }
-
-    #current-path {
-      font-size: 0.95rem;
-      color: var(--muted);
-      margin-bottom: 1rem;
-      opacity: 0.8;
-    }
-
-    #book-title {
-      width: 100%;
-      padding: 1.2rem;
-      font-size: 2.2rem;
-      background: transparent;
-      border: none;
-      border-bottom: 4px solid var(--gold);
+    .stats {
+      text-align: center;
+      margin: 2rem 0;
+      font-size: 1.3rem;
       color: var(--gold);
-      text-align: center;
-      margin-bottom: 1.8rem;
-      font-weight: 600;
     }
 
-    #book-title:focus { outline: none; border-color: var(--accent); }
+    .gates-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
 
-    textarea {
-      flex: 1;
-      background: rgba(15,15,25,0.95);
+    .gate {
+      background: var(--panel);
+      border-radius: 20px;
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1.8rem;
-      color: var(--text);
-      font-size: 1.15rem;
-      line-height: 1.9;
-      resize: none;
-    }
-
-    textarea:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(0,224,255,0.15);
-    }
-
-    .tree-node {
-      padding: 1rem 1.2rem;
-      margin-bottom: 0.8rem;
-      background: rgba(255,255,255,0.04);
-      border-radius: 12px;
-      border-left: 4px solid var(--border);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      transition: all 0.4s ease;
       cursor: pointer;
-      transition: all 0.3s ease;
     }
 
-    .tree-node:hover {
-      background: rgba(0,224,255,0.12);
-      border-left-color: var(--accent);
-      transform: translateX(8px);
+    .gate:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 50px rgba(0,224,255,0.2);
+      border-color: var(--accent);
     }
 
-    .tree-node.selected {
-      border-left-color: var(--gold);
-      background: rgba(240,208,64,0.15);
-      box-shadow: 0 0 15px rgba(240,208,64,0.2);
+    .gate h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      text-shadow: 0 0 15px rgba(0,224,255,0.3);
     }
 
-    .tree-node .icon {
-      margin-right: 0.8rem;
-      font-size: 1.1rem;
+    .worlds {
+      margin-top: 1.5rem;
     }
 
-    .nested {
-      margin-left: 2rem;
-      margin-top: 0.6rem;
-    }
-
-    .suggestion {
-      padding: 1.4rem;
-      margin-bottom: 1.2rem;
-      background: rgba(0,224,255,0.1);
-      border-left: 5px solid var(--accent);
+    .world {
+      background: rgba(255,255,255,0.05);
       border-radius: 12px;
-      line-height: 1.6;
-      font-size: 1.05rem;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid var(--gold);
     }
 
-    .status {
-      padding: 1.4rem;
-      text-align: center;
-      background: rgba(18,18,24,0.95);
+    .world h3 {
+      color: var(--gold);
+      font-size: 1.3rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .books-count {
+      font-size: 1rem;
       color: var(--muted);
-      font-size: 1.05rem;
-      border-top: 1px solid var(--border);
-      backdrop-filter: blur(12px);
+      opacity: 0.9;
     }
 
-    @media (max-width: 1300px) {
-      .layout { grid-template-columns: 1fr 1fr; }
-      .section:nth-child(3) { grid-column: span 2; }
-    }
-
-    @media (max-width: 900px) {
-      .layout { grid-template-columns: 1fr; }
+    .footer {
+      text-align: center;
+      margin-top: 5rem;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: 1.1rem;
     }
   </style>
 </head>
 <body>
   <header>
     <h1>ETERNIVERSE</h1>
-    <p>Master Premium PRO v8.0 — Pełna kreacja hierarchicznych światów</p>
+    <p>Biblioteka Nieskończonych Światów</p>
+    <div class="stats">
+      <strong>10 Bram</strong> • <strong>8 Światów</strong> • <strong>480 Ksiąg</strong>
+    </div>
   </header>
 
-  <div class="toolbar">
-    <select id="profile-select">
-      <option value="wattpad">Wattpad</option>
-      <option value="amazon">Amazon</option>
-    </select>
-    <button id="add-universe" class="gold">+ Nowe Uniwersum</button>
-    <button id="add-child" class="primary">+ Dziecko</button>
-    <button id="bella-analyze" class="primary">Bella AI</button>
-    <button id="export-docx" class="gold">Eksport DOCX</button>
-    <button id="start-dictate">Dyktuj</button>
-    <button id="stop-dictate" disabled>Stop</button>
+  <div class="gates-container" id="gatesContainer"></div>
+
+  <div class="footer">
+    © 2026 Eterniverse — Wszystkie światy są Twoje.
   </div>
-
-  <div class="layout">
-    <!-- Lewy panel: Struktura + Mapa -->
-    <div class="section">
-      <h2>Hierarchia Universum</h2>
-      <div id="current-path"></div>
-      <div class="scrollable" id="structure-tree"></div>
-
-      <h2 style="margin-top:2.5rem;">Mapa Bram</h2>
-      <div class="scrollable" id="mapa-grid"></div>
-    </div>
-
-    <!-- Główny edytor -->
-    <div class="section">
-      <input type="text" id="element-title" placeholder="Tytuł elementu...">
-      <textarea id="element-content" placeholder="Tu rozwija się Twoje uniwersum..."></textarea>
-    </div>
-
-    <!-- Prawy panel: Bella AI -->
-    <div class="section">
-      <h2>Bella AI Pro</h2>
-      <div class="scrollable" id="suggestions">
-        <p style="text-align:center; opacity:0.7; padding:3rem 0;">
-          Wybierz element i kliknij „Bella AI”<br>
-          <small>Analiza dostosowana do poziomu hierarchii</small>
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <div class="status" id="status">Eterniverse Master Premium PRO — gotowy</div>
 
   <script>
-    'use strict';
+    // Generowanie danych: 10 bram, 8 światów, każdy świat ~60 książek
+    const eterniverseData = {
+      name: "ETERUNIVERSE",
+      gates: []
+    };
 
-    class EterniverseMasterPRO {
-      constructor() {
-        this.STRUCT_KEY = 'eterniverse_structure_pro_v8';
-        this.MAPA_KEY = 'eterniverse_mapa_pro';
+    const worldNames = [
+      "InterSeeker Realm",
+      "EterSeeker Dimension",
+      "ObfitoSeeker Cosmos",
+      "The Knot Continuum",
+      "ReligioSeeker Path",
+      "LuxSeeker Void",
+      "UmbraSeeker Abyss",
+      "AetherSeeker Nexus"
+    ];
 
-        this.structure = this.load(this.STRUCT_KEY, []);
-        this.mapa = this.load(this.MAPA_KEY, this.defaultMapa());
+    const gatePrefixes = [
+      "INTERSEEKER", "ETERSEEKER", "OBFITOSEEKER", "THE KNOT", "RELIGIOSEEKER",
+      "LUXSEEKER", "UMBRASEEKER", "AETHERSEEKER", "CHRONOSEEKER", "VOIDSEEKER"
+    ];
 
-        this.currentElement = null;
-        this.currentProfile = localStorage.getItem('eterniverse_profile') || 'wattpad';
-        this.recognition = null;
+    // Generuj 10 bram
+    for (let g = 1; g <= 10; g++) {
+      const gate = {
+        id: g,
+        name: `BRAMA ${g} — ${gatePrefixes[g-1]}`,
+        worlds: []
+      };
 
-        this.init();
-      }
+      // Rozłóż 8 światów po bramach (niektóre bramy mają więcej)
+      const worldsInThisGate = g <= 8 ? 1 : Math.floor((8 - (g > 8 ? 8 : g)) / 2) + 1;
 
-      defaultMapa() {
-        return [
-          { id: 1, name: "BRAMA 1 — INTERSEEKER", books: ["INTERSEEKER: Geneza", "INTERSEEKER: Efekt Cienia"] },
-          { id: 2, name: "BRAMA 2 — ETERSEEKER", books: ["EterSeeker: Kronika Woli", "Interfejs Świadomości"] },
-          { id: 3, name: "BRAMA 3 — OBFITOSEEKER", books: ["ObfitoSeeker – Kod Obfitości"] },
-          { id: 4, name: "BRAMA 4 — THE KNOT", books: ["Kronika Splątania", "Eterniony Tom I"] },
-          { id: 5, name: "BRAMA 5 — RELIGIOSEEKER", books: ["ReligioSeeker"] }
-        ];
-      }
-
-      load(key, fallback) {
-        try {
-          const data = localStorage.getItem(key);
-          return data ? JSON.parse(data) : fallback;
-        } catch (e) {
-          console.error('Błąd ładowania:', e);
-          return fallback;
-        }
-      }
-
-      save(key, data) {
-        try {
-          localStorage.setItem(key, JSON.stringify(data));
-        } catch (e) {
-          console.error('Błąd zapisu:', e);
-        }
-      }
-
-      init() {
-        this.updateProfile();
-        this.bindEvents();
-        this.renderAll();
-        this.initSpeech();
-        this.status('Eterniverse Master Premium PRO uruchomiony');
-      }
-
-      updateProfile() {
-        const select = document.getElementById('profile-select');
-        if (select) select.value = this.currentProfile;
-      }
-
-      bindEvents() {
-        document.getElementById('profile-select').onchange = e => {
-          this.currentProfile = e.target.value;
-          localStorage.setItem('eterniverse_profile', this.currentProfile);
+      let worldIndexStart = g <= 8 ? g-1 : 0;
+      for (let w = 0; w < (g <= 8 ? 1 : 2); w++) {
+        const worldIndex = (worldIndexStart + w) % 8;
+        const world = {
+          name: worldNames[worldIndex],
+          bookCount: 60,
+          books: []
         };
 
-        document.getElementById('add-universe').onclick = () => this.addRootUniverse();
-        document.getElementById('add-child').onclick = () => this.addChild();
-        document.getElementById('bella-analyze').onclick = () => this.bellaAnalyze();
-        document.getElementById('export-docx').onclick = () => this.exportDocx();
-        document.getElementById('start-dictate').onclick = () => this.startDictation();
-        document.getElementById('stop-dictate').onclick = () => this.stopDictation();
+        // Generuj 60 książek dla każdego świata
+        for (let b = 1; b <= 60; b++) {
+          world.books.push({
+            title: `${worldNames[worldIndex].split(' ')[0]}: Tom ${b} — Część ${String(b).padStart(2, '0')}`,
+            chapters: Math.floor(Math.random() * 8) + 8  // 8-15 rozdziałów
+          });
+        }
 
-        document.getElementById('element-title').oninput = () => this.autoSave();
-        document.getElementById('element-content').oninput = () => this.autoSave();
+        gate.worlds.push(world);
       }
 
-      renderAll() {
-        this.renderStructure();
-        this.renderMapa();
-        this.renderSuggestions([]);
-        this.updateCurrentPath();
-      }
+      eterniverseData.gates.push(gate);
+    }
 
-      // === STRUKTURA ===
-      renderStructure() {
-        const container = document.getElementById('structure-tree');
-        container.innerHTML = this.structure.length ? this.structure.map(root => this.buildNode(root)).join('')
-          : '<p style="opacity:0.6;text-align:center;padding:2rem;">Kliknij „+ Nowe Uniwersum”, by zacząć</p>';
-      }
+    // Renderowanie
+    function renderGates() {
+      const container = document.getElementById('gatesContainer');
 
-      buildNode(node, depth = 0) {
-        const icon = {
-          'Uniwersum': '🌌', 'Świat': '🌍', 'Tom': '📚',
-          'Rozdział': '📖', 'Podrozdział': '📄', 'Fragment': '📜'
-        }[node.type] || '📄';
+      eterniverseData.gates.forEach(gate => {
+        const gateEl = document.createElement('div');
+        gateEl.className = 'gate';
 
-        const selected = this.currentElement && this.currentElement.id === node.id;
+        let worldsHTML = '<div class="worlds">';
+        let totalBooks = 0;
 
-        return `
-          <div class="tree-node \( {selected ? 'selected' : ''}" onclick="master.selectElement(' \){node.id}')">
-            <span class="icon">${icon}</span>
-            <strong>${this.escape(node.title || '(Bez tytułu)')}</strong>
-            <small style="margin-left:8px;opacity:0.7;">${node.type || ''}</small>
-            \( {node.children?.length ? `<div class="nested"> \){node.children.map(child => this.buildNode(child, depth + 1)).join('')}</div>` : ''}
-          </div>
+        gate.worlds.forEach(world => {
+          totalBooks += world.bookCount;
+          worldsHTML += `
+            <div class="world">
+              <h3>🌍 ${world.name}</h3>
+              <div class="books-count">
+                \( {world.bookCount} ksiąg • ~ \){world.bookCount * 12} rozdziałów
+              </div>
+            </div>
+          `;
+        });
+        worldsHTML += '</div>';
+
+        gateEl.innerHTML = `
+          <h2>🔮 ${gate.name}</h2>
+          <p style="opacity:0.8; margin-bottom:1.5rem;">
+            ${gate.worlds.length} świat(y) • ${totalBooks} ksiąg
+          </p>
+          ${worldsHTML}
         `;
-      }
 
-      selectElement(id) {
-        this.currentElement = this.findById(id);
-        if (this.currentElement) {
-          document.getElementById('element-title').value = this.currentElement.title || '';
-          document.getElementById('element-content').value = this.currentElement.content || '';
-          this.renderStructure();
-          this.updateCurrentPath();
-        }
-      }
+        // Kliknięcie pokazuje szczegóły (alert – można rozbudować)
+        gateEl.addEventListener('click', () => {
+          alert(`${gate.name}\n\nZawiera ${gate.worlds.length} świat(y) i ${totalBooks} ksiąg.\n\nKliknij OK, by kontemplować nieskończoność.`);
+        });
 
-      findById(id, nodes = this.structure) {
-        for (const node of nodes) {
-          if (node.id === id) return node;
-          if (node.children?.length) {
-            const found = this.findById(id, node.children);
-            if (found) return found;
-          }
-        }
-        return null;
-      }
+        container.appendChild(gateEl);
+      });
+    }
 
-      getPathTo(element) {
-        const path = [];
-        const search = (nodes) => {
-          for (const node of nodes) {
-            if (node.id === element.id) {
-              path.unshift(node);
-              return true;
-            }
-            if (node.children?.length && search(node.children)) {
-              path.unshift(node);
-              return true;
-            }
-          }
-          return false;
-        };
-        search(this.structure);
-        return path;
-      }
-
-      updateCurrentPath() {
-        const pathEl = document.getElementById('current-path');
-        if (!this.currentElement) {
-          pathEl.textContent = '';
-          return;
-        }
-
-        const path = this.getPathTo(this.currentElement);
-        pathEl.textContent = path.map(n => n.title || n.type).join(' → ');
-      }
-
-      addRootUniverse() {
-        const newUniv = {
-          id: this.generateId(),
-          type: 'Uniwersum',
-          title: 'Nowe Uniwersum',
-          content: '',
-          children: []
-        };
-        this.structure.push(newUniv);
-        this.save(this.STRUCT_KEY, this.structure);
-        this.renderStructure();
-        this.selectElement(newUniv.id);
-        this.status('Nowe uniwersum utworzone');
-      }
-
-      addChild() {
-        if (!this.currentElement) {
-          alert('Wybierz element nadrzędny');
-          return;
-        }
-
-        const types = ['Uniwersum', 'Świat', 'Tom', 'Rozdział', 'Podrozdział', 'Fragment'];
-        const currentIdx = types.indexOf(this.currentElement.type || 'Fragment');
-        const childType = types[currentIdx + 1] || 'Fragment';
-
-        const newChild = {
-          id: this.generateId(),
-          type: childType,
-          title: `Nowy ${childType}`,
-          content: '',
-          children: []
-        };
-
-        this.currentElement.children = this.currentElement.children || [];
-        this.currentElement.children.push(newChild);
-        this.save(this.STRUCT_KEY, this.structure);
-        this.renderStructure();
-        this.selectElement(newChild.id);
-        this.status(`Dodano: ${childType}`);
-      }
-
-      autoSave() {
-        if (!this.currentElement) return;
-
-        this.currentElement.title = document.getElementById('element-title').value;
-        this.currentElement.content = document.getElementById('element-content').value;
-
-        this.save(this.STRUCT_KEY, this.structure);
-      }
-
-      // === MAPA BRAM ===
-      renderMapa() {
-        const container = document.getElementById('mapa-grid');
-        container.innerHTML = this.mapa.map(brama => `
-          <div class="tree-node" onclick="master.insertBrama(${brama.id})">
-            <span class="icon">🔮</span>
-            <strong>${this.escape(brama.name)}</strong>
-            <small style="margin-left:8px;opacity:0.7;">${brama.books?.length || 0} tytułów</small>
-          </div>
-        `).join('');
-      }
-
-      insertBrama(id) {
-        const brama = this.mapa.find(b => b.id === id);
-        if (!this.currentElement || !brama) return;
-
-        const list = brama.books?.map(t => `• ${t}`).join('\n') || '';
-        const textarea = document.getElementById('element-content');
-        textarea.value += `\n\n✦ === \( {brama.name} === ✦\n \){list}\n\n`;
-        this.autoSave();
-        this.status(`Wstawiono bramę: ${brama.name}`);
-      }
-
-      // === BELLA AI PRO ===
-      bellaAnalyze() {
-        if (!this.currentElement || !this.currentElement.content?.trim()) {
-          this.status('Brak treści do analizy');
-          return;
-        }
-
-        const suggestions = this.generateProSuggestions(this.currentElement);
-        this.renderSuggestions(suggestions);
-        this.status(`${suggestions.length} profesjonalnych sugestii`);
-      }
-
-      generateProSuggestions(element) {
-        const text = element.content || '';
-        const lower = text.toLowerCase();
-        const type = element.type || 'Fragment';
-        const suggestions = [];
-
-        // Sugestie zależne od poziomu w hierarchii
-        if (type === 'Uniwersum' || type === 'Świat') {
-          if (text.length < 200) suggestions.push('Opisz fundamenty świata: prawa fizyki, magia, historia');
-          if (!lower.includes('geografia') && !lower.includes('mapa')) suggestions.push('Dodaj opis geografii i kluczowych lokacji');
-        }
-
-        if (type === 'Tom' || type === 'Rozdział') {
-          if (!text.match(/["„”]/)) suggestions.push('Wprowadź dialogi – ożywiają postaci');
-          if (!lower.includes('konflikt') && !lower.includes('cel')) suggestions.push('Wyraźnie zdefiniuj główny konflikt lub cel bohatera');
-        }
-
-        // Profilowe
-        if (this.currentProfile === 'amazon') {
-          if (!/limitowan|wyłączn|specjaln/i.test(lower)) suggestions.push('Podkreśl unikalność: „edycja limitowana”, „tylko tutaj”');
-        } else {
-          const emotions = (lower.match(/(strach|miłość|radość|smutek|gniew|zaskoczenie|nadzieja)/g) || []).length;
-          if (
+    // Start
+    document.addEventListener('DOMContentLoaded', () => {
+      renderGates();
+    });
+  </script>
+</body>
+</html>
