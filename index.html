@@ -1,57 +1,89 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Master Strona Redakcji Książek</title>
-    <link rel="stylesheet" href="styles.css" />
-</head><link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bella Author Mode - Uniwersum Manager</title>
+<!-- Podłącz zewnętrzny plik CSS -->
+<link rel="stylesheet" href="styles.css" />
+</head>
 <body>
-    <header>
-        <h1>Master Strona Redakcji Książek</h1>
-        <nav>
-            <ul>
-                <li><a href="#" data-section="library">Biblioteka</a></li>
-                <li><a href="#" data-section="editor">Edytor</a></li>
-                <li><a href="#" data-section="audiobooks">Audiobooki</a></li>
-                <li><a href="#" data-section="store">Sklep</a></li>
-            </ul>
-        </nav>
-    </header>
+<header>Bella Author Mode - Zarządzanie Uniwersum i Ochrona Praw</header>
+<div id="motto">System nie tworzy literatury. System chroni literaturę stworzoną przez autora.</div>
 
-    <main>
-        <section id="library" class="active">
-            <h2>Biblioteka książek</h2>
-            <div id="book-list"></div>
-            <button id="add-book-btn">Dodaj nową książkę</button>
-        </section>
+<main>
+  <section id="structurePanel" aria-label="Struktura Uniwersum">
+    <h2>Struktura Uniwersum</h2>
+    <div>
+      <button id="addUniverseBtn">Dodaj Uniwersum</button>
+    </div>
+    <ul id="universeList" class="hierarchy"></ul>
+  </section>
 
-        <section id="editor">
-            <h2>Edytor książki</h2>
-            <input type="text" id="book-title" placeholder="Tytuł książki" />
-            <textarea id="book-content" placeholder="Treść książki..."></textarea>
-            <button id="save-book-btn">Zapisz książkę</button>
-            <button id="export-book-btn">Eksportuj książkę</button>
-            <button id="import-book-btn">Importuj książkę</button>
-            <input type="file" id="import-file" style="display:none;" accept=".json,.txt" />
-        </section>
+  <section id="editorPanel" aria-label="Edytor Tekstu i Metadane">
+    <h2>Edytuj element</h2>
+    <div class="section-group">
+      <label for="elementType">Typ elementu</label>
+      <input type="text" id="elementType" readonly />
+    </div>
+    <div class="section-group">
+      <label for="elementTitle">Tytuł</label>
+      <input type="text" id="elementTitle" />
+    </div>
+    <div class="section-group">
+      <label for="elementDate">Data utworzenia</label>
+      <input type="text" id="elementDate" readonly />
+    </div>
+    <div class="section-group">
+      <label for="elementVersion">Wersja</label>
+      <input type="text" id="elementVersion" />
+    </div>
+    <div class="section-group">
+      <label for="elementLanguage">Język</label>
+      <select id="elementLanguage">
+        <option value="pl">Polski</option>
+        <option value="en">Angielski</option>
+        <option value="de">Niemiecki</option>
+        <option value="fr">Francuski</option>
+      </select>
+    </div>
+    <div class="section-group">
+      <label for="elementContent">Zawartość (tekst)</label>
+      <textarea id="elementContent" spellcheck="true" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+    </div>
+    <div class="section-group">
+      <label for="elementNotes">Notatki autora (niewidoczne dla czytelnika)</label>
+      <textarea id="elementNotes" placeholder="Opis emocji, kontekstu, powodów powstania..."></textarea>
+    </div>
+    <div>
+      <button id="saveElementBtn">Zapisz zmiany</button>
+      <button id="deleteElementBtn" style="background:#a33;">Usuń element</button>
+      <button id="addChildBtn">Dodaj element podrzędny</button>
+    </div>
+    <div id="output"></div>
+  </section>
 
-        <section id="audiobooks">
-            <h2>Audiobooki</h2>
-            <div id="audiobook-list"></div>
-            <button id="add-audiobook-btn">Dodaj audiobook</button>
-        </section>
+  <section id="archivePanel" aria-label="Archiwum i Eksport">
+    <h2>Archiwum Praw Autorskich</h2>
+    <div>
+      <button id="backupAllBtn">Wykonaj backup całości projektu</button>
+    </div>
+    <div class="section-group">
+      <label for="exportSelect">Eksportuj wybrany element do:</label>
+      <select id="exportSelect">
+        <option value="docx">DOCX</option>
+        <option value="pdf">PDF</option>
+        <option value="txt">TXT</option>
+      </select>
+      <button id="exportBtn">Eksportuj</button>
+    </div>
+    <div id="archiveOutput"></div>
+  </section>
+</main>
 
-        <section id="store">
-            <h2>Sklep</h2>
-            <div id="store-list"></div>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2024 Master Strona Redakcji Książek</p>
-    </footer>
-
-    <script src="script.js"></script>
+<!-- Podłącz zewnętrzne pliki JS -->
+<script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="bella-author-mode.js"></script>
 </body>
 </html>
