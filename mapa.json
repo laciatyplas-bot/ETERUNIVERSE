@@ -1,0 +1,14 @@
+{
+  "światy": [
+    {
+      "id": 1,
+      "nazwa": "Świat 1",
+      "bramy": [
+        {"id": 1, "nazwa": "Brama 1"},
+        {"id": 2, "nazwa": "Brama 2"},
+        {"id": 3, "nazwa": "Brama 3"}
+      ],
+      "książki": []
+    }
+  ]
+}
