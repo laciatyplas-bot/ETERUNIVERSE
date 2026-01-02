@@ -1,6 +1,6 @@
 // script.js
 
-// Prosta struktura książek przechowywana w pamięci na start
+// Dane książek przechowywane w pamięci (tymczasowo)
 let books = [];
 let currentBookId = null;
 
@@ -15,6 +15,21 @@ const exportBookBtn = document.getElementById('export-book-btn');
 const importBookBtn = document.getElementById('import-book-btn');
 const importFileInput = document.getElementById('import-file');
 
+// Nawigacja między sekcjami
+const navLinks = document.querySelectorAll('nav ul li a');
+const sections = document.querySelectorAll('main section');
+
+navLinks.forEach(link => {
+    link.addEventListener('click', e => {
+        e.preventDefault();
+        const target = e.target.getAttribute('data-section');
+        sections.forEach(sec => {
+            sec.classList.toggle('active', sec.id === target);
+        });
+    });
+});
+
+// Funkcja renderująca listę książek
 function renderBookList() {
     bookListEl.innerHTML = '';
     if (books.length === 0) {
@@ -31,15 +46,19 @@ function renderBookList() {
     });
 }
 
+// Otwórz edytor dla wybranej książki
 function openEditor(bookId) {
     currentBookId = bookId;
     const book = books.find(b => b.id === bookId);
     if (!book) return;
     bookTitleInput.value = book.title;
     bookContentTextarea.value = book.content;
-    editorSection.style.display = 'block';
+    // Przełącz na edytor
+    sections.forEach(sec => sec.classList.remove('active'));
+    editorSection.classList.add('active');
 }
 
+// Dodaj nową książkę
 function addNewBook() {
     const newBook = {
         id: Date.now(),
@@ -53,8 +72,9 @@ function addNewBook() {
     openEditor(newBook.id);
 }
 
+// Zapisz aktualną książkę
 function saveBook() {
-    if (currentBookId === null) return;
+    if (currentBookId === null) return alert('Nie wybrano książki do zapisu.');
     const book = books.find(b => b.id === currentBookId);
     if (!book) return;
     book.title = bookTitleInput.value.trim() || 'Bez tytułu';
@@ -63,8 +83,9 @@ function saveBook() {
     renderBookList();
 }
 
+// Eksportuj aktualną książkę do pliku JSON
 function exportBook() {
-    if (currentBookId === null) return;
+    if (currentBookId === null) return alert('Nie wybrano książki do eksportu.');
     const book = books.find(b => b.id === currentBookId);
     if (!book) return;
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(book));
@@ -76,6 +97,7 @@ function exportBook() {
     downloadAnchorNode.remove();
 }
 
+// Importuj książkę z pliku JSON
 function importBook(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -92,6 +114,7 @@ function importBook(event) {
         }
     };
     reader.readAsText(file);
+    importFileInput.value = ''; // Reset input
 }
 
 // Event listeners
@@ -101,4 +124,5 @@ exportBookBtn.addEventListener('click', exportBook);
 importBookBtn.addEventListener('click', () => importFileInput.click());
 importFileInput.addEventListener('change', importBook);
 
+// Inicjalne wyświetlenie listy książek
 renderBookList();
