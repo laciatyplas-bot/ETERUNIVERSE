@@ -1,4 +1,4 @@
-// app.js - Eterniverse Master Premium v6.0
+// app.js - Eteruniverse Master Premium v6.0
 // Pełna logika: Książki + Struktura Universum + Mapa Bram + Bella AI + Dyktowanie + Eksport DOCX
 
 'use strict';
