@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POLARIS — Mapa Kanoniczna | ŚWIAT 2 ETERNIVERSE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Georgia', serif;
+            background: radial-gradient(circle at center, #0a0a1f 0%, #000 70%);
+            color: #f0f8ff;
+            min-height: 100vh;
+            overflow-x: auto;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .header h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffffff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+        .subtitle {
+            font-size: 1.3rem;
+            color: #b0c4de;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        .kanon {
+            background: rgba(255,215,0,0.1);
+            border: 2px solid rgba(255,215,0,0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            text-align: center;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        .ice-wall {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(180deg, 
+                #e0f7fa 0%, 
+                #b2ebf2 30%, 
+                #4fc3f7 70%, 
+                #0288d1 100%);
+            border-radius: 20px;
+            margin: 40px 0;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(2,136,209,0.4);
+        }
+        .ice-wall::before {
+            content: "🧊 LODOWA ŚCIANA 🧊";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: rgba(255,255,255,0.9);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+        .ice-wall::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 50px,
+                rgba(255,255,255,0.3) 50px,
+                rgba(255,255,255,0.3) 52px
+            );
+            animation: shimmer 3s infinite linear;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .rings-container {
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+            margin-top: 40px;
+        }
+        .ring {
+            position: relative;
+            padding: 40px;
+            border-radius: 25px;
+        }
+        .ring-1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 3px solid #a8b5ff;
+        }
+        .ring-2 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: 3px solid #ff9ff3;
+        }
+        .ring-title {
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 0 0 20px rgba(255,255,255,0.8);
+        }
+        .islands-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .island {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .island:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+            border-color: rgba(255,255,255,0.7);
+        }
+        .island::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .island:hover::before {
+            left: 100%;
+        }
+        .island-emoji {
+            font-size: 3rem;
+            display: block;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .island-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .island-desc {
+            font-size: 1rem;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+        .aurion {
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            width: 160px;
+            height: 160px;
+            background: radial-gradient(circle, #ffd700 0%, #ffed4e 40%, #ff6b35 70%, transparent 100%);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            box-shadow: 
+                0 0 50px #ffd700,
+                0 0 100px #ffed4e,
+                inset 0 0 50px rgba(255,255,255,0.3);
+            z-index: 10;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        .zdanie-kanoniczne {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border: 3px solid #ffd700;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 60px;
+            font-size: 1.6rem;
+            font-style: italic;
+            box-shadow: 0 20px 60px rgba(30,60,114,0.6);
+        }
+        .bramy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        .brama {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,215,0,0.5);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .brama:hover {
+            background: rgba(255,215,0,0.1);
+            border-color: #ffd700;
+            transform: scale(1.05);
+        }
+        @media print {
+            body { background: white; color: black; }
+            .aurion { animation: none; }
+            .ice-wall::after { animation: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌌 POLARIS</h1>
+            <p class="subtitle">ŚWIAT DRUGI ETERNIVERSE</p>
+            <div class="kanon">STATUS: KANON | FORMA: WEWNĘTRZNA ZIEMIA</div>
+        </div>
+
+        <div class="ice-wall"></div>
+
+        <div class="aurion"></div>
+
+        <div class="rings-container">
+            <!-- PIERWSZY PIERŚCIEŃ -->
+            <div class="ring ring-1">
+                <h2 class="ring-title">❄️ PIERWSZY PIERŚCIEŃ POLARIS</h2>
+                <p style="text-align: center; margin-bottom: 30px; font-size: 1.2rem;">
+                    SIEDEM WYSYP ZA LODOWĄ ŚCIANĄ
+                </p>
+                <div class="islands-grid">
+                    <div class="island">
+                        <span class="island-emoji">⛲</span>
+                        <div class="island-title">Wyspa Olimpu</div>
+                        <div class="island-desc">Administratorzy starego porządku</div>
+                    </div>
+                    <div class="island">
+                        <span class="island-emoji">⚡</span>
+                        <div class="island-title">Asgard</div>
+                        <div class="island-desc">Bogowie północy, którzy się wycofali</div>
+                    </div>
+                    <div class="island">
+                        <span class="island-emoji">🦕</span>
+                        <div class="island-title">Wyspa Dinozaurów</div>
+                        <div class="island-desc">Czas zatrzymany</div>
+                    </div>
+                    <div class="island">
+                        <span class="island-emoji">🌿</span>
+                        <div class="island-title">Alfheim</div>
+                        <div class="island-desc">Elfy Pola</div>
+                    </div>
+                    <div class="island">
+                        <span class="island-emoji">🌀</span>
+                        <div class="island-title">Wyspa Mitów</div>
+                        <div class="island-desc">Hybrydy i rasy zapomniane</div>
+                    </div>
+                    <div class="island">
+                        <span class="island-emoji">🧜‍♀️</span>
+                        <div class="island-title">Królestwa Syren</div>
+                        <div class="island-desc">Kontrola przejść wodnych</div>
+                    </div>
+                    <div class="island">
+                        <span class="island-emoji">🔨</span>
+                        <div class="island-title">Wyspa Kowali</div>
+                        <div class="island-desc">Krasnoludy Rdzenia</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DRUGI PIERŚCIEŃ -->
+            <div class="ring ring-2">
+                <h2 class="ring-title">✨ DRUGI PIERŚCIEŃ POLARIS</h2>
+                <p style="text-align: center; margin-bottom: 30px; font-size: 1.2rem;">
+                    DZIEWIĘĆ KRAIN WYSOKIEJ CZĘSTOTLIWOŚCI
+                </p>
+                <div class="islands-grid">
+                    <div class="island">
+                        <span class="island-emoji">🌊</span>
+                        <div class="island-title">Lemuria</div>
+                    </div>
+                    <div class="island">
+                        <span class="island-emoji">🏛️</span>
+                        <div class="island-title">Atlantyda</div>
+                    </div>
+                    <div class="island">
+                        <span class="island-emoji">🗿</span>
+                        <div class="island-title">Krainy Olbrzymów</div>
+                    </div>
+                    <div class="island">
+                        <span class="island-emoji">🧚</span>
+                        <div class="island-title">Wyspy Wróżek</div>
+                    </div>
+                    <div class="island">
+                        <span class="island-emoji">🐉</span>
+                        <div class="island-title">Domeny Smoków</div>
+                    </div>
+                    <div class="island">
+                        <span class="island-emoji">🔇</span>
+                        <div class="island-title">Krainy Ciszy</div>
+                    </div>
+                    <div class="island">
+                        <span class="island-emoji">📢</span>
+                        <div class="island-title">Krainy Echa</div>
+                    </div>
+                    <div class="island">
+                        <span class="island-emoji">📜</span>
+                        <div class="island-title">Krainy Pamięci</div>
+                    </div>
+                    <div class="island">
+                        <span class="island-emoji">⚰️</span>
+                        <div class="island-title">Krainy Końca</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BRAMY -->
+        <div style="margin-top: 60px;">
+            <h2 style="text-align: center; font-size: 2rem; margin-bottom: 30px; color: #ffd700;">
+                🚪 D Z E S I Ą T B R A M P O L A R I S
+            </h2>
+            <div class="bramy-grid">
+                <div class="brama">Krainy Cienia</div>
+                <div class="brama">Archiwum Pierwotne</div>
+                <div class="brama">Wieże Woli</div>
+                <div class="brama">Dwory Archetypów</div>
+                <div class="brama">Ogrody Obfitości</div>
+                <div class="brama">Jaskinie Ciała</div>
+                <div class="brama">Splątane Lasy</div>
+                <div class="brama">Rzeki Trajektorii</div>
+                <div class="brama">Węzły Eternionów</div>
+                <div class="brama">Horyzont Jedności</div>
+            </div>
+        </div>
+
+        <!-- ZDANIE KANONICZNE -->
+        <div class="zdanie-kanoniczne">
+            „Polaris nie leży za lodowcem.<br>
+            <span style="font-size: 2rem; color: #ffd700; font-weight: bold;">Polaris zaczyna się tam, gdzie kończy się strach przed prawdą.”</span>
+        </div>
+    </div>
+
+    <script>
+        // Dodatkowe interakcje dla PDF preview
+        document.querySelectorAll('.island, .brama').forEach(el => {
+            el.addEventListener('click', function() {
+                this.style.transform = 'scale(1.05) rotate(2deg)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
+            });
+        });
+    </script>
+</body>
+</html>
