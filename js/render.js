@@ -1,215 +1,141 @@
-// Pełny kod renderowania i zarządzania Panelem Edycji z walidacją i autosave
-// Eterniverse Master Premium PRO v13.0
-
-class EditPanelManager {
+class Renderer {
   constructor(app) {
-    this.app = app; // odniesienie do głównej aplikacji (master/daja)
-    this.autoSaveDelay = 1000; // 1 sekunda po ostatnim wpisywaniu
-    this.autoSaveTimeout = null;
-    this.isValid = true;
-
+    this.app = app; // odniesienie do głównej aplikacji (master)
     this.elements = {
-      title: document.getElementById('element-title'),
-      content: document.getElementById('element-content'),
-      path: document.getElementById('current-path'),
-      meta: document.getElementById('element-meta'),
+      structureTree: document.getElementById('structure-tree'),
+      mapaGrid: document.getElementById('mapa-grid'),
+      suggestions: document.getElementById('suggestions'),
+      elementTitle: document.getElementById('element-title'),
+      elementContent: document.getElementById('element-content'),
+      currentPath: document.getElementById('current-path'),
       status: document.getElementById('status')
     };
-
-    this.bindEvents();
   }
 
-  // Renderowanie całego panelu edycji
-  render(currentElement) {
-    this.currentElement = currentElement;
-
-    // Tytuł
-    if (this.elements.title) {
-      this.elements.title.value = currentElement?.title || '';
-      this.elements.title.placeholder = currentElement?.type 
-        ? `Tytuł ${currentElement.type.toLowerCase()}...` 
-        : 'Tytuł elementu...';
-
-      // Walidacja tytułu
-      this.validateTitle();
-    }
-
-    // Treść
-    if (this.elements.content) {
-      this.elements.content.value = currentElement?.content || '';
-      this.elements.content.placeholder = currentElement
-        ? `Tu rozwija się \( {currentElement.type?.toLowerCase()} „ \){currentElement.title || 'nowy element'}”...\nAI może przyspieszyć kreację.`
-        : 'Wybierz element w hierarchii, aby edytować jego treść...';
-    }
-
-    // Ścieżka
-    this.renderPath(currentElement);
-
-    // Metadane
-    this.renderMeta(currentElement);
-
-    // Focus na tytuł jeśli nowy element
-    if (currentElement && this.elements.title && document.activeElement !== this.elements.title) {
-      setTimeout(() => this.elements.title.focus(), 100);
-    }
+  // Główna metoda – renderuje wszystko naraz
+  renderAll() {
+    this.renderStructure();
+    this.renderMapa();
+    this.renderEditPanel(this.app.currentElement);
+    this.renderSuggestions([]);
   }
 
-  // Renderowanie ścieżki
-  renderPath(element) {
-    if (!this.elements.path) return;
+  // === 1. RENDEROWANIE HIERARCHII ===
+  renderStructure() {
+    const container = this.elements.structureTree;
+    if (!container) return;
 
-    if (!element) {
-      this.elements.path.innerHTML = '<em style="opacity:0.5;">Brak wybranego elementu</em>';
+    const structure = this.app.data.getStructure();
+    if (structure.length === 0) {
+      container.innerHTML = `
+        <p style="opacity:0.6;text-align:center;padding:3rem;font-size:1.1rem;">
+          Brak uniwersów<br><br>
+          Kliknij „+ Nowe Uniwersum”, by rozpocząć kreację
+        </p>`;
+      return;
+    }
+
+    container.innerHTML = structure.map(root => this.buildTreeNode(root)).join('');
+  }
+
+  buildTreeNode(node) {
+    const icons = {
+      'Uniwersum': '🌌',
+      'Świat': '🌍',
+      'Tom': '📚',
+      'Rozdział': '📖',
+      'Podrozdział': '📄',
+      'Fragment': '📜'
+    };
+    const icon = icons[node.type] || '📄';
+    const isSelected = this.app.currentElement && this.app.currentElement.id === node.id;
+
+    let html = `
+      <div class="tree-node \( {isSelected ? 'selected' : ''}" onclick="master.selectElement(' \){node.id}')">
+        <span class="icon">${icon}</span>
+        <strong>${this.escape(node.title || '(Bez tytułu)')}</strong>
+        <small style="margin-left:8px;opacity:0.7;">${node.type || ''}</small>
+    `;
+
+    if (node.children && node.children.length > 0) {
+      html += `<div class="nested">${node.children.map(child => this.buildTreeNode(child)).join('')}</div>`;
+    }
+
+    html += `</div>`;
+    return html;
+  }
+
+  // === 2. RENDEROWANIE MAPY BRAM ===
+  renderMapa() {
+    const container = this.elements.mapaGrid;
+    if (!container) return;
+
+    const mapa = this.app.data.getMapa();
+    container.innerHTML = mapa.map(brama => `
+      <div class="tree-node" onclick="master.insertBrama(${brama.id})">
+        <span class="icon">🔮</span>
+        <strong>${this.escape(brama.name)}</strong>
+        <small style="margin-left:8px;opacity:0.7;">${brama.books?.length || 0} tytułów</small>
+      </div>
+    `).join('');
+  }
+
+  // === 3. RENDEROWANIE PANELU EDYCJI ===
+  renderEditPanel(element) {
+    if (this.elements.elementTitle) {
+      this.elements.elementTitle.value = element?.title || '';
+    }
+    if (this.elements.elementContent) {
+      this.elements.elementContent.value = element?.content || '';
+    }
+    this.renderCurrentPath(element);
+  }
+
+  renderCurrentPath(element) {
+    if (!this.elements.currentPath || !element) {
+      if (this.elements.currentPath) this.elements.currentPath.innerHTML = '';
       return;
     }
 
     const path = this.app.getPathToElement(element);
-    this.elements.path.innerHTML = path.map((node, idx) => {
-      const icon = {
-        'Uniwersum': '🌌', 'Świat': '🌍', 'Tom': '📚',
-        'Rozdział': '📖', 'Podrozdział': '📄', 'Fragment': '📜'
-      }[node.type] || '📄';
-
-      const isLast = idx === path.length - 1;
-      return `
-        <span style="opacity:\( {isLast ? '1' : '0.7'}; font-weight: \){isLast ? '700' : '500'};">
-          ${icon} ${this.escape(node.title || node.type)}
-        </span>
-        ${!isLast ? '<span style="margin:0 12px; opacity:0.5;">→</span>' : ''}
-      `;
-    }).join('');
+    this.elements.currentPath.innerHTML = path.map(n => `${n.title || n.type}`).join(' → ');
   }
 
-  // Renderowanie metadanych
-  renderMeta(element) {
-    if (!this.elements.meta) return;
+  // === 4. RENDEROWANIE SUGESTII BELLA AI ===
+  renderSuggestions(items = []) {
+    const panel = this.elements.suggestions;
+    if (!panel) return;
 
-    if (!element) {
-      this.elements.meta.innerHTML = '<em style="opacity:0.5;">Wybierz element, aby zobaczyć metadane</em>';
+    if (items.length === 0) {
+      panel.innerHTML = `
+        <p style="text-align:center;opacity:0.7;padding:4rem;line-height:1.8;">
+          Wybierz element i użyj „Bella Analiza” lub „AI Generuj”
+        </p>`;
       return;
     }
 
-    const wordCount = this.wordCount(element.content || '');
-    const charCount = (element.content || '').length;
-    const created = element.created ? new Date(element.created).toLocaleString('pl-PL') : 'nieznana';
-
-    this.elements.meta.innerHTML = `
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; font-size:0.95rem; opacity:0.9;">
-        <div><strong>Typ:</strong> ${this.escape(element.type || 'Nieznany')}</div>
-        <div><strong>ID:</strong> <code style="background:rgba(0,224,255,0.1); padding:2px 8px; border-radius:6px;">${element.id}</code></div>
-        <div><strong>Utworzono:</strong> ${created}</div>
-        <div><strong>Słów:</strong> ${wordCount}</div>
-        <div><strong>Znaków:</strong> ${charCount}</div>
-        <div><strong>Profil:</strong> ${this.app.currentProfile?.toUpperCase() || 'WATTPAD'}</div>
+    panel.innerHTML = items.map(item => `
+      <div class="${item.type || 'suggestion'}">
+        ${this.escape(item.text)}
       </div>
-    `;
+    `).join('');
   }
 
-  // === WALIDACJA ===
-  validateTitle() {
-    if (!this.elements.title || !this.currentElement) return true;
-
-    const value = this.elements.title.value.trim();
-    const minLength = 1;
-    const maxLength = 200;
-
-    let valid = true;
-    let message = '';
-
-    if (value.length < minLength) {
-      valid = false;
-      message = 'Tytuł jest wymagany';
-    } else if (value.length > maxLength) {
-      valid = false;
-      message = `Tytuł zbyt długi (max ${maxLength} znaków)`;
-    }
-
-    // Stylizacja walidacji
-    this.elements.title.style.borderColor = valid ? 'var(--quantum-gold)' : '#ff4060';
-    this.elements.title.title = message;
-
-    this.isValid = valid;
-    return valid;
-  }
-
-  validateAll() {
-    return this.validateTitle();
-  }
-
-  // === AUTOSAVE ===
-  bindEvents() {
-    if (this.elements.title) {
-      this.elements.title.addEventListener('input', () => {
-        this.validateTitle();
-        this.triggerAutoSave();
-      });
-    }
-
-    if (this.elements.content) {
-      this.elements.content.addEventListener('input', () => {
-        this.triggerAutoSave();
-        this.renderMeta(this.currentElement); // aktualizuj liczbę słów na żywo
-      });
+  // === 5. STATUS DOLNY PASEK ===
+  setStatus(message, timeout = 6000) {
+    if (!this.elements.status) return;
+    this.elements.status.textContent = message;
+    if (timeout > 0) {
+      setTimeout(() => {
+        if (this.elements.status.textContent === message) {
+          this.elements.status.textContent = 'Gotowy';
+        }
+      }, timeout);
     }
   }
 
-  triggerAutoSave() {
-    if (!this.app.autoSaveCurrent) return;
-
-    clearTimeout(this.autoSaveTimeout);
-
-    this.autoSaveTimeout = setTimeout(() => {
-      if (this.validateAll()) {
-        this.app.autoSaveCurrent();
-        this.status('Zapisano automatycznie', 3000);
-      } else {
-        this.status('Nie zapisano – popraw błędy', 5000);
-      }
-    }, this.autoSaveDelay);
-  }
-
-  // === POMOCNICZE ===
+  // === POMOCNICZA ===
   escape(text = '') {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  wordCount(text = '') {
-    return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-  }
-
-  status(message, duration = 4000) {
-    if (this.elements.status) {
-      this.elements.status.textContent = message;
-      if (duration > 0) {
-        setTimeout(() => {
-          if (this.elements.status.textContent === message) {
-            this.elements.status.textContent = 'Gotowy';
-          }
-        }, duration);
-      }
-    }
+    return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 }
-
-// === INICJALIZACJA ===
-document.addEventListener('DOMContentLoaded', () => {
-  if (window.master) {
-    window.editPanel = new EditPanelManager(window.master);
-    
-    // Renderuj panel po każdej zmianie elementu
-    const originalSelect = window.master.selectElement.bind(window.master);
-    window.master.selectElement = function(id) {
-      originalSelect(id);
-      if (window.editPanel) {
-        window.editPanel.render(this.currentElement);
-      }
-    };
-
-    // Początkowe renderowanie
-    if (window.editPanel && window.master.currentElement) {
-      window.editPanel.render(window.master.currentElement);
-    }
-  }
-});
