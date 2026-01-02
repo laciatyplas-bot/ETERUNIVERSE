@@ -1,40 +1,44 @@
-// app.js - Eteruniverse Master Premium v6.0
-// Pełna logika: Książki + Struktura Universum + Mapa Bram + Bella AI + Dyktowanie + Eksport DOCX
+// app.js - Eterniverse Master Premium PRO v12.0
+// Główna logika aplikacji: Hierarchia + AI + Eksport + Dyktowanie + Bella Console
 
 'use strict';
 
-class EterniverseMaster {
+class EterniverseMasterPRO {
   constructor() {
     // Klucze localStorage
-    this.BOOKS_KEY = 'eterniverse_books_v6';
-    this.STRUCT_KEY = 'eterniverse_structure_v6';
-    this.MAPA_KEY = 'eterniverse_mapa_v6';
+    this.STRUCT_KEY = 'eterniverse_structure_pro_v12';
+    this.MAPA_KEY = 'eterniverse_mapa_pro';
 
     // Dane
-    this.books = this.load(this.BOOKS_KEY, []);
     this.structure = this.load(this.STRUCT_KEY, []);
-    this.mapa = this.load(this.MAPA_KEY, [
-      { id: 1, name: "BRAMA 1 — INTERSEEKER", books: [{ title: "INTERSEEKER: Geneza" }, { title: "INTERSEEKER: Efekt Cienia" }] },
-      { id: 2, name: "BRAMA 2 — ETERSEEKER", books: [{ title: "EterSeeker: Kronika Woli" }, { title: "Interfejs Świadomości" }] },
-      { id: 3, name: "BRAMA 3 — OBFITOSEEKER", books: [{ title: "ObfitoSeeker – Kod Obfitości" }] },
-      { id: 4, name: "BRAMA 4 — THE KNOT", books: [{ title: "Kronika Splątania" }, { title: "Eterniony Tom I" }] },
-      { id: 5, name: "BRAMA 5 — RELIGIOSEEKER", books: [{ title: "ReligioSeeker" }] }
-    ]);
+    this.mapa = this.load(this.MAPA_KEY, this.defaultMapa());
 
     // Stan
-    this.currentBook = null;
-    this.currentProfile = 'wattpad';
+    this.currentElement = null;
+    this.currentProfile = localStorage.getItem('eterniverse_profile') || 'wattpad';
     this.recognition = null;
 
     this.init();
   }
 
+  // Domyślna mapa bram
+  defaultMapa() {
+    return [
+      { id: 1, name: "BRAMA 1 — INTERSEEKER", books: ["INTERSEEKER: Geneza", "INTERSEEKER: Efekt Cienia"] },
+      { id: 2, name: "BRAMA 2 — ETERSEEKER", books: ["EterSeeker: Kronika Woli", "Interfejs Świadomości"] },
+      { id: 3, name: "BRAMA 3 — OBFITOSEEKER", books: ["ObfitoSeeker – Kod Obfitości"] },
+      { id: 4, name: "BRAMA 4 — THE KNOT", books: ["Kronika Splątania", "Eterniony Tom I"] },
+      { id: 5, name: "BRAMA 5 — RELIGIOSEEKER", books: ["ReligioSeeker"] }
+    ];
+  }
+
+  // Podstawowe operacje storage
   load(key, fallback) {
     try {
       const data = localStorage.getItem(key);
       return data ? JSON.parse(data) : fallback;
     } catch (e) {
-      console.warn('Błąd ładowania danych:', key, e);
+      console.error('Błąd ładowania danych:', e);
       return fallback;
     }
   }
@@ -43,223 +47,248 @@ class EterniverseMaster {
     try {
       localStorage.setItem(key, JSON.stringify(data));
     } catch (e) {
-      console.error('Błąd zapisu:', key, e);
+      console.error('Błąd zapisu danych:', e);
+      alert('Błąd zapisu – localStorage może być pełny');
     }
   }
 
+  // Inicjalizacja
   init() {
+    this.updateProfileSelect();
     this.bindEvents();
     this.renderAll();
     this.initSpeech();
-    this.status('Eterniverse Master Premium uruchomiony');
+    this.status('Eterniverse Master Premium PRO v12.0 — gotowy do kreacji');
+  }
+
+  updateProfileSelect() {
+    const select = document.getElementById('profile-select');
+    if (select) select.value = this.currentProfile;
   }
 
   bindEvents() {
-    const els = {
-      profile: document.getElementById('profile-select'),
-      addBook: document.getElementById('add-book-btn'),
-      addUniverse: document.getElementById('add-universe'),
-      bella: document.getElementById('bella-analyze'),
-      export: document.getElementById('export-docx'),
-      dictateStart: document.getElementById('start-dictate'),
-      dictateStop: document.getElementById('stop-dictate'),
-      title: document.getElementById('book-title'),
-      content: document.getElementById('book-content')
+    // Profil
+    document.getElementById('profile-select').onchange = (e) => {
+      this.currentProfile = e.target.value;
+      localStorage.setItem('eterniverse_profile', this.currentProfile);
     };
 
-    els.profile.onchange = (e) => this.currentProfile = e.target.value;
-    els.addBook.onclick = () => this.addBook();
-    els.addUniverse.onclick = () => this.addUniverse();
-    els.bella.onclick = () => this.bellaAnalyze();
-    els.export.onclick = () => this.exportDocx();
-    els.dictateStart.onclick = () => this.startDictation();
-    els.dictateStop.onclick = () => this.stopDictation();
-    els.title.oninput = () => this.autoSave();
-    els.content.oninput = () => this.autoSave();
+    // Przyciski główne
+    document.getElementById('add-universe').onclick = () => this.addRootUniverse();
+    document.getElementById('add-child').onclick = () => this.addChild();
+    document.getElementById('generate-story').onclick = () => this.generateStory();
+    document.getElementById('bella-analyze').onclick = () => this.bellaAnalyze();
+    document.getElementById('export-docx').onclick = () => this.exportDocx();
+    document.getElementById('start-dictate').onclick = () => this.startDictation();
+    document.getElementById('stop-dictate').onclick = () => this.stopDictation();
+
+    // Autozapis
+    document.getElementById('element-title').oninput = () => this.autoSave();
+    document.getElementById('element-content').oninput = () => this.autoSave();
   }
 
   renderAll() {
-    this.renderBooks();
-    this.renderStructure();
-    this.renderMapa();
+    if (window.renderer) {
+      window.renderer.renderAll();
+      window.renderer.renderCurrentElement();
+    }
   }
 
-  // === KSIĘGI ===
-  renderBooks() {
-    const list = document.getElementById('books-list');
-    if (this.books.length === 0) {
-      list.innerHTML = '<p style="opacity:0.6;text-align:center;padding:2rem;">Brak ksiąg – utwórz pierwszą</p>';
+  // === OPERACJE NA HIERARCHII ===
+  addRootUniverse() {
+    const newUniv = {
+      id: this.generateId(),
+      type: 'Uniwersum',
+      title: 'Nowe Uniwersum',
+      content: '',
+      children: []
+    };
+
+    this.structure.push(newUniv);
+    this.save(this.STRUCT_KEY, this.structure);
+    this.currentElement = newUniv;
+    this.renderAll();
+    this.status('Utworzono nowe uniwersum');
+  }
+
+  addChild() {
+    if (!this.currentElement) {
+      alert('Wybierz element nadrzędny w hierarchii');
       return;
     }
 
-    list.innerHTML = this.books.map(book => `
-      <div class="item \( {this.currentBook?.id === book.id ? 'active' : ''}" onclick="master.openBook( \){book.id})">
-        <strong>📖 ${this.escape(book.title || 'Bez tytułu')}</strong>
-        <div style="font-size:0.9rem;opacity:0.8;margin-top:0.4rem;">
-          ${this.wordCount(book.content || '')} słów
-        </div>
-      </div>
-    `).join('');
-  }
+    const types = ['Uniwersum', 'Świat', 'Tom', 'Rozdział', 'Podrozdział', 'Fragment'];
+    const currentIdx = types.indexOf(this.currentElement.type || 'Uniwersum');
+    const childType = types[currentIdx + 1] || 'Fragment';
 
-  addBook() {
-    const book = {
-      id: Date.now(),
-      title: 'Nowa Księga Eteryczna',
+    const newChild = {
+      id: this.generateId(),
+      type: childType,
+      title: `Nowy ${childType}`,
       content: '',
-      created: new Date().toISOString()
+      children: []
     };
-    this.books.unshift(book);
-    this.save(this.BOOKS_KEY, this.books);
-    this.openBook(book.id);
-    this.status('Nowa księga utworzona');
+
+    this.currentElement.children = this.currentElement.children || [];
+    this.currentElement.children.push(newChild);
+    this.save(this.STRUCT_KEY, this.structure);
+    this.currentElement = newChild;
+    this.renderAll();
+    this.status(`Dodano: ${childType}`);
   }
 
-  openBook(id) {
-    this.currentBook = this.books.find(b => b.id === id);
-    if (!this.currentBook) return;
+  selectElement(id) {
+    this.currentElement = this.findById(id);
+    this.renderAll();
+    if (window.renderer) window.renderer.renderCurrentElement();
+  }
 
-    document.getElementById('book-title').value = this.currentBook.title || '';
-    document.getElementById('book-content').value = this.currentBook.content || '';
-    this.renderBooks();
+  findById(id, nodes = this.structure) {
+    for (const node of nodes) {
+      if (node.id === id) return node;
+      if (node.children?.length) {
+        const found = this.findById(id, node.children);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  getPathTo(element) {
+    const path = [];
+    const traverse = (nodes) => {
+      for (const node of nodes) {
+        if (node.id === element.id) {
+          path.unshift(node);
+          return true;
+        }
+        if (node.children?.length && traverse(node.children)) {
+          path.unshift(node);
+          return true;
+        }
+      }
+      return false;
+    };
+    traverse(this.structure);
+    return path;
   }
 
   autoSave() {
-    if (!this.currentBook) return;
-    this.currentBook.title = document.getElementById('book-title').value;
-    this.currentBook.content = document.getElementById('book-content').value;
-    this.save(this.BOOKS_KEY, this.books);
-  }
+    if (!this.currentElement) return;
 
-  // === STRUKTURA UNIWERSUM ===
-  renderStructure() {
-    const tree = document.getElementById('structure-tree');
-    if (this.structure.length === 0) {
-      tree.innerHTML = '<p style="opacity:0.6;text-align:center;padding:1rem;">Brak struktur – dodaj pierwsze uniwersum</p>';
-      return;
-    }
+    this.currentElement.title = document.getElementById('element-title').value.trim();
+    this.currentElement.content = document.getElementById('element-content').value;
 
-    tree.innerHTML = this.structure.map(item => this.buildTreeNode(item)).join('');
-  }
-
-  buildTreeNode(item) {
-    const icon = { 'Uniwersum': '🌌', 'Świat': '🌍', 'Tom': '📚' }[item.type] || '📄';
-    const children = item.children?.length 
-      ? `<div class="nested">${item.children.map(c => this.buildTreeNode(c)).join('')}</div>` 
-      : '';
-
-    return `
-      <div class="item" onclick="master.selectStruct(${item.id})">
-        ${icon} ${this.escape(item.title)}
-        ${children}
-      </div>
-    `;
-  }
-
-  addUniverse() {
-    const univ = {
-      id: Date.now(),
-      type: 'Uniwersum',
-      title: 'Nowe Uniwersum',
-      children: []
-    };
-    this.structure.push(univ);
     this.save(this.STRUCT_KEY, this.structure);
-    this.renderStructure();
-    this.status('Nowe uniwersum dodane');
-  }
-
-  selectStruct(id) {
-    // Można rozbudować o edycję struktury w przyszłości
-    this.status('Wybrano element struktury (funkcja w budowie)');
   }
 
   // === MAPA BRAM ===
-  renderMapa() {
-    const grid = document.getElementById('mapa-grid');
-    if (this.mapa.length === 0) {
-      grid.innerHTML = '<p style="opacity:0.6;text-align:center;padding:1rem;">Brak bram</p>';
-      return;
-    }
-
-    grid.innerHTML = this.mapa.map(brama => `
-      <div class="item" onclick="master.insertBrama(${brama.id})">
-        <strong>🔮 ${this.escape(brama.name)}</strong>
-        <div style="font-size:0.9rem;opacity:0.8;margin-top:0.4rem;">
-          ${brama.books?.length || 0} tytułów
-        </div>
-      </div>
-    `).join('');
-  }
-
   insertBrama(id) {
     const brama = this.mapa.find(b => b.id === id);
-    if (!this.currentBook || !brama) return;
+    if (!this.currentElement || !brama) return;
 
-    const list = brama.books?.map(b => `📖 ${b.title}`).join('\n') || '';
-    const content = document.getElementById('book-content');
-    content.value += `\n\n✦ === \( {brama.name} === ✦\n \){list}\n\n`;
+    const list = brama.books?.map(t => `• ${t}`).join('\n') || '';
+    const textarea = document.getElementById('element-content');
+    textarea.value += `\n\n✦ === \( {brama.name} === ✦\n \){list}\n\n`;
     this.autoSave();
     this.status(`Wstawiono: ${brama.name}`);
   }
 
-  // === BELLA AI ===
+  // === BELLA AI ANALIZA ===
   bellaAnalyze() {
-    if (!this.currentBook || !this.currentBook.content?.trim()) {
-      return this.status('Brak tekstu do analizy');
-    }
-
-    const suggestions = this.generateBellaSuggestions(this.currentBook.content);
-    this.renderSuggestions(suggestions);
-    this.status(`${suggestions.length} sugestii od Bella AI`);
-  }
-
-  generateBellaSuggestions(text) {
-    const suggestions = [];
-    const lower = text.toLowerCase();
-    const words = this.wordCount(text);
-
-    if (this.currentProfile === 'amazon') {
-      if (!/darmowa|wysyłka|gwarancja|satysfakcja/i.test(lower))
-        suggestions.push('📦 Dodaj frazy konwertujące: „darmowa wysyłka”, „gwarancja satysfakcji”');
-      if (!/najlepszy|rewolucyjny|premium|ekskluzywny|wyjątkowy/i.test(lower))
-        suggestions.push('🏆 Użyj słów premium: najlepszy, rewolucyjny, ekskluzywny');
-    } else {
-      if (!text.includes('„') && !text.includes('"') && !text.includes('“'))
-        suggestions.push('💬 Dodaj dialogi – to serce Wattpad');
-      if ((lower.match(/(smut|strach|miłość|radość|przeraż|nadzieja|gniew|zakocha)/g) || []).length < 4)
-        suggestions.push('❤️ Wpleć więcej emocji – czytelnik musi czuć');
-    }
-
-    if (words < 300) suggestions.push('📈 Rozwiń tekst – dłuższe fragmenty mają większy zasięg');
-    if (text.split('\n\n').length < 5) suggestions.push('✨ Więcej akapitów – lepsza czytelność');
-
-    return suggestions.slice(0, 8);
-  }
-
-  renderSuggestions(suggestions) {
-    const panel = document.getElementById('suggestions');
-    if (suggestions.length === 0) {
-      panel.innerHTML = '<p style="text-align:center;opacity:0.7;padding:2rem;">🎉 Tekst idealny!</p>';
+    if (!this.currentElement || !this.currentElement.content?.trim()) {
+      this.status('Brak treści do analizy');
       return;
     }
 
-    panel.innerHTML = suggestions.map(s => `
-      <div class="suggestion">${s}</div>
-    `).join('');
+    const suggestions = this.generateProSuggestions(this.currentElement);
+    if (window.renderer) {
+      window.renderer.renderSuggestions(suggestions.map(text => ({ type: 'suggestion', text })));
+    }
+    this.status(`${suggestions.length} sugestii Bella AI`);
+  }
+
+  generateProSuggestions(element) {
+    const text = element.content || '';
+    const lower = text.toLowerCase();
+    const type = element.type || 'Fragment';
+    const suggestions = [];
+
+    if (['Uniwersum', 'Świat'].includes(type)) {
+      if (text.length < 200) suggestions.push('Opisz fundamenty świata: prawa fizyki, magia, historia');
+      if (!lower.includes('geografia') && !lower.includes('mapa')) suggestions.push('Dodaj opis geografii i kluczowych lokacji');
+    }
+
+    if (['Tom', 'Rozdział', 'Podrozdział'].includes(type)) {
+      if (!text.match(/["„”]/)) suggestions.push('Wprowadź dialogi – ożywiają postaci');
+      if (!lower.includes('konflikt') && !lower.includes('cel')) suggestions.push('Zdefiniuj główny konflikt lub cel bohatera');
+    }
+
+    if (this.currentProfile === 'amazon') {
+      if (!/limitowan|ekskluzywn|specjaln/i.test(lower)) suggestions.push('Podkreśl unikalność: „edycja limitowana”, „tylko tutaj”');
+    } else {
+      const emotions = (lower.match(/(miłość|strach|radość|smutek|gniew|nadzieja|przeraż|zakocha)/g) || []).length;
+      if (emotions < 5) suggestions.push('Wzmocnij emocje – Wattpad żyje uczuciami');
+    }
+
+    if (this.wordCount(text) < 500) suggestions.push('Rozwijaj sceny – szczegóły budują immersję');
+
+    return suggestions;
+  }
+
+  // === AI STORY GENERATOR ===
+  generateStory() {
+    if (!this.currentElement) {
+      this.status('Wybierz element do generowania');
+      return;
+    }
+
+    const context = this.currentElement;
+    const profile = this.currentProfile;
+    const type = context.type || 'Fragment';
+
+    let generated = '';
+
+    if (profile === 'amazon') {
+      generated = '⭐⭐⭐⭐⭐ ODKRYJ NAJLEPSZĄ KSIĄŻKĘ ROKU! Epicka przygoda, która wciąga od pierwszej strony. Idealna dla fanów fantasy i emocjonalnych historii. Darmowa wysyłka przy zamówieniu teraz!';
+    } else {
+      if (['Rozdział', 'Podrozdział'].includes(type)) {
+        generated = 'Deszcz bębnił o szybę, a jej serce biło jak oszalałe. Wiedziała, że to koniec... albo początek czegoś większego. Spojrzała w jego oczy i szepnęła: „Nie zostawiaj mnie”. Świat wokół nich zamarł w oczekiwaniu.';
+      } else {
+        generated = 'W ciemności lasu coś się poruszyło. Nie był to wiatr. To była magia – stara, zapomniana, budząca się do życia. Ona poczuła to pierwsza. Strach mieszał się z ekscytacją.';
+      }
+    }
+
+    const textarea = document.getElementById('element-content');
+    const separator = textarea.value ? '\n\n--- AI Generated ---\n\n' : '';
+    textarea.value += separator + generated;
+
+    this.autoSave();
+
+    if (window.renderer) {
+      window.renderer.renderSuggestions([{ type: 'generated', text: generated }]);
+    }
+
+    this.status('Treść wygenerowana przez AI');
   }
 
   // === EKSPORT DOCX ===
   async exportDocx() {
-    if (!this.currentBook) return this.status('Brak otwartej księgi');
+    if (!this.currentElement) {
+      this.status('Nie wybrano elementu do eksportu');
+      return;
+    }
 
     const { Document, Packer, Paragraph, HeadingLevel } = docx;
+    const path = this.getPathTo(this.currentElement);
+
     const doc = new Document({
       sections: [{
         children: [
-          new Paragraph({ text: this.currentBook.title || 'Bez tytułu', heading: HeadingLevel.TITLE, alignment: "center" }),
-          new Paragraph({ text: `Eterniverse • ${this.currentProfile.toUpperCase()} • ${new Date().toLocaleDateString('pl-PL')}`, alignment: "center" }),
-          new Paragraph({ text: this.currentBook.content || '' })
+          new Paragraph({ text: this.currentElement.title || 'Bez tytułu', heading: HeadingLevel.TITLE, alignment: "center" }),
+          new Paragraph({ text: path.map(n => n.title || n.type).join(' → '), alignment: "center" }),
+          new Paragraph({ text: `Typ: ${this.currentElement.type} • Profil: ${this.currentProfile.toUpperCase()} • ${new Date().toLocaleDateString('pl-PL')}`, alignment: "center" }),
+          new Paragraph({ text: this.currentElement.content || '' })
         ]
       }]
     });
@@ -269,19 +298,22 @@ class EterniverseMaster {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${(this.currentBook.title || 'ksiega').replace(/[^a-z0-9]/gi, '_')}_Eterniverse.docx`;
+      a.download = `${(this.currentElement.title || 'element').replace(/[^a-z0-9]/gi, '_')}_Eterniverse_PRO.docx`;
       a.click();
       URL.revokeObjectURL(url);
       this.status('Eksport DOCX zakończony');
-    } catch (err) {
+    } catch (e) {
       this.status('Błąd eksportu');
-      console.error(err);
+      console.error(e);
     }
   }
 
   // === DYKTowanie ===
   initSpeech() {
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) return;
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      console.log('Dyktowanie nieobsługiwane w tej przeglądarce');
+      return;
+    }
 
     this.recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     this.recognition.lang = 'pl-PL';
@@ -289,11 +321,12 @@ class EterniverseMaster {
     this.recognition.interimResults = true;
 
     this.recognition.onresult = (e) => {
-      const transcript = Array.from(e.results)
-        .map(r => r[0].transcript)
-        .join('');
-      document.getElementById('book-content').value += transcript;
-      this.autoSave();
+      const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+      const textarea = document.getElementById('element-content');
+      if (textarea) {
+        textarea.value += transcript;
+        this.autoSave();
+      }
     };
 
     this.recognition.onstart = () => {
@@ -308,25 +341,45 @@ class EterniverseMaster {
     };
   }
 
-  startDictation() { this.recognition?.start(); }
-  stopDictation() { this.recognition?.stop(); }
+  startDictation() {
+    if (this.recognition) this.recognition.start();
+  }
+
+  stopDictation() {
+    if (this.recognition) this.recognition.stop();
+  }
 
   // === POMOCNICZE ===
-  status(msg) {
-    const el = document.getElementById('status');
-    el.textContent = msg;
-    setTimeout(() => el.textContent = 'Gotowy', 5000);
+  generateId() {
+    return 'node_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
+  }
+
+  status(message, timeout = 6000) {
+    if (window.renderer) {
+      window.renderer.setStatus(message, timeout);
+    } else {
+      const statusEl = document.getElementById('status');
+      if (statusEl) {
+        statusEl.textContent = message;
+        if (timeout > 0) setTimeout(() => statusEl.textContent = 'Gotowy', timeout);
+      }
+    }
   }
 
   wordCount(text = '') {
     return (text.match(/\b\w+\b/g) || []).length;
   }
-
-  escape(text = '') {
-    return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
 }
 
-// Uruchomienie aplikacji
-const master = new EterniverseMaster();
-window.master = master; // Dla onclick w HTML
+// Uruchomienie głównej aplikacji
+const master = new EterniverseMasterPRO();
+window.master = master;
+
+// Po załadowaniu DOM – uruchom renderer (jeśli istnieje)
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.EterniverseRenderer) {
+    window.renderer = new EterniverseRenderer(master);
+    master.renderer = window.renderer;
+    master.renderAll(); // początkowe renderowanie
+  }
+});
