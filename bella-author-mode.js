@@ -101,6 +101,7 @@
       e.stopPropagation();
       selectElement(element.id);
     });
+
     li.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -108,295 +109,247 @@
       }
     });
 
-    if (element.children && element.children.length) {
+    if (element.children && element.children.length > 0) {
       const ul = document.createElement('ul');
-      ul.className = 'hierarchy';
-      element.children.forEach(child => ul.appendChild(renderElementNode(child)));
+      element.children.forEach(child => {
+        ul.appendChild(renderElementNode(child));
+      });
       li.appendChild(ul);
     }
     return li;
   }
 
-  // Wybierz element i załaduj do edytora
+  // Zaznacz element i pokaż jego dane w formularzu
   function selectElement(id) {
-    const found = findElementById(id);
-    if (!found) return;
     selectedElementId = id;
     renderUniverseList();
-    loadElementToEditor(found.element);
-    outputEl.textContent = '';
+
+    const found = findElementById(id);
+    if (!found) {
+      clearForm();
+      return;
+    }
+    const { element } = found;
+
+    elementTypeEl.value = element.type || '';
+    elementTitleEl.value = element.title || '';
+    elementDateEl.value = element.dateCreated || '';
+    elementVersionEl.value = element.version || '';
+    elementLanguageEl.value = element.language || '';
+    elementContentEl.value = element.content || '';
+    elementNotesEl.value = element.notes || '';
+
+    // Włącz przyciski edycji i usuwania
+    saveElementBtn.disabled = false;
+    deleteElementBtn.disabled = false;
+    addChildBtn.disabled = false;
   }
 
-  // Załaduj dane elementu do edytora
-  function loadElementToEditor(el) {
-    elementTypeEl.value = el.type;
-    elementTitleEl.value = el.title || '';
-    elementDateEl.value = new Date(el.dateCreated).toLocaleString() || '';
-    elementVersionEl.value = el.version || 'v1';
-    elementLanguageEl.value = el.language || 'pl';
-    elementContentEl.value = el.content || '';
-    elementNotesEl.value = el.notes || '';
-    updateButtonsState(true);
-  }
-
-  // Wyczyszczenie edytora i odznaczenie elementu
-  function clearEditor() {
+  // Wyczyść formularz edycji
+  function clearForm() {
     selectedElementId = null;
     elementTypeEl.value = '';
     elementTitleEl.value = '';
     elementDateEl.value = '';
     elementVersionEl.value = '';
-    elementLanguageEl.value = 'pl';
+    elementLanguageEl.value = '';
     elementContentEl.value = '';
     elementNotesEl.value = '';
-    updateButtonsState(false);
-    renderUniverseList();
-    outputEl.textContent = 'Edytor wyczyszczony.';
+
+    saveElementBtn.disabled = true;
+    deleteElementBtn.disabled = true;
+    addChildBtn.disabled = true;
   }
 
-  // Aktualizacja stanu przycisków (usuń/dodaj dziecko) w zależności od wybranego elementu
-  function updateButtonsState(enabled) {
-    deleteElementBtn.disabled = !enabled;
-    addChildBtn.disabled = !enabled;
-    saveElementBtn.disabled = !enabled;
-  }
+  // Zapisz zmiany w zaznaczonym elemencie
+  function saveElement() {
+    if (!selectedElementId) return alert('Nie wybrano elementu do zapisu.');
 
-  // Dodaj nowy element na poziomie Uniwersum (najwyższy poziom)
-  addUniverseBtn.addEventListener('click', () => {
-    const newUniverse = createNewElement('Uniwersum');
-    universeData.push(newUniverse);
+    const found = findElementById(selectedElementId);
+    if (!found) return alert('Nie znaleziono elementu.');
+
+    const { element } = found;
+
+    // Walidacja podstawowa
+    if (!elementTypeEl.value.trim()) return alert('Typ elementu jest wymagany.');
+    if (!elementTitleEl.value.trim()) return alert('Tytuł elementu jest wymagany.');
+
+    // Aktualizuj dane
+    element.type = elementTypeEl.value.trim();
+    element.title = elementTitleEl.value.trim();
+    element.dateCreated = elementDateEl.value.trim();
+    element.version = elementVersionEl.value.trim();
+    element.language = elementLanguageEl.value.trim();
+    element.content = elementContentEl.value.trim();
+    element.notes = elementNotesEl.value.trim();
+
     saveData();
-    selectedElementId = newUniverse.id;
     renderUniverseList();
-    loadElementEditor(newUniverse);
-    outputEl.textContent = 'Dodano nowe Uniwersum.';
-  });
+    alert('Element zapisany.');
+  }
 
-  // Tworzy nowy element z datą, wersją, ID i pustymi polami
-  function createNewElement(type, parent = null) {
-    return {
+  // Usuń zaznaczony element
+  function deleteElement() {
+    if (!selectedElementId) return alert('Nie wybrano elementu do usunięcia.');
+
+    const found = findElementById(selectedElementId);
+    if (!found) return alert('Nie znaleziono elementu.');
+
+    const { element, parent } = found;
+
+    if (!confirm(`Usunąć element "${element.title || '(Bez tytułu)'}" i wszystkie jego dzieci?`)) return;
+
+    if (parent) {
+      parent.children = parent.children.filter(child => child.id !== element.id);
+    } else {
+      // Usuwamy element z root
+      universeData = universeData.filter(el => el.id !== element.id);
+    }
+
+    saveData();
+    clearForm();
+    renderUniverseList();
+  }
+
+  // Dodaj nowy Uniwersum (root)
+  function addUniverse() {
+    const newUniverse = {
       id: generateId(),
-      parentId: parent ? parent.id : null,
-      type,
-      title: '',
-      dateCreated: new Date().toISOString(),
+      parentId: null,
+      type: 'Uniwersum',
+      title: 'Nowe Uniwersum',
+      dateCreated: new Date().toISOString().split('T')[0],
       version: 'v1',
       language: 'pl',
       content: '',
       notes: '',
       children: []
     };
+    universeData.push(newUniverse);
+    saveData();
+    renderUniverseList();
   }
 
-  // Obsługa zapisu zmian elementu
-  saveElementBtn.addEventListener('click', () => {
-    if (!selectedElementId) {
-      outputEl.textContent = 'Brak wybranego elementu do zapisu.';
-      return;
-    }
+  // Dodaj dziecko do zaznaczonego elementu
+  function addChild() {
+    if (!selectedElementId) return alert('Nie wybrano elementu, do którego dodać dziecko.');
+
     const found = findElementById(selectedElementId);
-    if (!found) {
-      outputEl.textContent = 'Element nie został znaleziony.';
-      return;
+    if (!found) return alert('Nie znaleziono elementu.');
+
+    const { element } = found;
+
+    // Określamy typ dziecka na podstawie bieżącego typu (prosty przykład)
+    let childType = '';
+    switch (element.type) {
+      case 'Uniwersum':
+        childType = 'Świat';
+        break;
+      case 'Świat':
+        childType = 'Tom';
+        break;
+      case 'Tom':
+        childType = 'Rozdział';
+        break;
+      case 'Rozdział':
+        childType = 'Podrozdział';
+        break;
+      case 'Podrozdział':
+        childType = 'Fragment';
+        break;
+      default:
+        childType = 'Fragment';
     }
-    // Walidacja tytułu
-    if (!elementTitleEl.value.trim()) {
-      outputEl.textContent = 'Tytuł nie może być pusty!';
-      return;
-    }
-    // Aktualizacja danych
-    const el = found.element;
-    el.title = elementTitleEl.value.trim();
-    // DataCreated pozostaje stała
-    el.version = elementVersionEl.value.trim() || el.version || 'v1';
-    el.language = elementLanguageEl.value || 'pl';
-    el.content = elementContentEl.value;
-    el.notes = elementNotesEl.value;
+
+    const newChild = {
+      id: generateId(),
+      parentId: element.id,
+      type: childType,
+      title: `Nowy ${childType}`,
+      dateCreated: new Date().toISOString().split('T')[0],
+      version: 'v1',
+      language: 'pl',
+      content: '',
+      notes: '',
+      children: []
+    };
+
+    element.children = element.children || [];
+    element.children.push(newChild);
 
     saveData();
     renderUniverseList();
-    outputEl.textContent = `Zapisano zmiany w elemencie "${el.title}".`;
-  });
-
-  // Usuwanie wybranego elementu wraz z dziećmi
-  deleteElementBtn.addEventListener('click', () => {
-    if (!selectedElementId) {
-      outputEl.textContent = 'Brak wybranego elementu do usunięcia.';
-      return;
-    }
-    if (!confirm('Czy na pewno chcesz usunąć ten element wraz z wszystkimi podrzędnymi?')) return;
-
-    const found = findElementById(selectedElementId);
-    if (!found) {
-      outputEl.textContent = 'Element nie został znaleziony.';
-      return;
-    }
-
-    if (found.parent) {
-      // Usuwamy z dzieci rodzica
-      found.parent.children = found.parent.children.filter(c => c.id !== selectedElementId);
-    } else {
-      // Usuwamy z root
-      universeData = universeData.filter(el => el.id !== selectedElementId);
-    }
-    saveData();
-    clearEditor();
-    renderUniverseList();
-    outputEl.textContent = 'Element usunięty.';
-  });
-
-  // Dodawanie dziecka do wybranego elementu
-  addChildBtn.addEventListener('click', () => {
-    if (!selectedElementId) {
-      outputEl.textContent = 'Wybierz element, do którego chcesz dodać podrzędny.';
-      return;
-    }
-    const found = findElementById(selectedElementId);
-    if (!found) {
-      outputEl.textContent = 'Wybrany element nie został znaleziony.';
-      return;
-    }
-    // Określamy typ podrzędny na podstawie typu rodzica (poziom hierarchii)
-    const nextType = getChildType(found.element.type);
-    if (!nextType) {
-      outputEl.textContent = `Nie można dodać podrzędnego elementu do typu "${found.element.type}".`;
-      return;
-    }
-    const newChild = createNewElement(nextType, found.element);
-    found.element.children.push(newChild);
-    saveData();
-    renderUniverseList();
-    selectedElementId = newChild.id;
-    loadElementToEditor(newChild);
-    outputEl.textContent = `Dodano nowy element typu "${nextType}".`;
-  });
-
-  // Określa typ dziecka na podstawie typu rodzica wg hierarchii
-  function getChildType(parentType) {
-    switch (parentType) {
-      case 'Uniwersum': return 'Świat';
-      case 'Świat': return 'Tom';
-      case 'Tom': return 'Rozdział';
-      case 'Rozdział': return 'Podrozdział / Fragment';
-      case 'Podrozdział / Fragment': return null;
-      default: return null;
-    }
+    selectElement(newChild.id);
   }
 
-  // Załaduj element do edytora (pomocnicza)
-  function loadElementEditor(el) {
-    selectedElementId = el.id;
-    renderUniverseList();
-    loadElementToEditor(el);
-  }
-
-  // Backup całego projektu (archiwum autora) - eksport do JSON i pobranie pliku
-  backupAllBtn.addEventListener('click', () => {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `Bella_Archiwum_Backup_${timestamp}.json`;
-    const blob = new Blob([JSON.stringify(universeData, null, 2)], { type: 'application/json' });
-    triggerDownload(blob, filename);
-    archiveOutputEl.textContent = `Backup wykonany: ${filename}`;
-  });
-
-  // Eksport wybranego elementu do wybranego formatu
-  exportBtn.addEventListener('click', () => {
-    if (!selectedElementId) {
-      archiveOutputEl.textContent = 'Wybierz element do eksportu.';
-      return;
-    }
-    const found = findElementById(selectedElementId);
-    if (!found) {
-      archiveOutputEl.textContent = 'Nie znaleziono wybranego elementu.';
-      return;
-    }
-    const el = found.element;
-    const format = exportSelectEl.value;
-    exportElement(el, format);
-  });
-
-  // Eksport elementu do formatu docx, pdf, txt
-  async function exportElement(el, format) {
-    const title = `[el.type]{el.type}]el.type]{el.title || '(Bez tytułu)'}`;
-    const content = el.content || '';
-    const notes = el.notes ? `\n\nNOTATKI AUTORA:\n${el.notes}` : '';
-    const text = `title\nWersja:{title}\nWersja:title\nWersja:{el.version}\nJęzyk: el.language\nData:{el.language}\nData:el.language\nData:{new Date(el.dateCreated).toLocaleString()}\n\ncontent{content}content{notes}`;
-
-    if (format === 'docx') {
-      const doc = new docx.Document({
-        sections: [{
-          children: [
-            new docx.Paragraph({ text: title, heading: docx.HeadingLevel.HEADING_1 }),
-            new docx.Paragraph(`Wersja: ${el.version}`),
-            new docx.Paragraph(`Język: ${el.language}`),
-            new docx.Paragraph(`Data utworzenia: ${new Date(el.dateCreated).toLocaleString()}`),
-            new docx.Paragraph(''),
-            new docx.Paragraph(content),
-            ...(el.notes ? [new docx.Paragraph(''), new docx.Paragraph('NOTATKI AUTORA:'), new docx.Paragraph(el.notes)] : [])
-          ],
-        }],
-      });
-      const blob = await docx.Packer.toBlob(doc);
-      const filename = sanitizeFilename(`${title}.docx`);
-      triggerDownload(blob, filename);
-      archiveOutputEl.textContent = `Eksportowano ${filename}`;
-    } else if (format === 'pdf') {
-      // Używamy jsPDF
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const margin = 10;
-      const maxWidth = pageWidth - margin * 2;
-
-      pdf.setFontSize(16);
-      pdf.text(title, margin, 20);
-      pdf.setFontSize(10);
-      pdf.text(`Wersja: ${el.version}`, margin, 30);
-      pdf.text(`Język: ${el.language}`, margin, 36);
-      pdf.text(`Data utworzenia: ${new Date(el.dateCreated).toLocaleString()}`, margin, 42);
-
-      pdf.setFontSize(12);
-      const splitText = pdf.splitTextToSize(content + notes, maxWidth);
-      pdf.text(splitText, margin, 55);
-
-      const filename = sanitizeFilename(`${title}.pdf`);
-      pdf.save(filename);
-      archiveOutputEl.textContent = `Eksportowano ${filename}`;
-    } else if (format === 'txt') {
-      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-      const filename = sanitizeFilename(`${title}.txt`);
-      triggerDownload(blob, filename);
-      archiveOutputEl.textContent = `Eksportowano ${filename}`;
-    } else {
-      archiveOutputEl.textContent = 'Nieznany format eksportu.';
-    }
-  }
-
-  // Pomocnicza funkcja pobierania pliku
-  function triggerDownload(blob, filename) {
+  // Backup całej bazy do pliku JSON
+  function backupAll() {
+    const dataStr = JSON.stringify(universeData, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
+
     const a = document.createElement('a');
     a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
+    a.download = `universe_backup_${new Date().toISOString().slice(0,10)}.json`;
     a.click();
-    document.body.removeChild(a);
+
     URL.revokeObjectURL(url);
   }
 
-  // Usuwa znaki niedozwolone w nazwach plików
-  function sanitizeFilename(name) {
-    return name.replace(/[\/\\?%*:|"<>]/g, '-');
+  // Export danych wg wybranego formatu (prosty przykład)
+  function exportData() {
+    if (!universeData.length) return alert('Brak danych do eksportu.');
+
+    const format = exportSelectEl.value;
+    let dataStr = '';
+
+    switch(format) {
+      case 'json':
+        dataStr = JSON.stringify(universeData, null, 2);
+        break;
+      case 'txt':
+        dataStr = exportAsText(universeData);
+        break;
+      default:
+        alert('Nieznany format eksportu.');
+        return;
+    }
+
+    const blob = new Blob([dataStr], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `universe_export_newDate().toISOString().slice(0,10).{new Date().toISOString().slice(0,10)}.newDate().toISOString().slice(0,10).{format}`;
+    a.click();
+
+    URL.revokeObjectURL(url);
   }
 
-  // Inicjalizacja - render listy i czyść edytor
-  renderUniverseList();
-  clearEditor();
+  // Przykład eksportu jako tekst (rekurencyjny)
+  function exportAsText(elements, indent = 0) {
+    let result = '';
+    elements.forEach(el => {
+      result += ' '.repeat(indent) + `[el.type]{el.type}]el.type]{el.title || '(Bez tytułu)'}\n`;
+      if (el.children && el.children.length) {
+        result += exportAsText(el.children, indent + 2);
+      }
+    });
+    return result;
+  }
 
-  // --- TRYB AUTORA - blokada generowania fabuły ---
-  // System NIE generuje fabuły, NIE proponuje stylu ani narracji
-  // W związku z tym funkcje generowania fabuły są wyłączone i nie istnieją
+  // Inicjalizacja UI i eventów
+  function init() {
+    renderUniverseList();
+    clearForm();
 
-  // Dodatkowo można wprowadzić ostrzeżenia przy próbie generowania (jeśli dodasz GUI do tego w przyszłości)
+    saveElementBtn.addEventListener('click', saveElement);
+    deleteElementBtn.addEventListener('click', deleteElement);
+    addUniverseBtn.addEventListener('click', addUniverse);
+    addChildBtn.addEventListener('click', addChild);
+    backupAllBtn.addEventListener('click', backupAll);
+    exportBtn.addEventListener('click', exportData);
+  }
 
+  init();
 })();
