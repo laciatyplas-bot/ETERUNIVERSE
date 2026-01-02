@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETERNIVERSE — ŚWIAT 2 | KANON EXPLORATION</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(180deg, #0a0a1a 0%, #1a1a2a 50%, #0a0a1a 100%);
+            color: #e8f1f8;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 30px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 80px;
+            padding-bottom: 40px;
+            border-bottom: 3px solid rgba(120, 219, 255, 0.3);
+        }
+        .header h1 {
+            font-size: clamp(2.8rem, 6vw, 4.5rem);
+            background: linear-gradient(90deg, #78dbfd 0%, #5ba8f5 50%, #78dbfd 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+        }
+        .status {
+            display: inline-block;
+            background: rgba(0, 255, 102, 0.15);
+            border: 2px solid rgba(0, 255, 102, 0.4);
+            color: #00ff66;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+        .section {
+            margin-bottom: 60px;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            color: #78dbfd;
+            margin-bottom: 25px;
+            font-weight: 400;
+            position: relative;
+            padding-left: 20px;
+        }
+        .section-title::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #78dbfd, #5ba8f5);
+            border-radius: 2px;
+        }
+        .zones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .zone {
+            background: rgba(120, 219, 253, 0.08);
+            border: 1px solid rgba(120, 219, 253, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .zone::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #78dbfd, transparent);
+            transition: left 0.6s;
+        }
+        .zone:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(120, 219, 253, 0.15);
+            border-color: rgba(120, 219, 253, 0.5);
+        }
+        .zone:hover::before {
+            left: 100%;
+        }
+        .zone-number {
+            display: inline-block;
+            background: rgba(91, 168, 245, 0.2);
+            color: #5ba8f5;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        .zone-title {
+            font-size: 1.3rem;
+            color: #ffffff;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        .zone-rule {
+            background: rgba(0,0,0,0.4);
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-style: italic;
+            color: #b8d8f5;
+            margin-top: 15px;
+            border-left: 4px solid #78dbfd;
+        }
+        .kanoniczne {
+            background: linear-gradient(135deg, rgba(0,255,102,0.1) 0%, rgba(0,170,68,0.1) 100%);
+            border: 2px solid rgba(0,255,102,0.4);
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            margin: 60px 0;
+            font-size: 1.4rem;
+            line-height: 1.8;
+            box-shadow: 0 15px 35px rgba(0,255,102,0.2);
+        }
+        .kanoniczne strong {
+            color: #00ff66;
+            font-weight: 700;
+        }
+        .roles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .role {
+            background: rgba(26, 26, 42, 0.6);
+            border: 1px solid rgba(120, 219, 253, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+        }
+        .role-number {
+            font-size: 2rem;
+            color: #78dbfd;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 15px;
+        }
+        @media print {
+            body { background: white; color: black; }
+            .zone, .role, .kanoniczne { 
+                background: white !important; 
+                border-color: #ccc !important;
+                box-shadow: none !important;
+            }
+            .header h1 { 
+                -webkit-text-fill-color: #5ba8f5 !important;
+                background: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌌 ETERNIVERSE</h1>
+            <div style="font-size: 1.3rem; color: #b0c4de; margin-bottom: 20px;">
+                ŚWIAT 2 — EXPLORATION
+            </div>
+            <div class="status">
+                STATUS: KANON | SCIENCE FICTION / FILOZOFICZNA EKSPLORACJA
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">0. FUNDAMENT ONTOLOGICZNY</h2>
+            <p style="font-size: 1.2rem; line-height: 1.9; opacity: 0.95;">
+                Wszechświat obserwowany przez ludzi, którzy przeszli inicjację świadomości.<br>
+                <strong>Kosmos reaguje na sposób patrzenia.</strong>
+            </p>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">1. EEC — ETERNIVERSE EXPLORATION CORPS</h2>
+            <p>Korpus badawczy działający na granicy poznania. Interdyscyplinarny. Pół-naukowy, pół-filozoficzny.</p>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">2. STRUKTURA ZAŁÓG</h2>
+            <div class="roles-grid">
+                <div class="role">
+                    <span class="role-number">1.</span>
+                    <strong>OBserwATOR</strong><br>
+                    Interpretuje zdarzenia. Świadomy wpływu percepcji.
+                </div>
+                <div class="role">
+                    <span class="role-number">2.</span>
+                    <strong>NAVIGATOR POLA</strong><br>
+                    Wybiera trajektorie prawdopodobieństwa.
+                </div>
+                <div class="role">
+                    <span class="role-number">3.</span>
+                    <strong>LINGWISTA RZECZYWISTOŚCI</strong><br>
+                    Bada języki bytów, rytuałów, symboli.
+                </div>
+                <div class="role">
+                    <span class="role-number">4.</span>
+                    <strong>ARCHETYPALNY ANALITYK</strong><br>
+                    Rozpoznaje struktury archetypowe cywilizacji.
+                </div>
+                <div class="role">
+                    <span class="role-number">5.</span>
+                    <strong>KOREKTOR</strong><br>
+                    Reaguje gdy rzeczywistość się rozpada.
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">3. STATEK EKSPLORACYJNY</h2>
+            <p><strong>Byt techniczno-świadomościowy.</strong> Rezonans doświadczeń. Zachowuje ślady alternatywnych wydarzeń.</p>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">4. STREFY POZNANIA</h2>
+            <div class="zones-grid">
+                <div class="zone">
+                    <div class="zone-number">0</div>
+                    <div class="zone-title">PRZESTRZEŃ ZNANA</div>
+                    <div>Klasyczna fizyka. Znane cywilizacje.</div>
+                </div>
+                <div class="zone">
+                    <div class="zone-number">I</div>
+                    <div class="zone-title">PAS CIENIA</div>
+                    <div>Zjawiska reagujące na psychikę.</div>
+                    <div class="zone-rule">Im większy strach, tym silniejsza reakcja.</div>
+                </div>
+                <div class="zone">
+                    <div class="zone-number">II</div>
+                    <div class="zone-title">ARCHIWA POCZĄTKU</div>
+                    <div>Megastruktury. Ruiny bez twórców.</div>
+                    <div class="zone-rule">Poznanie genezy = utrata niewinności.</div>
+                </div>
+                <div class="zone">
+                    <div class="zone-number">III</div>
+                    <div class="zone-title">POLE ARCHITEKTÓW</div>
+                    <div>Rzeczywistość projektowana.</div>
+                    <div class="zone-rule">Kto pojmuje pole, zmienia świat.</div>
+                </div>
+                <div class="zone">
+                    <div class="zone-number">IV</div>
+                    <div class="zone-title">SEKTORY ARCHETYPÓW</div>
+                    <div>Społeczeństwa ról. Konflikt archetypów.</div>
+                </div>
+                <div class="zone">
+                    <div class="zone-number">V</div>
+                    <div class="zone-title">ZŁOTE STREFY OBFITOŚCI</div>
+                    <div>Brak niedoboru. Stagnacja ewolucyjna.</div>
+                    <div class="zone-rule">Brak bólu = brak ruchu.</div>
+                </div>
+                <div class="zone">
+                    <div class="zone-number">VI</div>
+                    <div class="zone-title">BIOSFERY GRANIC</div>
+                    <div>Mutacje ciała i psychiki.</div>
+                </div>
+                <div class="zone">
+                    <div class="zone-number">VII</div>
+                    <div class="zone-title">WĘZŁY SPLĄTANIA</div>
+                    <div>Byty wielowersyjne. Wiedza o alternatywach.</div>
+                </div>
+                <div class="zone">
+                    <div class="zone-number">VIII</div>
+                    <div class="zone-title">TRAJEKTORIE CZASU</div>
+                    <div>Czas jako krajobraz. Spotkania z wersjami.</div>
+                </div>
+                <div class="zone">
+                    <div class="zone-number">IX</div>
+                    <div class="zone-title">KOLEKTYWY WĘZŁÓW</div>
+                    <div>Pokusa nieśmiertelności kosztem „ja”.</div>
+                </div>
+                <div class="zone">
+                    <div class="zone-number">X</div>
+                    <div class="zone-title">HORYZONT INTEGRACJI</div>
+                    <div>Zanik granicy obserwator–świat.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="kanoniczne">
+            <strong>„Kosmos ETERNIVERSE nie bada technologii.<br>
+            On bada dojrzałość świadomości.”</strong>
+        </div>
+    </div>
+</body>
+</html>
