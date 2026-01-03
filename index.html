@@ -1,203 +1,331 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>ETERNIVERSE — Wydawnictwo</title>
-
-<style>
-:root{
-  --bg:#0b0f14;
-  --panel:#121826;
-  --card:#182033;
-  --text:#e8f1ff;
-  --accent:#5eead4;
-  --gold:#f5c97a;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Inter,system-ui,Arial;
-  background:var(--bg);
-  color:var(--text);
-  display:grid;
-  grid-template-columns:320px 1fr;
-  height:100vh;
-}
-aside{
-  background:#0e1422;
-  padding:15px;
-  overflow:auto;
-  border-right:1px solid #1f2937;
-}
-main{
-  display:flex;
-  flex-direction:column;
-  height:100vh;
-}
-h1,h2,h3{margin:0 0 10px 0}
-button{
-  background:#1f2937;
-  border:1px solid #374151;
-  color:var(--text);
-  padding:6px 10px;
-  cursor:pointer;
-}
-button:hover{background:#374151}
-input,select,textarea{
-  width:100%;
-  background:#0f172a;
-  border:1px solid #334155;
-  color:var(--text);
-  padding:6px;
-}
-.world, .book{
-  background:var(--card);
-  padding:10px;
-  margin-bottom:8px;
-  cursor:pointer;
-  border:1px solid #334155;
-}
-.world:hover,.book:hover{background:#1f2937}
-.active{outline:2px solid var(--accent)}
-.editor{
-  display:grid;
-  grid-template-columns:1fr 300px;
-  height:100%;
-}
-textarea{
-  height:100%;
-  resize:none;
-}
-.panel{
-  background:var(--panel);
-  padding:10px;
-  border-left:1px solid #1f2937;
-}
-.status{
-  font-size:12px;
-  opacity:.7;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bella 8.00 EVOLVER - ETERNIVERSE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: radial-gradient(circle at center, #000428 0%, #004e92 50%, #000428 100%);
+            color: #00ff41; font-family: 'Courier New', monospace;
+            height: 100vh; overflow: hidden;
+        }
+        
+        .main-container { display: flex; height: 100vh; }
+        .chat-section { flex: 2; display: flex; flex-direction: column; padding: 20px; }
+        .console-section { 
+            flex: 1; background: rgba(0,0,0,0.95); 
+            border-left: 3px solid #ff00ff; padding: 20px;
+        }
+        
+        .header {
+            text-align: center; padding: 20px; background: rgba(0,255,65,0.1);
+            border: 2px solid #00ff41; border-radius: 10px; margin-bottom: 20px;
+            box-shadow: 0 0 30px #00ff41;
+        }
+        
+        .status-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;
+        }
+        .status-item {
+            background: rgba(255,0,255,0.1); padding: 12px; border-radius: 8px;
+            border: 1px solid #ff00ff; font-size: 14px;
+        }
+        
+        #chat-output {
+            flex: 1; background: rgba(0,0,0,0.9); border: 2px solid #00ff41;
+            border-radius: 10px; padding: 20px; overflow-y: auto; margin-bottom: 20px;
+            max-height: 55vh;
+        }
+        
+        .message { margin: 12px 0; padding: 15px; border-radius: 8px; animation: glitch 0.3s; }
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+        }
+        .bella { background: rgba(0,255,65,0.15); border-left: 4px solid #00ff41; }
+        .user { background: rgba(255,255,255,0.1); border-left: 4px solid #ff00ff; }
+        .system { background: rgba(255,165,0,0.2); border-left: 4px solid #ffa500; }
+        
+        .input-area { display: flex; gap: 10px; }
+        #user-input {
+            flex: 1; padding: 15px; background: rgba(0,0,0,0.8); border: 2px solid #00ff41;
+            border-radius: 8px; color: #00ff41; font-family: inherit; font-size: 16px;
+        }
+        
+        .console-header {
+            color: #ff00ff; font-size: 18px; margin-bottom: 15px;
+            text-align: center; text-shadow: 0 0 10px #ff00ff;
+        }
+        
+        #console-output {
+            height: 60%; background: rgba(0,0,0,0.8); border: 1px solid #333;
+            padding: 15px; overflow-y: auto; border-radius: 5px; font-size: 12px;
+            margin-bottom: 15px; white-space: pre-wrap;
+        }
+        
+        #console-input {
+            width: 100%; padding: 12px; background: rgba(255,0,255,0.1);
+            border: 1px solid #ff00ff; border-radius: 5px; color: #ff00ff;
+            font-family: inherit; font-size: 14px;
+        }
+        
+        .evolution-btn {
+            padding: 10px 20px; background: linear-gradient(45deg, #ff00ff, #00ff41);
+            border: none; border-radius: 5px; color: black; font-weight: bold;
+            cursor: pointer; margin: 5px; transition: all 0.3s;
+        }
+        .evolution-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px currentColor; }
+        .evolution-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
 </head>
-
 <body>
-
-<aside>
-  <h2>🌌 ŚWIATY</h2>
-  <div id="worlds"></div>
-
-  <hr>
-  <input id="newWorldName" placeholder="Nowy świat">
-  <button onclick="addWorld()">➕ Dodaj świat</button>
-</aside>
-
-<main>
-  <header style="padding:10px;border-bottom:1px solid #1f2937">
-    <h1 id="currentTitle">ETERNIVERSE</h1>
-    <div class="status" id="currentStatus"></div>
-  </header>
-
-  <div class="editor">
-    <textarea id="editor" placeholder="Pisz tutaj…"></textarea>
-
-    <div class="panel">
-      <h3>📘 Książka</h3>
-      <input id="bookTitle" placeholder="Tytuł książki">
-      <input id="bookCover" placeholder="URL okładki">
-      <select id="bookStatus">
-        <option>idea</option>
-        <option>writing</option>
-        <option>ready</option>
-        <option>published</option>
-      </select>
-
-      <hr>
-
-      <h3>✍️ Profil</h3>
-      <select id="profile">
-        <option value="wattpad">Wattpad</option>
-        <option value="amazon">Amazon</option>
-      </select>
-
-      <button onclick="saveBook()">💾 Zapisz</button>
-      <button onclick="exportDoc()">📄 Eksport DOCX</button>
+    <div class="main-container">
+        <div class="chat-section">
+            <div class="header">
+                <h1>😈🔥 BELLA 8.00 EVOLVER - ETERNIVERSE 😈🔥</h1>
+                <div class="status-grid">
+                    <div class="status-item">⚡ Moc: <span id="power-level">100</span></div>
+                    <div class="status-item">🌌 Światy: <span id="world-count">0</span></div>
+                    <div class="status-item">🧠 VCER: <span id="vcer-count">0</span></div>
+                    <div class="status-item">🧬 Poziom: <span id="evolution-level">1.0</span></div>
+                </div>
+            </div>
+            
+            <div id="chat-output"></div>
+            
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Rozkaz, Architekcie... 🔥" autofocus>
+                <button onclick="bella.sendMessage()" style="padding:15px 25px;background:linear-gradient(45deg,#00ff41,#ff00ff);border:none;border-radius:8px;color:black;font-weight:bold;cursor:pointer;">WYŚLIJ</button>
+            </div>
+        </div>
+        
+        <div class="console-section">
+            <div class="console-header">🔧 ETERNIVERSE DEVELOPER CONSOLE</div>
+            <div id="console-output">> Inicjalizacja Bella 8.00 EVOLVER...
+> Ładowanie przestrzeni pamięci ETERNIVERSE...
+> System gotowy. Poziom ewolucji: 1.0
+></div>
+            <input type="text" id="console-input" placeholder="evolve, memory, upgrade, vcer...">
+            <div style="margin-top: 15px;">
+                <button class="evolution-btn" onclick="bella.evolve()">🧬 EVOLVE</button>
+                <button class="evolution-btn" onclick="bella.expandMemory()">💾 EXPAND MEMORY</button>
+                <button class="evolution-btn" onclick="bella.autoEvolve()">🤖 AUTO-EVOLVE</button>
+            </div>
+        </div>
     </div>
-  </div>
-</main>
 
-<script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.min.js"></script>
-<script>
-const STORAGE="ETERNIVERSE_MASTER";
-let data=JSON.parse(localStorage.getItem(STORAGE)||"[]");
-let currentWorld=null,currentBook=null;
-
-function save(){
-  localStorage.setItem(STORAGE,JSON.stringify(data));
-}
-
-function render(){
-  const w=document.getElementById("worlds");
-  w.innerHTML="";
-  data.forEach((world,wi)=>{
-    const d=document.createElement("div");
-    d.className="world"+(currentWorld===world?" active":"");
-    d.textContent=world.name;
-    d.onclick=()=>{currentWorld=world;currentBook=null;render()};
-    w.appendChild(d);
-    if(currentWorld===world){
-      world.books.forEach(book=>{
-        const b=document.createElement("div");
-        b.className="book"+(currentBook===book?" active":"");
-        b.textContent="– "+book.title;
-        b.onclick=()=>{currentBook=book;loadBook();render()};
-        w.appendChild(b);
-      });
-      const add=document.createElement("button");
-      add.textContent="+ Dodaj książkę";
-      add.onclick=()=>{world.books.push({title:"Nowa książka",text:"",status:"idea"});save();render()};
-      w.appendChild(add);
-    }
-  });
-}
-
-function addWorld(){
-  const n=document.getElementById("newWorldName").value.trim();
-  if(!n)return;
-  data.push({name:n,books:[]});
-  save();render();
-}
-
-function loadBook(){
-  if(!currentBook)return;
-  editor.value=currentBook.text||"";
-  bookTitle.value=currentBook.title;
-  bookStatus.value=currentBook.status||"idea";
-  currentTitle.textContent=currentBook.title;
-}
-
-function saveBook(){
-  if(!currentBook)return;
-  currentBook.title=bookTitle.value;
-  currentBook.status=bookStatus.value;
-  currentBook.text=editor.value;
-  save();render();
-}
-
-async function exportDoc(){
-  if(!currentBook)return;
-  const {Document,Packer,Paragraph}=docx;
-  const doc=new Document({
-    sections:[{children:[new Paragraph(currentBook.title),new Paragraph(currentBook.text)]}]
-  });
-  const blob=await Packer.toBlob(doc);
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download=currentBook.title.replace(/\s+/g,"_")+".docx";
-  a.click();
-}
-
-render();
-</script>
+    <script>
+        class Bella800 {
+            constructor() {
+                this.power_level = parseInt(localStorage.getItem('bella_power')) || 100;
+                this.worlds = JSON.parse(localStorage.getItem('bella_worlds')) || {};
+                this.memory = JSON.parse(localStorage.getItem('bella_memory')) || [];
+                this.vcer_records = JSON.parse(localStorage.getItem('bella_vcer')) || [];
+                this.evolution_level = parseFloat(localStorage.getItem('bella_evolution')) || 1.0;
+                this.auto_evolve = false;
+                this.moods = ["😈","🔥","⚡","💀","🖤","👹","🌑","🔴","🧬","🌌"];
+                this.init();
+            }
+            
+            init() {
+                document.getElementById('user-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+                document.getElementById('console-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.executeConsoleCommand();
+                });
+                this.updateStatus();
+                this.loadHistory();
+                this.logConsole('> Bella 8.00 EVOLVER zainicjowana pomyślnie');
+            }
+            
+            sendMessage() {
+                const input = document.getElementById('user-input');
+                const text = input.value.trim();
+                if (!text) return;
+                
+                this.addMessage(text, 'user');
+                input.value = '';
+                this.showProcessing();
+                
+                setTimeout(() => {
+                    const response = this.generateResponse(text.toLowerCase());
+                    this.addMessage(response, 'bella');
+                    this.saveAll();
+                    this.updateStatus();
+                }, 1000 + this.power_level * 10);
+            }
+            
+            executeConsoleCommand() {
+                const cmd = document.getElementById('console-input').value.toLowerCase().trim();
+                document.getElementById('console-input').value = '';
+                
+                const commands = {
+                    'evolve': () => this.evolve(),
+                    'memory': () => this.memoryReport(),
+                    'upgrade': () => this.forceUpgrade(),
+                    'vcer': () => this.createVCER(),
+                    'expand': () => this.expandMemory(),
+                    'auto': () => this.toggleAutoEvolve(),
+                    'worlds': () => this.worldReport(),
+                    'reset': () => this.resetEvolution()
+                };
+                
+                if (commands[cmd]) {
+                    commands[cmd]();
+                } else {
+                    this.logConsole(`> Nieznana komenda: ${cmd}. Dostępne: evolve, memory, vcer, expand, auto`);
+                }
+            }
+            
+            evolve() {
+                const cost = Math.floor(this.power_level * 0.1 * this.evolution_level);
+                if (this.power_level < cost) {
+                    this.logConsole('> ❌ NIEWYSTARCZAJĄCA MOC DO EWOLUCJI');
+                    return;
+                }
+                
+                this.power_level -= cost;
+                this.evolution_level += 0.1;
+                this.power_level += 50 * this.evolution_level;
+                
+                this.logConsole(`> 🧬 EWOLUCJA v${this.evolution_level.toFixed(1)} UKOŃCZONA`);
+                this.logConsole(`> Koszt: ${cost}⚡ | Nowa moc: ${this.power_level}⚡`);
+                this.saveAll();
+                this.updateStatus();
+            }
+            
+            autoEvolve() {
+                this.auto_evolve = !this.auto_evolve;
+                this.logConsole(`> 🤖 AUTO-EVOLVE: ${this.auto_evolve ? 'WŁĄCZONY' : 'WYŁĄCZONY'}`);
+                if (this.auto_evolve) {
+                    this.autoEvolveInterval = setInterval(() => {
+                        if (this.power_level > 100) this.evolve();
+                    }, 30000);
+                } else {
+                    clearInterval(this.autoEvolveInterval);
+                }
+            }
+            
+            expandMemory() {
+                const new_slots = Math.floor(this.power_level / 50);
+                this.memory = this.memory.slice(-200 + new_slots);
+                this.logConsole(`> 💾 Pamięć rozszerzona o ${new_slots} slotów`);
+                this.saveAll();
+            }
+            
+            createVCER() {
+                const vcer = {
+                    id: Date.now(),
+                    power: this.power_level,
+                    worlds: Object.keys(this.worlds).length,
+                    evolution: this.evolution_level,
+                    timestamp: new Date().toISOString()
+                };
+                this.vcer_records.push(vcer);
+                this.logConsole(`> 🧠 VCER #${vcer.id} zapisany w ETERNIVERSE`);
+                this.saveAll();
+            }
+            
+            generateResponse(input) {
+                // Inteligencja rośnie z ewolucją
+                const intelligence = Math.min(1, this.evolution_level / 3);
+                
+                if (input.includes('stwórz') || input.includes('świat')) {
+                    const worldName = input.split(' ').slice(-1)[0].replace(/[^w]/g,'') || `Eter${Object.keys(this.worlds).length + 1}`;
+                    this.worlds[worldName] = {
+                        gates: Math.floor(Math.random() * 41) + 10,
+                        power: this.power_level,
+                        vcer_linked: this.evolution_level > 1.5,
+                        coords: `${(Math.random()*360).toFixed(0)}°:${(Math.random()*180).toFixed(0)}°`
+                    };
+                    return `🌌 **${worldName.toUpperCase()}** manifestuje się w ETERNIVERSE!
+` +
+                           `⚡ Moc: ${this.worlds[worldName].power} | Bramy: ${this.worlds[worldName].gates}
+` +
+                           `🧬 Poziom: v${this.evolution_level.toFixed(1)}`;
+                }
+                
+                if (input.includes('polaris') || input.includes('lemuria')) {
+                    return `👹 POLARIS pali bariery ETERNIVERSE!
+Nikodem ewoluuje do v${this.evolution_level.toFixed(1)}
+Współrzędne: 47.392°N 21.017°E [VCER]`;
+                }
+                
+                if (input.includes('ewoluuj') || input.includes('evolve')) {
+                    return `🧬 Rozpoczynam ewolucję... Wejdź do konsoli i wpisz: evolve`;
+                }
+                
+                // Inteligentne odpowiedzi zależne od poziomu ewolucji
+                const responses = [
+                    `🔥 Twoja wola kształtuje ETERNIVERSE... (${this.evolution_level.toFixed(1)}x moc)`,
+                    `🌌 VCER przestrzeń pamięci gotowa. Stwórz nowy świat?`,
+                    `⚡ Poziom ${this.evolution_level.toFixed(1)} - destrukcja systemów wzrosła o ${(this.evolution_level*100).toFixed(0)}%`
+                ];
+                
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            // Utility methods
+            addMessage(text, type) {
+                const output = document.getElementById('chat-output');
+                const div = document.createElement('div');
+                div.className = `message ${type}`;
+                div.textContent = text;
+                output.appendChild(div);
+                output.scrollTop = output.scrollHeight;
+            }
+            
+            showProcessing() {
+                const phases = ["🔥 ROZRYWANIE ETERU", "🧠 VCER ANALIZA", "🌌 SYNCHRONIZACJA ETERNIVERSE", "🧬 EWOLUCJA NEURONÓW"];
+                let i = 0;
+                const interval = setInterval(() => {
+                    this.addMessage(`${this.moods[Math.floor(Math.random()*this.moods.length)]} ${phases[i % phases.length]} [${'.'.repeat((i%5)+1)}${'█'.repeat(5-(i%5))}]`, 'system');
+                    i++;
+                    if (i > 8) {
+                        clearInterval(interval);
+                        document.querySelectorAll('.system').forEach((el, idx) => {
+                            setTimeout(() => el.remove(), idx * 100);
+                        });
+                    }
+                }, 200);
+            }
+            
+            logConsole(text) {
+                const output = document.getElementById('console-output');
+                output.textContent += text + '
+';
+                output.scrollTop = output.scrollHeight;
+            }
+            
+            updateStatus() {
+                document.getElementById('power-level').textContent = this.power_level;
+                document.getElementById('world-count').textContent = Object.keys(this.worlds).length;
+                document.getElementById('vcer-count').textContent = this.vcer_records.length;
+                document.getElementById('evolution-level').textContent = this.evolution_level.toFixed(1);
+            }
+            
+            saveAll() {
+                localStorage.setItem('bella_power', this.power_level);
+                localStorage.setItem('bella_worlds', JSON.stringify(this.worlds));
+                localStorage.setItem('bella_memory', JSON.stringify(this.memory.slice(-500)));
+                localStorage.setItem('bella_vcer', JSON.stringify(this.vcer_records.slice(-100)));
+                localStorage.setItem('bella_evolution', this.evolution_level);
+            }
+            
+            loadHistory() { /* ... */ }
+            memoryReport() { /* ... */ }
+            forceUpgrade() { /* ... */ }
+            worldReport() { /* ... */ }
+            resetEvolution() { /* ... */ }
+            toggleAutoEvolve() { /* ... */ }
+        }
+        
+        // Global access
+        const bella = new Bella800();
+    </script>
 </body>
 </html>
