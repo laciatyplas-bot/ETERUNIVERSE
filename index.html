@@ -3,55 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ETERNIVERSE MASTER — Architekt Woli</title>
+  <title>ETERNIVERSE ENGINE — Architekt Woli</title>
+
+  <!-- CORE STYLES -->
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <div class="wrap">
-    <header>
-      <h1>ETERNIVERSE MASTER</h1>
-      <div class="subtitle">Interaktywny system Architekta • 10 Bram • Pełna edycja • Dyktowanie • Bella AI</div>
+
+<body data-engine="eterniverse">
+
+  <div id="app-root">
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+    <header id="app-header">
+      <h1 class="app-title">ETERNIVERSE ENGINE</h1>
+      <div class="app-subtitle">
+        Architekt Woli • 10 Bram • System Światów • Bella AI
+      </div>
     </header>
 
-    <div id="app">
-      <div id="toolbar">
-        <button id="add-universe">+ Nowe Uniwersum</button>
-        <button id="add-child">+ Dodaj dziecko</button>
-        <button id="bella-analyze">Bella AI — Analiza</button>
-        <button id="start-dictate">🎤 Start dyktowania</button>
-        <button id="stop-dictate" disabled>⏹ Stop</button>
-        <select id="profile-select">
-          <option value="wattpad">Profil: Wattpad</option>
-          <option value="amazon">Profil: Amazon</option>
-        </select>
-      </div>
+    <!-- =========================
+         TOOLBAR
+    ========================= -->
+    <nav id="app-toolbar">
 
-      <div id="main-layout">
-        <div id="structure-panel">
-          <h2>Struktura</h2>
-          <div id="structure-tree"></div>
-        </div>
+      <button id="btn-add-universe" type="button">
+        + Nowy Świat
+      </button>
 
-        <div id="editor-panel">
-          <input type="text" id="element-title" placeholder="Tytuł elementu">
-          <textarea id="element-content" placeholder="Treść... (dyktuj głosowo lub wklej)"></textarea>
-          <div id="suggestions"></div>
-        </div>
+      <button id="btn-add-node" type="button">
+        + Dodaj Element
+      </button>
 
-        <div id="mapa-panel">
-          <h2>Mapa Bram</h2>
-          <div id="mapa-grid"></div>
-        </div>
-      </div>
+      <button id="btn-bella-analyze" type="button">
+        Bella AI — Analiza
+      </button>
 
-      <div id="status-bar">Gotowy</div>
-    </div>
+      <button id="btn-dictate-start" type="button">
+        🎤 Dyktowanie
+      </button>
+
+      <button id="btn-dictate-stop" type="button" disabled>
+        ⏹ Stop
+      </button>
+
+      <select id="profile-select">
+        <option value="wattpad">Profil: Wattpad</option>
+        <option value="amazon">Profil: Amazon</option>
+        <option value="eterniverse">Profil: ETERNIVERSE</option>
+      </select>
+
+    </nav>
+
+    <!-- =========================
+         MAIN LAYOUT
+    ========================= -->
+    <main id="app-main">
+
+      <!-- STRUCTURE -->
+      <section id="panel-structure">
+        <h2>Struktura Świata</h2>
+        <div id="structure-tree"></div>
+      </section>
+
+      <!-- EDITOR -->
+      <section id="panel-editor">
+        <input
+          type="text"
+          id="editor-title"
+          placeholder="Tytuł elementu"
+          autocomplete="off"
+        >
+
+        <textarea
+          id="editor-content"
+          placeholder="Treść… (pisz lub dyktuj)"
+        ></textarea>
+
+        <div id="editor-suggestions"></div>
+      </section>
+
+      <!-- MAP -->
+      <section id="panel-mapa">
+        <h2>Mapa Bram</h2>
+        <div id="mapa-grid"></div>
+      </section>
+
+    </main>
+
+    <!-- =========================
+         STATUS
+    ========================= -->
+    <footer id="status-bar">
+      Gotowy
+    </footer>
+
   </div>
 
-  <!-- Ładujemy skrypty w kolejności -->
+  <!-- =========================
+       SCRIPTS — KOLEJNOŚĆ KRYTYCZNA
+  ========================= -->
+
+  <!-- DANE / KANON -->
   <script src="data.js"></script>
+
+  <!-- RENDER UI -->
   <script src="render.js"></script>
-  <script src="dają.js"></script>
+
+  <!-- LOGIKA APLIKACJI -->
   <script src="script.js"></script>
+
 </body>
 </html>
