@@ -7,7 +7,7 @@
 class DataMaster {
   constructor() {
     this.VERSION = 14.3;
- 
+
     this.KEYS = {
       STRUCTURE: 'eterniverse_structure_v14',
       MAPA: 'eterniverse_mapa_v14',
@@ -36,7 +36,8 @@ class DataMaster {
     if (prev < this.VERSION) {
       if (prev < 14.0) {
         localStorage.removeItem(this.KEYS.STRUCTURE);
-        console.log('[DataMaster] Migracja: struktura wyczyszczona');
+        localStorage.removeItem(this.KEYS.MAPA);
+        console.log('[DataMaster] Migracja: struktura + mapa wyczyszczone');
       }
       localStorage.setItem(this.KEYS.DATA_VERSION, String(this.VERSION));
     }
@@ -47,30 +48,30 @@ class DataMaster {
   ========================= */
   normalizeStatus(s) {
     const map = {
-      'opublikowana': 'published',
-      'published': 'published',
-      'gotowa': 'ready',
-      'ready': 'ready',
+      opublikowana: 'published',
+      published: 'published',
+      gotowa: 'ready',
+      ready: 'ready',
       'w przygotowaniu': 'writing',
-      'writing': 'writing',
-      'szkic': 'draft',
-      'draft': 'draft',
-      'idea': 'idea',
-      'planowana': 'idea'
+      writing: 'writing',
+      szkic: 'draft',
+      draft: 'draft',
+      idea: 'idea',
+      planowana: 'idea'
     };
     return map[s] || 'idea';
   }
 
   /* =========================
-     KANON BRAM
+     KANON 10 BRAM
   ========================= */
   getCanonicalMapa() {
     const canon = [
       {
         id: 1,
-        name: 'BRAMA 1 — INTERSEEKER',
+        name: 'BRAMA I — INTERSEEKER',
         color: '#28D3C6',
-        sub: 'Psychika · Cień · Trauma · Mechanizmy przetrwania',
+        sub: 'Psychika · Cień · Trauma · Tożsamość',
         tag: 'CORE/PSYCHE',
         books: [
           { title: 'INTERSEEKER: Geneza', status: 'published' },
@@ -80,7 +81,18 @@ class DataMaster {
       },
       {
         id: 2,
-        name: 'BRAMA 2 — ETERSEEKER',
+        name: 'BRAMA II — CUSTOS / GENEZA',
+        color: '#D9A441',
+        sub: 'Początek · Rdzeń · Strażnik · Linia rodu',
+        tag: 'CORE/ORIGIN',
+        books: [
+          { title: 'RootSeeker — Anatomia Początku', status: 'idea' },
+          { title: 'OriginCode — Kod Początku', status: 'idea' }
+        ]
+      },
+      {
+        id: 3,
+        name: 'BRAMA III — ETERSEEKER',
         color: '#12C65B',
         sub: 'Wola · Pole · Architektura rzeczywistości',
         tag: 'CORE/FIELD',
@@ -91,36 +103,82 @@ class DataMaster {
         ]
       },
       {
-        id: 3,
-        name: 'BRAMA 3 — OBFITOSEEKER',
-        color: '#FFB14B',
-        sub: 'Przepływ · Manifestacja · Reguły gry',
-        tag: 'EMBODIED/FLOW',
+        id: 4,
+        name: 'BRAMA IV — ARCHETYPY',
+        color: '#9B6BFF',
+        sub: 'Role · Maski · Konstrukcja Ja',
+        tag: 'CORE/ARCHETYPE',
         books: [
-          { title: 'ObfitoSeeker – Kod Obfitości', status: 'published' },
-          { title: 'Reguły Gry', status: 'writing' },
-          { title: 'Dla Nikosia', status: 'idea' }
+          { title: 'ArchetypSeeker — System Archetypów', status: 'idea' }
         ]
       },
       {
-        id: 4,
-        name: 'BRAMA 4 — THE KNOT',
-        color: '#9B6BFF',
-        sub: 'Splątanie · Węzły pola · Eterniony',
-        tag: 'META/KNOT',
+        id: 5,
+        name: 'BRAMA V — OBFITOSEEKER',
+        color: '#FFB14B',
+        sub: 'Przepływ · Materia · Reguły gry',
+        tag: 'EMBODIED/FLOW',
         books: [
-          { title: 'Kronika Splątania', status: 'writing' },
-          { title: 'Eterniony Tom I', status: 'idea' },
-          { title: 'Narodziny Eteriona³', status: 'idea' }
+          { title: 'ObfitoSeeker — Kod Obfitości', status: 'published' },
+          { title: 'Reguły Gry', status: 'writing' }
+        ]
+      },
+      {
+        id: 6,
+        name: 'BRAMA VI — BIOSEEKER',
+        color: '#FF6B6B',
+        sub: 'Ciało · Biologia · Granice adaptacji',
+        tag: 'EMBODIED/BIO',
+        books: [
+          { title: 'BioSeeker — Sekret Biologii Pola', status: 'idea' }
+        ]
+      },
+      {
+        id: 7,
+        name: 'BRAMA VII — SPLĄTANIE',
+        color: '#7A6CFF',
+        sub: 'Obserwator · AI · Meta-świadomość',
+        tag: 'META/TECH',
+        books: [
+          { title: 'SplatanieSeeker — Protokół Obserwatora', status: 'idea' }
+        ]
+      },
+      {
+        id: 8,
+        name: 'BRAMA VIII — TRAJEKTORIE',
+        color: '#28D3C6',
+        sub: 'Czas · Linie życia · Konsekwencje',
+        tag: 'META/TIME',
+        books: [
+          { title: 'TrajektoriaSeeker — Mapa Linii Życia', status: 'idea' }
+        ]
+      },
+      {
+        id: 9,
+        name: 'BRAMA IX — ETERNIONY',
+        color: '#D9A441',
+        sub: 'Kolektyw · Sieć · Jednostka',
+        tag: 'COLLECTIVE',
+        books: [
+          { title: 'ETERNIONY — Tom I', status: 'idea' }
+        ]
+      },
+      {
+        id: 10,
+        name: 'BRAMA X — ETERUNIVERSE',
+        color: '#12C65B',
+        sub: 'Integracja · Cisza · Projektant',
+        tag: 'INTEGRATION',
+        books: [
+          { title: 'SilenceForge — Kuźnia Ciszy', status: 'idea' }
         ]
       }
     ];
 
-    // normalizacja statusów
-    canon.forEach(g =>
-      g.books.forEach(b => {
-        b.status = this.normalizeStatus(b.status);
-        b.cover = b.cover || '';
+    canon.forEach(brama =>
+      brama.books.forEach(book => {
+        book.status = this.normalizeStatus(book.status);
+        book.cover = book.cover || '';
       })
     );
 
@@ -134,7 +192,8 @@ class DataMaster {
     try {
       const raw = localStorage.getItem(key);
       return raw ? JSON.parse(raw) : fallback;
-    } catch {
+    } catch (e) {
+      console.warn('[DataMaster] Błąd load', key, e);
       return fallback;
     }
   }
@@ -146,7 +205,9 @@ class DataMaster {
   /* =========================
      API PUBLICZNE
   ========================= */
-  getMapa() { return this.mapa; }
+  getMapa() {
+    return this.mapa;
+  }
 
   setMapa(val) {
     this.mapa = val;
@@ -171,4 +232,4 @@ class DataMaster {
    BOOT
 ========================= */
 window.dataMaster = new DataMaster();
-console.log('🌌 DataMaster v14.3 — GOTOWE');
+console.log('🌌 DataMaster v14.3 — KANON 10 BRAM ZAŁADOWANY');
