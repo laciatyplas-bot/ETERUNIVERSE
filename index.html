@@ -19,6 +19,7 @@ main{padding:32px;max-width:1200px;margin:0 auto}
 .book{padding:20px;margin:16px 0;border-radius:16px;background:#020617;border:1px solid rgba(255,255,255,.08)}
 .book strong{font-size:20px;display:block;margin-bottom:8px}
 .book .status{display:inline-block;padding:6px 14px;border-radius:999px;font-size:12px;background:#1f2937}
+.empty{opacity:.5;text-align:center;font-style:italic}
 </style>
 </head>
 
@@ -71,16 +72,27 @@ const DEFAULT_DATA = [
   }
 ];
 
-let DATA = JSON.parse(localStorage.getItem(STORAGE_KEY)) || DEFAULT_DATA;
+let DATA = JSON.parse(localStorage.getItem(STORAGE_KEY));
+if(!Array.isArray(DATA)){
+  DATA = DEFAULT_DATA;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
+}
 
 /* ===========================
    RENDER
 =========================== */
 const app = document.getElementById('app');
+const searchInput = document.getElementById('search');
+const statusFilter = document.getElementById('statusFilter');
+
+function normalizeStatus(s){
+  return (s || '').toLowerCase();
+}
 
 function render(){
-  const q = document.getElementById('search').value.toLowerCase();
-  const status = document.getElementById('statusFilter').value;
+  const q = searchInput.value.toLowerCase();
+  const status = statusFilter.value;
+
   app.innerHTML = '';
 
   DATA.forEach(brama=>{
@@ -93,10 +105,17 @@ function render(){
       <div class="sub">${brama.sub}</div>
     `;
 
-    brama.books
-      .filter(b => status==='all' || b.status===status)
-      .filter(b => b.title.toLowerCase().includes(q))
-      .forEach(book=>{
+    const books = brama.books
+      .filter(b => status === 'all' || normalizeStatus(b.status) === status)
+      .filter(b => b.title.toLowerCase().includes(q));
+
+    if(books.length === 0){
+      const empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.textContent = 'Brak pasujących tytułów';
+      section.appendChild(empty);
+    } else {
+      books.forEach(book=>{
         const el = document.createElement('div');
         el.className='book';
         el.innerHTML = `
@@ -105,13 +124,14 @@ function render(){
         `;
         section.appendChild(el);
       });
+    }
 
     app.appendChild(section);
   });
 }
 
-document.getElementById('search').addEventListener('input', render);
-document.getElementById('statusFilter').addEventListener('change', render);
+searchInput.addEventListener('input', render);
+statusFilter.addEventListener('change', render);
 
 render();
 </script>
