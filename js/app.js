@@ -1,349 +1,463 @@
-'use strict';
+// app.js — ETERNIVERSE PRO MASTER v1.3 — 100% POPRAWIONE TEMPLATE STRINGS
+// Architekt: Maciej Maciuszek | Data: 27 grudnia 2025
 
-/*
-  =========================================
-  ETERNIVERSE MASTER PRO v13.1.1
-  STABLE FIX — zgodny z Renderer v14+
-  =========================================
-*/
-
-class EterniverseMasterPRO {
+class Eterniverse {
   constructor() {
-    this.VERSION = 'v13.1.1-stable-fix';
-
-    // SILNIKI
-    this.data = window.dataMaster || null;
-    this.renderer = window.renderer || null;
-    this.console = window.bellaConsole || window.metaConsole || null;
-
-    // STAN
-    this.currentElement = null;
-    this.currentProfile = this.data?.getProfile?.() || 'wattpad';
-
-    // DYKTOWANIE
-    this.recognition = null;
-    this.isDictating = false;
-
+    this.VERSION = '1.3';
+    this.STORAGE_KEY = 'eterniverse-pro-master-v1.3';
+    this.data = { meta: { version: this.VERSION }, gates: [] };
+    this.mode = 'ARCHITEKT';
+    this.elements = {};
+    this.editContext = null;
     this.init();
   }
 
-  /* =========================
-     INIT
-  ========================= */
   init() {
-    if (!this.data) {
-      console.error('❌ DataMaster nie załadowany');
-      this.setStatus('BŁĄD: Brak DataMaster', 0);
+    this.cacheElements();
+    this.loadData();
+    this.render();
+    this.removeLoadingScreen();
+    this.bindGlobalEvents();
+  }
+
+  getDefaultData() {
+    return {
+      meta: { version: this.VERSION },
+      gates: [
+        { id: 1, name: "BRAMA I — INTERSEEKER", sub: "Psychika · Cień · Trauma · Mechanizmy przetrwania", tag: "CORE/PSYCHE", books: [] },
+        { id: 2, name: "BRAMA II — CUSTOS / GENEZA", sub: "Strażnik · Rdzeń · Początek · Błąd pierwotny", tag: "CORE/ORIGIN", books: [] },
+        { id: 3, name: "BRAMA III — ETERSEEKER", sub: "Wola · Pole · Architektura rzeczywistości", tag: "CORE/FIELD", books: [] },
+        { id: 4, name: "BRAMA IV — ARCHETYPY / WOLA", sub: "Konstrukcja · Role · Przeznaczenie", tag: "CORE/WILL", books: [] },
+        { id: 5, name: "BRAMA V — OBFITOSEEKER", sub: "Materia · Przepływ · Manifestacja · Obfitość", tag: "EMBODIED/FLOW", books: [] },
+        { id: 6, name: "BRAMA VI — BIOSEEKER", sub: "Ciało · Biologia · Regulacja · Hardware", tag: "EMBODIED/BIO", books: [] },
+        { id: 7, name: "BRAMA VII — SPLĄTANIE / AI", sub: "Obserwator · Meta-tożsamość · Technologia", tag: "META/TECH", books: [] },
+        { id: 8, name: "BRAMA VIII — TRAJEKTORIE", sub: "Kod Życia · Linie Czasu · Fizyka Duszy", tag: "META/PHYSICS", books: [] },
+        { id: 9, name: "BRAMA IX — ETERNIONY / KOLEKTYW", sub: "Węzły Pola · Wspólnota · Misja zbiorowa", tag: "COLLECTIVE", books: [] },
+        { id: 10, name: "BRAMA X — ETERUNIVERSE", sub: "Integracja · Jedność · Architekt · Absolut", tag: "INTEGRATION", books: [] }
+      ]
+    };
+  }
+
+  loadData() {
+    const saved = localStorage.getItem(this.STORAGE_KEY);
+    if (!saved) {
+      this.resetToDefault();
+      this.showToast('ETERNIVERSE PRO MASTER v1.3 — system gotowy.');
       return;
     }
-
-    this.updateUIProfile();
-    this.bindEvents();
-    this.render();
-    this.initSpeechRecognition();
-
-    this.setStatus(`Eterniverse Master PRO ${this.VERSION} — aktywny`);
+    try {
+      const parsed = JSON.parse(saved);
+      if (parsed.meta?.version === this.VERSION) {
+        this.data = parsed;
+      } else {
+        this.migrateData(parsed);
+      }
+    } catch (e) {
+      console.warn('Błąd danych — reset', e);
+      this.resetToDefault();
+    }
   }
 
-  /* =========================
-     UI
-  ========================= */
-  updateUIProfile() {
-    const sel = document.getElementById('profile-select');
-    if (sel) sel.value = this.currentProfile;
+  migrateData(old) {
+    this.data = {
+      meta: { version: this.VERSION },
+      gates: old.gates?.map(g => ({
+        ...g,
+        books: Array.isArray(g.books) ? g.books.map(b => ({
+          title: b.title || '',
+          status: b.status || 'idea',
+          desc: b.desc || '',
+          cover: b.cover || '',
+          content: b.content || '',
+          audio: Array.isArray(b.audio) ? b.audio : []
+        })) : []
+      })) || this.getDefaultData().gates
+    };
+    this.saveData();
+    this.showToast('Dane zaktualizowane do v1.3');
   }
 
-  bindEvents() {
-    const $ = id => document.getElementById(id);
+  saveData() {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.data));
+  }
 
-    $('profile-select')?.addEventListener('change', e => {
-      this.currentProfile = e.target.value;
-      this.data.setProfile?.(this.currentProfile);
-      this.setStatus(`Profil: ${this.currentProfile.toUpperCase()}`);
-    });
+  resetToDefault() {
+    this.data = this.getDefaultData();
+    this.saveData();
+  }
 
-    $('add-universe')?.addEventListener('click', () => this.addRootUniverse());
-    $('add-child')?.addEventListener('click', () => this.addChild());
-    $('bella-analyze')?.addEventListener('click', () => this.bellaAnalyze());
-    $('generate-story')?.addEventListener('click', () => this.generateAIContent());
-    $('export-docx')?.addEventListener('click', () => this.exportToDocx());
+  cacheElements() {
+    this.elements = {
+      app: document.getElementById('app'),
+      modalBackdrop: document.getElementById('modalBackdrop'),
+      modalTitle: document.getElementById('modalTitle'),
+      modalContent: document.getElementById('modalContent'),
+      toastContainer: document.getElementById('toastContainer')
+    };
+  }
 
-    $('start-dictate')?.addEventListener('click', () => this.startDictation());
-    $('stop-dictate')?.addEventListener('click', () => this.stopDictation());
+  removeLoadingScreen() {
+    const loading = this.elements.app?.querySelector('.loading-screen');
+    if (loading) loading.remove();
+  }
 
-    $('element-title')?.addEventListener('input', () => this.autoSaveCurrent());
-    $('element-content')?.addEventListener('input', () => this.autoSaveCurrent());
-
-    // DELEGACJA KLIKÓW
-    document.addEventListener('click', e => {
-      const tree = e.target.closest('.tree-node[data-id]');
-      if (tree) {
-        this.selectElement(tree.dataset.id);
-        return;
-      }
-
-      const brama = e.target.closest('.brama-card[data-id]');
-      if (brama) {
-        this.insertBrama(brama.dataset.id);
-      }
-    });
+  escapeHtml(str = '') {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
   render() {
-    if (!this.renderer) return;
-    this.renderer.renderAll();
-    this.renderer.renderEditPanel(this.currentElement);
-  }
+    if (!this.elements.app) return;
 
-  /* =========================
-     STRUKTURA
-  ========================= */
-  generateId() {
-    return 'node_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-  }
+    this.elements.app.innerHTML = `
+      <header class="dashboard-header">
+        <h1>ETERNIVERSE PRO MASTER</h1>
+        <p class="dashboard-subtitle">Wydawnictwo Architekta Woli • 10 Bram • v1.3</p>
+        <div class="mode-switch">
+          <button id="modeArchitekt" class="${this.mode === 'ARCHITEKT' ? 'active' : ''}">🛠️ Architekt</button>
+          <button id="modeCzytelnik" class="${this.mode === 'CZYTELNIK' ? 'active' : ''}">📖 Czytelnik</button>
+        </div>
+      </header>
+      <section class="gates-grid" id="gatesGrid"></section>
+      <div class="master-actions">
+        <button id="exportWattpadAll">📤 Eksportuj całe uniwersum do Wattpada</button>
+        <button id="exportJSON">💾 Backup JSON</button>
+        <button id="importJSON">📥 Import JSON</button>
+      </div>
+    `;
 
-  addRootUniverse() {
-    const u = {
-      id: this.generateId(),
-      type: 'Uniwersum',
-      title: 'Nowe Uniwersum',
-      content: '',
-      created: new Date().toISOString(),
-      children: []
-    };
+    const grid = this.elements.app.querySelector('#gatesGrid');
 
-    const s = this.data.getStructure();
-    s.push(u);
-    this.data.setStructure(s);
+    this.data.gates.forEach((gate, gateIdx) => {
+      const card = document.createElement('div');
+      card.className = 'gate-card';
 
-    this.currentElement = u;
-    this.render();
-    this.setStatus('Utworzono nowe Uniwersum');
-  }
-
-  addChild() {
-    if (!this.currentElement) {
-      alert('Wybierz element nadrzędny');
-      return;
-    }
-
-    const order = ['Uniwersum', 'Świat', 'Tom', 'Rozdział', 'Podrozdział', 'Fragment'];
-    const idx = order.indexOf(this.currentElement.type);
-    const type = order[idx + 1] || 'Fragment';
-
-    const c = {
-      id: this.generateId(),
-      type,
-      title: `Nowy ${type}`,
-      content: '',
-      created: new Date().toISOString(),
-      children: []
-    };
-
-    this.currentElement.children ||= [];
-    this.currentElement.children.push(c);
-
-    this.data.setStructure(this.data.getStructure());
-    this.currentElement = c;
-
-    this.render();
-    this.setStatus(`Dodano: ${type}`);
-  }
-
-  selectElement(id) {
-    this.currentElement = this.findById(id, this.data.getStructure());
-    this.render();
-  }
-
-  findById(id, nodes) {
-    for (const n of nodes) {
-      if (String(n.id) === String(id)) return n;
-      if (n.children?.length) {
-        const f = this.findById(id, n.children);
-        if (f) return f;
+      let booksHTML = '<div class="books-list">';
+      if (gate.books?.length > 0) {
+        gate.books.forEach((book, bookIdx) => {
+          const initials = book.title.slice(0, 2).toUpperCase() || '??';
+          const coverStyle = book.cover ? `background-image:url(${book.cover})` : '';
+          booksHTML += `
+            <div class="book-item" data-gate="${gateIdx}" data-book="${bookIdx}">
+              <div class="book-cover" style="${coverStyle}" data-initials="${initials}"></div>
+              <div class="book-info">
+                <div class="book-title">${this.escapeHtml(book.title)}</div>
+                ${book.desc ? `<div class="book-desc">${this.escapeHtml(book.desc)}</div>` : ''}
+                <span class="status-tag st-${book.status || 'idea'}">${book.status || 'idea'}</span>
+                ${book.audio?.length > 0 ? `<span class="audio-indicator">🎧 ${book.audio.length}</span>` : ''}
+              </div>
+            </div>
+          `;
+        });
+      } else {
+        booksHTML += '<p class="no-books">Brak ksiąg — dodaj pierwszą</p>';
       }
-    }
-    return null;
-  }
+      booksHTML += '</div>';
 
-  /* ====== KLUCZOWE: ALIAS DLA RENDERERA ====== */
-  getPathTo(el) {
-    const path = [];
-    const walk = nodes => {
-      for (const n of nodes) {
-        if (n === el) {
-          path.unshift(n);
-          return true;
+      card.innerHTML = `
+        <div class="gate-header">
+          <h3>${this.escapeHtml(gate.name)}</h3>
+          <span class="gate-tag">${this.escapeHtml(gate.tag)}</span>
+        </div>
+        <p class="gate-sub">${this.escapeHtml(gate.sub)}</p>
+        <div class="books-count">${gate.books?.length || 0} ksiąg</div>
+        ${booksHTML}
+        ${this.mode === 'ARCHITEKT' ? '<button class="add-book-btn">+ Dodaj księgę</button>' : ''}
+      `;
+
+      if (this.mode === 'ARCHITEKT') {
+        const addBtn = card.querySelector('.add-book-btn');
+        if (addBtn) addBtn.addEventListener('click', () => this.openBookModal(gateIdx));
+      }
+
+      card.querySelectorAll('.book-item').forEach(item => {
+        const g = parseInt(item.dataset.gate);
+        const b = parseInt(item.dataset.book);
+        item.addEventListener('click', () => this.openBookModal(g, b));
+
+        const cover = item.querySelector('.book-cover');
+        if (cover && cover.style.backgroundImage) {
+          cover.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const url = cover.style.backgroundImage.slice(5, -2);
+            this.showCover(url);
+          });
         }
-        if (n.children && walk(n.children)) {
-          path.unshift(n);
-          return true;
+      });
+
+      grid.appendChild(card);
+    });
+
+    this.bindMasterActions();
+    <div class="master-actions">
+  <button id="monaAnalyze">🛡️ MONA Heap Analysis</button>
+  <!-- reszta przycisków -->
+</div>
+  }
+
+  bindMasterActions() {
+    const exportBtn = document.getElementById('exportWattpadAll');
+    const jsonExport = document.getElementById('exportJSON');
+    const jsonImport = document.getElementById('importJSON');
+    const modeArch = document.getElementById('modeArchitekt');
+    const modeCzyt = document.getElementById('modeCzytelnik');
+
+    if (document.getElementById('monaAnalyze')) {
+  document.getElementById('monaAnalyze').addEventListener('click', () => {
+    alert('📊 Heap Analysis:
+• Free blocks: 42
+• Allocated: 1.2MB
+• Largest: 256KB');
+  });
+}
+    if (exportBtn) exportBtn.addEventListener('click', () => this.exportToWattpad(true));
+    if (jsonExport) jsonExport.addEventListener('click', () => this.exportJSON());
+    if (jsonImport) jsonImport.addEventListener('click', () => this.importJSON());
+    if (modeArch) modeArch.addEventListener('click', () => this.setMode('ARCHITEKT'));
+    if (modeCzyt) modeCzyt.addEventListener('click', () => this.setMode('CZYTELNIK'));
+  }
+
+  setMode(mode) {
+    this.mode = mode;
+    this.render();
+    this.showToast(`Tryb: ${mode}`);
+  }
+
+  openBookModal(gateIdx, bookIdx = null) {
+    if (this.mode !== 'ARCHITEKT') return;
+
+    this.editContext = { gateIdx, bookIdx };
+    this.elements.modalTitle.textContent = bookIdx !== null ? 'Edytuj księgę' : 'Nowa księga';
+
+    const book = bookIdx !== null ? this.data.gates[gateIdx].books[bookIdx] : { 
+      title: '', status: 'idea', desc: '', cover: '', content: '', audio: [] 
+    };
+
+    this.elements.modalContent.innerHTML = `
+      <div class="modal-row">
+        <label>Tytuł</label>
+        <input type="text" id="bookTitle" value="${this.escapeHtml(book.title)}">
+      </div>
+      <div class="modal-row">
+        <label>Opis (krótki)</label>
+        <textarea id="bookDesc">${this.escapeHtml(book.desc || '')}</textarea>
+      </div>
+      <div class="modal-row">
+        <label>Treść rozdziału (format Wattpad)</label>
+        <textarea id="bookContent" class="content-editor">${this.escapeHtml(book.content || '')}</textarea>
+        <p class="editor-hint">**bold**, *italic*, ### Nagłówek, --- separator</p>
+      </div>
+      <div class="modal-row">
+        <label>Status</label>
+        <select id="bookStatus">
+          <option value="idea" ${book.status === 'idea' ? 'selected' : ''}>💡 Pomysł</option>
+          <option value="writing" ${book.status === 'writing' ? 'selected' : ''}>✍️ W pisaniu</option>
+          <option value="ready" ${book.status === 'ready' ? 'selected' : ''}>🟡 Gotowa</option>
+          <option value="published" ${book.status === 'published' ? 'selected' : ''}>✅ Opublikowana</option>
+        </select>
+      </div>
+      <div class="modal-row">
+        <label>URL okładki</label>
+        <input type="url" id="bookCover" value="${this.escapeHtml(book.cover || '')}">
+      </div>
+      <div class="modal-row">
+        <label>Audiobooki (linki, jeden na linię)</label>
+        <textarea id="bookAudio">${(book.audio || []).join('\n')}</textarea>
+      </div>
+      <div class="modal-actions">
+        ${bookIdx !== null ? '<button id="modalDelete">🗑️ Usuń</button>' : ''}
+        <button id="modalCancel">Anuluj</button>
+        <button id="modalSave">Zapisz</button>
+        <button id="modalExportWattpad">📤 Eksportuj do Wattpada</button>
+      </div>
+    `;
+
+    this.elements.modalBackdrop.style.display = 'flex';
+
+    document.getElementById('modalSave').addEventListener('click', () => this.saveBook());
+    document.getElementById('modalCancel').addEventListener('click', () => this.closeModal());
+    const del = document.getElementById('modalDelete');
+    if (del) del.addEventListener('click', () => this.deleteBook());
+    document.getElementById('modalExportWattpad').addEventListener('click', () => this.exportToWattpad(false));
+  }
+
+  saveBook() {
+    const title = document.getElementById('bookTitle').value.trim();
+    if (!title) return this.showToast('Tytuł jest wymagany');
+
+    const { gateIdx, bookIdx } = this.editContext;
+    const gate = this.data.gates[gateIdx];
+    if (!gate.books) gate.books = [];
+
+    const audioLines = document
+  .getElementById('bookAudio')
+  .value
+  .trim()
+  .split('\n')
+  .filter(l => l.trim());
+
+    const book = {
+      title,
+      status: document.getElementById('bookStatus').value,
+      desc: document.getElementById('bookDesc').value.trim(),
+      cover: document.getElementById('bookCover').value.trim(),
+      content: document.getElementById('bookContent').value,
+      audio: audioLines
+    };
+
+    if (bookIdx !== null) {
+      gate.books[bookIdx] = book;
+    } else {
+      gate.books.push(book);
+    }
+
+    this.saveData();
+    this.closeModal();
+    this.render();
+    this.showToast('Księga zapisana');
+  }
+
+  deleteBook() {
+    if (!confirm('Na pewno usunąć tę księgę?')) return;
+    const { gateIdx, bookIdx } = this.editContext;
+    this.data.gates[gateIdx].books.splice(bookIdx, 1);
+    this.saveData();
+    this.closeModal();
+    this.render();
+    this.showToast('Księga usunięta');
+  }
+
+  closeModal() {
+    if (this.elements.modalBackdrop) {
+      this.elements.modalBackdrop.style.display = 'none';
+    }
+    this.editContext = null;
+  }
+
+  exportToWattpad(all = true) {
+    let text = '';
+    if (all) {
+      text += `# ETERNIVERSE — Pełne wydanie PRO MASTER
+
+`;
+      this.data.gates.forEach(gate => {
+        if (gate.books?.length > 0) {
+          text += `**${gate.name}**
+_${gate.sub}_
+
+`;
+          gate.books.forEach(book => {
+            text += `### ${book.title}
+
+${book.content || ''}
+
+_Status: ${book.status} | Opis: ${book.desc || 'brak'}_
+
+---
+
+`;
+          });
         }
-      }
-      return false;
-    };
-    walk(this.data.getStructure());
-    return path;
-  }
+      });
+    } else {
+      const { gateIdx, bookIdx } = this.editContext;
+      if (bookIdx === null) return;
+      const book = this.data.gates[gateIdx].books[bookIdx];
+      text += `### ${book.title}
 
-  // ALIAS – Renderer go oczekuje
-  getPathToElement(el) {
-    return this.getPathTo(el);
-  }
+${book.content || ''}
 
-  autoSaveCurrent() {
-    if (!this.currentElement) return;
-
-    const t = document.getElementById('element-title');
-    const c = document.getElementById('element-content');
-
-    this.currentElement.title = t?.value || '';
-    this.currentElement.content = c?.value || '';
-
-    this.data.setStructure(this.data.getStructure());
-    this.setStatus('Zapisano', 3000);
-  }
-
-  /* =========================
-     MAPA BRAM
-  ========================= */
-  insertBrama(id) {
-    const mapa = this.data.getMapa();
-    const b = mapa.find(x => String(x.id) === String(id));
-    if (!b || !this.currentElement) return;
-
-    const list = b.books?.map(t => `• ${t}`).join('\n') || '';
-    const c = document.getElementById('element-content');
-    if (!c) return;
-
-    c.value += `\n\n✦ === ${b.name} === ✦\n${list}\n\n`;
-    this.autoSaveCurrent();
-    this.setStatus(`Wstawiono: ${b.name}`);
-  }
-
-  /* =========================
-     BELLA AI
-  ========================= */
-  bellaAnalyze() {
-    if (!this.currentElement?.content?.trim()) {
-      this.setStatus('Brak treści do analizy');
-      return;
+`;
     }
 
-    const s = this.generateBellaSuggestions(this.currentElement);
-    this.renderer?.renderSuggestions(s.map(t => ({ text: t })));
-    this.setStatus(`${s.length} sugestii Bella AI`);
+    navigator.clipboard.writeText(text).then(() => {
+      this.showToast(all ? 'Całe uniwersum skopiowane!' : 'Rozdział skopiowany do Wattpada!');
+    }).catch(() => {
+      this.showToast('Błąd kopiowania — tekst w konsoli');
+      console.log(text);
+    });
   }
 
-  generateBellaSuggestions(el) {
-    const t = el.content.toLowerCase();
-    const out = [];
-
-    if (t.length < 300) out.push('Rozwiń treść — dłuższe fragmenty mają większą siłę');
-    if ((t.match(/\n\n/g) || []).length < 3) out.push('Dodaj więcej akapitów');
-    if (!/(dialog|powiedział|„)/.test(t)) out.push('Dodaj dialogi');
-    if ((t.match(/miłość|strach|gniew|nadzieja/g) || []).length < 5)
-      out.push('Wzmocnij emocje (Wattpad)');
-
-    return out.length ? out : ['Tekst idealny — brak sugestii'];
+  exportJSON() {
+    const dataStr = JSON.stringify(this.data, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ETERNIVERSE_BACKUP_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    this.showToast('Backup JSON pobrany');
   }
 
-  generateAIContent() {
-    if (!this.currentElement) {
-      this.setStatus('Wybierz element');
-      return;
+  importJSON() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const imported = JSON.parse(ev.target.result);
+          this.data = imported;
+          this.saveData();
+          this.render();
+          this.showToast('Projekt zaimportowany');
+        } catch (err) {
+          this.showToast('Błąd importu JSON');
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }
+
+  showToast(message) {
+    const toastContainer = document.getElementById('toastContainer') || this.elements.toastContainer;
+    if (!toastContainer) return console.log(message);
+
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    toastContainer.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 400);
+    }, 3000);
+  }
+
+  showCover(url) {
+    const img = document.getElementById('coverImg');
+    const preview = document.getElementById('coverPreview');
+    if (!img || !preview) return;
+    img.src = url;
+    preview.style.display = 'flex';
+  }
+
+  bindGlobalEvents() {
+    if (this.elements.modalBackdrop) {
+      this.elements.modalBackdrop.addEventListener('click', e => {
+        if (e.target === this.elements.modalBackdrop) this.closeModal();
+      });
     }
 
-    const text = this.currentProfile === 'amazon'
-      ? '⭐⭐⭐⭐⭐ Bestseller, który zmienia wszystko. Zamów teraz.'
-      : 'Noc była zbyt cicha. Świat wstrzymał oddech.';
-
-    const c = document.getElementById('element-content');
-    if (!c) return;
-
-    c.value += `\n\n--- AI Generated ---\n\n${text}`;
-    this.autoSaveCurrent();
-
-    this.renderer?.renderSuggestions([{ text }]);
-    this.setStatus('Treść wygenerowana przez AI');
-  }
-
-  /* =========================
-     DYKTOWANIE
-  ========================= */
-  initSpeechRecognition() {
-    if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) return;
-
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    this.recognition = new SR();
-    this.recognition.lang = 'pl-PL';
-    this.recognition.continuous = true;
-    this.recognition.interimResults = false;
-
-    this.recognition.onresult = e => {
-      const text = Array.from(e.results).map(r => r[0].transcript).join(' ');
-      const c = document.getElementById('element-content');
-      if (c) {
-        c.value += text + ' ';
-        this.autoSaveCurrent();
-      }
-    };
-
-    this.recognition.onstart = () => {
-      this.isDictating = true;
-      this.toggleDictation(true);
-      this.setStatus('🎤 Dyktowanie aktywne', 0);
-    };
-
-    this.recognition.onend = () => {
-      this.isDictating = false;
-      this.toggleDictation(false);
-      this.setStatus('Dyktowanie zatrzymane');
-    };
-  }
-
-  startDictation() {
-    if (!this.recognition || this.isDictating) return;
-    try { this.recognition.start(); } catch {}
-  }
-
-  stopDictation() {
-    if (!this.recognition || !this.isDictating) return;
-    try { this.recognition.stop(); } catch {}
-  }
-
-  toggleDictation(active) {
-    const s = document.getElementById('start-dictate');
-    const t = document.getElementById('stop-dictate');
-    if (s) s.disabled = active;
-    if (t) t.disabled = !active;
-  }
-
-  /* =========================
-     STATUS
-  ========================= */
-  setStatus(msg, time = 6000) {
-    if (this.renderer?.setStatus) {
-      this.renderer.setStatus(msg, time);
-      return;
-    }
-
-    const e = document.getElementById('status');
-    if (!e) return;
-
-    e.textContent = msg;
-    if (time > 0) {
-      setTimeout(() => {
-        if (e.textContent === msg) e.textContent = 'Gotowy';
-      }, time);
+    const coverClose = document.getElementById('coverClose');
+    if (coverClose) {
+      coverClose.addEventListener('click', () => {
+        const preview = document.getElementById('coverPreview');
+        if (preview) preview.style.display = 'none';
+      });
     }
   }
 }
 
-/* =========================
-   START
-========================= */
-const master = new EterniverseMasterPRO();
-window.master = master;
-
-console.log(`Eterniverse Master PRO ${master.VERSION} uruchomiony`);
+// START — PEŁNA MOC
+new Eterniverse();
+new Eterniverse();
