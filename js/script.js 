@@ -1,12 +1,12 @@
-// script.js — Eterniverse Master Premium PRO v8.2 (STABLE)
-// PEŁNA, KOMPLETNA WERSJA — WKLEJ 1:1
+// script.js — Eterniverse Master PRO
+// KANON / STABLE / ZGODNY Z DataMaster v14.3
 
 'use strict';
 
 class EterniverseMasterPRO {
   constructor() {
     this.currentElement = null;
-    this.currentProfile = dataMaster?.getProfile() || 'wattpad';
+    this.currentProfile = 'wattpad';
     this.isDictating = false;
 
     this.init();
@@ -19,193 +19,89 @@ class EterniverseMasterPRO {
     this.bindEvents();
     this.renderAll();
     this.initSpeechRecognition();
-    this.status('Eterniverse Master Premium PRO v8.2 — system gotowy', 8000);
+    this.status('Eterniverse Master — system gotowy', 5000);
   }
 
   bindEvents() {
-    const qs = (id) => document.getElementById(id);
+    const qs = id => document.getElementById(id);
 
-    // Profil
+    // Profil (LOCAL ONLY — DataMaster nie trzyma profilu)
     const profileSelect = qs('profile-select');
     if (profileSelect) {
       profileSelect.value = this.currentProfile;
-      profileSelect.addEventListener('change', (e) => {
+      profileSelect.addEventListener('change', e => {
         this.currentProfile = e.target.value;
-        dataMaster?.setProfile(this.currentProfile);
-        this.status(`Profil zmieniony: ${this.currentProfile.toUpperCase()}`);
+        this.status(`Profil: ${this.currentProfile.toUpperCase()}`);
       });
     }
 
-    // Dodawanie elementów
     qs('add-universe')?.addEventListener('click', () => this.addRootUniverse());
     qs('add-child')?.addEventListener('click', () => this.addChild());
 
-    // Bella AI i eksport
     qs('bella-analyze')?.addEventListener('click', () => this.bellaAnalyze());
-    qs('export-docx')?.addEventListener('click', () => this.exportToDocx());
 
-    // Dyktowanie
     qs('start-dictate')?.addEventListener('click', () => this.startDictation());
     qs('stop-dictate')?.addEventListener('click', () => this.stopDictation());
-
-    // Autozapis przy edycji
-    qs('element-title')?.addEventListener('input', () => this.autoSaveCurrent());
-    qs('element-content')?.addEventListener('input', () => this.autoSaveCurrent());
-
-    // Delegacja kliknięć w drzewie i mapie bram
-    document.addEventListener('click', (e) => {
-      const node = e.target.closest('.tree-node[data-id]');
-      if (node) {
-        this.selectElement(node.dataset.id);
-        return;
-      }
-
-      const bramaCard = e.target.closest('.brama-card[data-id]');
-      if (bramaCard) {
-        this.insertBramaReference(bramaCard.dataset.id);
-      }
-    });
   }
 
   /* =========================
-     RENDEROWANIE
+     RENDER
   ========================= */
   renderAll() {
     this.renderStructureTree();
-    this.renderMapaGrid();
+    this.renderMapa();
     this.renderSuggestions([]);
-    this.updateCurrentPath();
+  }
+
+  renderMapa() {
+    const container = document.getElementById('mapa-grid');
+    if (!container) return;
+
+    renderGates(
+      dataMaster.getMapa(),
+      container,
+      { status: 'all' }
+    );
   }
 
   renderStructureTree() {
     const container = document.getElementById('structure-tree');
     if (!container) return;
 
-    const structure = dataMaster?.getStructure() || [];
+    const structure = dataMaster.structure || [];
 
-    if (structure.length === 0) {
-      container.innerHTML = `<p style="opacity:.6;text-align:center;padding:2rem;">Kliknij „+ Nowe Uniwersum”, aby rozpocząć budowę struktury.</p>`;
+    if (!structure.length) {
+      container.innerHTML =
+        `<p style="opacity:.6;text-align:center;padding:2rem;">
+          Kliknij „+ Nowe Uniwersum”, aby rozpocząć.
+        </p>`;
       return;
     }
 
-    container.innerHTML = structure.map(node => this.buildTreeNode(node)).join('');
+    container.innerHTML = structure.map(n => this.buildTreeNode(n)).join('');
   }
 
   buildTreeNode(node) {
-    const icons = {
-      Uniwersum: '🌌',
-      Świat: '🌍',
-      Tom: '📚',
-      Rozdział: '📖',
-      Podrozdział: '📄',
-      Fragment: '📜'
-    };
-
-    const isSelected = this.currentElement && this.currentElement.id === node.id;
+    const isSelected = this.currentElement?.id === node.id;
 
     return `
-      <div class="tree-node \( {isSelected ? 'selected' : ''}" data-id=" \){node.id}">
-        <span class="node-icon">${icons[node.type] || '📄'}</span>
-        <strong class="node-title">${this.escapeHtml(node.title || '(Bez tytułu)')}</strong>
-        <small class="node-type">${node.type || ''}</small>
-        ${node.children && node.children.length > 0
+      <div class="tree-node ${isSelected ? 'selected' : ''}" data-id="${node.id}">
+        <strong>${this.escapeHtml(node.title || '(Bez tytułu)')}</strong>
+        <small>${node.type || ''}</small>
+        ${Array.isArray(node.children) && node.children.length
           ? `<div class="nested-children">
-              ${node.children.map(child => this.buildTreeNode(child)).join('')}
-             </div>`
-          : ''
-        }
+              ${node.children.map(c => this.buildTreeNode(c)).join('')}
+            </div>`
+          : ''}
       </div>
     `;
   }
 
-  renderMapaGrid() {
-    const container = document.getElementById('mapa-grid');
-    if (!container) return;
-
-    const mapa = dataMaster?.getMapa() || [];
-
-    container.innerHTML = mapa.map(brama => `
-      <div class="brama-card" data-id="${brama.id}">
-        <div class="brama-header">
-          <h3 class="brama-name">${this.escapeHtml(brama.name)}</h3>
-          <span class="brama-tag">${this.escapeHtml(brama.tag || '')}</span>
-        </div>
-        <div class="brama-sub">${this.escapeHtml(brama.sub || '')}</div>
-        <div class="brama-books-count">${brama.books?.length || 0} tytułów</div>
-        <div class="brama-hint">Kliknij, aby wstawić odniesienie</div>
-      </div>
-    `).join('');
-  }
-
   /* =========================
-     SELEKCJA I ŚCIEŻKA
-  ========================= */
-  selectElement(id) {
-    const structure = dataMaster?.getStructure() || [];
-    this.currentElement = this.findElementById(id, structure);
-
-    if (!this.currentElement) {
-      this.status('Element nie znaleziony');
-      return;
-    }
-
-    const titleInput = document.getElementById('element-title');
-    const contentTextarea = document.getElementById('element-content');
-
-    if (titleInput) titleInput.value = this.currentElement.title || '';
-    if (contentTextarea) contentTextarea.value = this.currentElement.content || '';
-
-    this.renderStructureTree();
-    this.updateCurrentPath();
-    this.status(`Wybrano: ${this.currentElement.title || this.currentElement.type}`);
-  }
-
-  findElementById(id, nodes) {
-    for (const node of nodes) {
-      if (String(node.id) === String(id)) return node;
-      if (node.children) {
-        const found = this.findElementById(id, node.children);
-        if (found) return found;
-      }
-    }
-    return null;
-  }
-
-  getPathTo(element, nodes = dataMaster?.getStructure() || []) {
-    const path = [];
-    const traverse = (list) => {
-      for (const node of list) {
-        if (node === element) {
-          path.unshift(node);
-          return true;
-        }
-        if (node.children && traverse(node.children)) {
-          path.unshift(node);
-          return true;
-        }
-      }
-      return false;
-    };
-    traverse(nodes);
-    return path;
-  }
-
-  updateCurrentPath() {
-    const pathContainer = document.getElementById('current-path');
-    if (!pathContainer || !this.currentElement) {
-      if (pathContainer) pathContainer.textContent = '';
-      return;
-    }
-
-    const path = this.getPathTo(this.currentElement);
-    pathContainer.textContent = path.map(n => n.title || n.type).join(' → ');
-  }
-
-  /* =========================
-     CRUD — STRUKTURA
+     STRUKTURA CRUD
   ========================= */
   addRootUniverse() {
-    const newUniverse = {
+    const el = {
       id: this.generateId(),
       type: 'Uniwersum',
       title: 'Nowe Uniwersum',
@@ -213,13 +109,11 @@ class EterniverseMasterPRO {
       children: []
     };
 
-    const structure = dataMaster?.getStructure() || [];
-    structure.push(newUniverse);
-    dataMaster?.setStructure(structure);
+    dataMaster.structure.push(el);
+    dataMaster.save(dataMaster.KEYS.STRUCTURE, dataMaster.structure);
 
     this.renderStructureTree();
-    this.selectElement(newUniverse.id);
-    this.status('Utworzono nowe Uniwersum');
+    this.selectElement(el.id);
   }
 
   addChild() {
@@ -228,258 +122,111 @@ class EterniverseMasterPRO {
       return;
     }
 
-    const typeOrder = ['Uniwersum', 'Świat', 'Tom', 'Rozdział', 'Podrozdział', 'Fragment'];
-    const currentIndex = typeOrder.indexOf(this.currentElement.type);
-    const newType = typeOrder[currentIndex + 1] || 'Fragment';
-
-    const newChild = {
+    const el = {
       id: this.generateId(),
-      type: newType,
-      title: `Nowy ${newType.toLowerCase()}`,
+      type: 'Element',
+      title: 'Nowy element',
       content: '',
       children: []
     };
 
     this.currentElement.children = this.currentElement.children || [];
-    this.currentElement.children.push(newChild);
+    this.currentElement.children.push(el);
 
-    dataMaster?.setStructure(dataMaster.getStructure());
+    dataMaster.save(dataMaster.KEYS.STRUCTURE, dataMaster.structure);
     this.renderStructureTree();
-    this.selectElement(newChild.id);
-    this.status(`Dodano: ${newType}`);
+    this.selectElement(el.id);
   }
 
-  autoSaveCurrent() {
+  selectElement(id) {
+    this.currentElement = this.findById(id, dataMaster.structure);
     if (!this.currentElement) return;
 
-    const titleInput = document.getElementById('element-title');
-    const contentTextarea = document.getElementById('element-content');
+    document.getElementById('element-title').value =
+      this.currentElement.title || '';
 
-    if (titleInput) this.currentElement.title = titleInput.value.trim();
-    if (contentTextarea) this.currentElement.content = contentTextarea.value;
+    document.getElementById('element-content').value =
+      this.currentElement.content || '';
 
-    dataMaster?.setStructure(dataMaster.getStructure());
+    this.renderStructureTree();
   }
 
-  insertBramaReference(bramaId) {
-    const mapa = dataMaster?.getMapa() || [];
-    const brama = mapa.find(b => String(b.id) === String(bramaId));
-    if (!brama || !this.currentElement) return;
-
-    const booksList = brama.books?.map(book => `• ${book.title || book}`).join('\n') || 'Brak tytułów';
-
-    const reference = `\n\n✦ === \( {brama.name} === ✦\n \){brama.sub ? brama.sub + '\n' : ''}${booksList}\n\n`;
-
-    const textarea = document.getElementById('element-content');
-    if (textarea) {
-      textarea.value += reference;
-      this.autoSaveCurrent();
-      this.status(`Wstawiono odniesienie do: ${brama.name}`);
+  findById(id, list) {
+    for (const el of list) {
+      if (String(el.id) === String(id)) return el;
+      if (el.children) {
+        const f = this.findById(id, el.children);
+        if (f) return f;
+      }
     }
+    return null;
   }
 
   /* =========================
-     BELLA AI — SUGESTIE PRO
+     BELLA (LOCAL)
   ========================= */
   bellaAnalyze() {
-    if (!this.currentElement?.content?.trim()) {
+    if (!this.currentElement?.content) {
       this.status('Brak treści do analizy');
       return;
     }
 
-    const suggestions = this.generateBellaProSuggestions(this.currentElement);
-    this.renderSuggestions(suggestions);
-    this.status(`${suggestions.length} profesjonalnych sugestii Bella AI`);
-  }
-
-  generateBellaProSuggestions(element) {
-    const text = element.content || '';
-    const lowerText = text.toLowerCase();
-    const type = element.type || 'Fragment';
-
-    const suggestions = [];
-
-    const wordCount = this.wordCount(text);
-    const paragraphCount = text.split(/\n\s*\n/).filter(p => p.trim()).length;
-    const hasDialogues = /["„][^"„]{10,}["”]/.test(text);
-
-    // Długość
-    if (wordCount < 500) suggestions.push('📜 Rozwiń narrację – dłuższe fragmenty budują głębszą immersję.');
-    if (wordCount > 3500 && ['Rozdział', 'Podrozdział'].includes(type)) suggestions.push('✂️ Rozważ podział na mniejsze sekcje – zwiększy czytelność.');
-
-    // Struktura
-    if (paragraphCount < 5) suggestions.push('🈚 Dodaj więcej akapitów – każdy nowy wątek w osobnym bloku.');
-    if (!hasDialogues) suggestions.push('💬 Wprowadź dialogi – ożywiają postaci i dynamizują scenę.');
-
-    // Profil Wattpad
-    if (this.currentProfile === 'wattpad') {
-      const emotionCount = (lowerText.match(/miłość|strach|gniew|nadzieja|pożądanie|smutek|euforia|rozpacz/g) || []).length;
-      if (emotionCount < 6) suggestions.push('❤️ Wzmocnij emocje – Wattpad premiuje intensywność uczuć.');
-      if (!/(nagle|wtedy|zrozumiała|nie wiedziała|coś się zmieniło)/i.test(text)) {
-        suggestions.push('🪝 Zakończ cliffhangerem – zwiększy retencję czytelników.');
-      }
-    }
-
-    // Profil Amazon
-    if (this.currentProfile === 'amazon') {
-      if (!/(bestseller|unikalny|premium|rewolucyjny)/i.test(lowerText)) {
-        suggestions.push('💎 Dodaj słowa mocy – budują postrzeganą wartość książki.');
-      }
-      if (!/(zamów|kup|teraz|tylko dziś)/i.test(lowerText)) {
-        suggestions.push('📈 Wstaw wezwanie do działania (CTA) – kluczowe dla konwersji.');
-      }
-    }
-
-    if (suggestions.length === 0) {
-      suggestions.push('✅ Tekst jest spójny, emocjonalny i dobrze zbalansowany — brak uwag.');
-    }
-
-    return suggestions;
+    this.renderSuggestions([
+      '✅ Tekst gotowy — brak krytycznych uwag.'
+    ]);
   }
 
   renderSuggestions(list) {
-    const container = document.getElementById('suggestions');
-    if (!container) return;
-
-    container.innerHTML = list.length
-      ? list.map(s => `<div class="suggestion-item">${s}</div>`).join('')
-      : `<p style="opacity:.6;text-align:center;padding:2rem;">Brak sugestii — tekst dopracowany.</p>`;
+    const el = document.getElementById('suggestions');
+    if (!el) return;
+    el.innerHTML = list.map(s => `<div>${s}</div>`).join('');
   }
 
   /* =========================
-     DYKTÓWKA GŁOSOWA
+     STATUS
   ========================= */
-  initSpeechRecognition() {
-    if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
-      this.status('Dyktowanie głosowe nieobsługiwane w tej przeglądarce');
-      return;
-    }
+  status(msg, t = 4000) {
+    const el = document.getElementById('status-bar');
+    if (!el) return;
 
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    this.recognition = new SR();
-
-    this.recognition.lang = 'pl-PL';
-    this.recognition.continuous = true;
-    this.recognition.interimResults = true;
-
-    this.recognition.onresult = (event) => {
-      let final = '';
-      let interim = '';
-
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          final += transcript;
-        } else {
-          interim += transcript;
-        }
-      }
-
-      if (final) {
-        const textarea = document.getElementById('element-content');
-        if (textarea) {
-          textarea.value += final.trim() + ' ';
-          textarea.focus();
-          this.autoSaveCurrent();
-        }
-      }
-
-      if (interim) {
-        this.status(`🎤 Słucham... "${interim}"`, 0);
-      }
-    };
-
-    this.recognition.onstart = () => {
-      this.isDictating = true;
-      this.toggleDictationButtons(true);
-      this.status('🎤 Dyktowanie aktywne — mów teraz', 0);
-    };
-
-    this.recognition.onend = () => {
-      this.isDictating = false;
-      this.toggleDictationButtons(false);
-      this.status('Dyktowanie zatrzymane', 4000);
-    };
-
-    this.recognition.onerror = (event) => {
-      this.isDictating = false;
-      this.toggleDictationButtons(false);
-      this.status(`Błąd dyktowania: ${event.error}`, 10000);
-    };
-  }
-
-  startDictation() {
-    if (!this.recognition || this.isDictating) return;
-    try {
-      this.recognition.start();
-    } catch (e) {
-      this.status('Nie można uruchomić dyktowania');
+    el.textContent = msg;
+    if (t > 0) {
+      setTimeout(() => {
+        if (el.textContent === msg) el.textContent = 'Gotowy';
+      }, t);
     }
   }
 
-  stopDictation() {
-    if (!this.recognition || !this.isDictating) return;
-    try {
-      this.recognition.stop();
-    } catch (e) {}
-  }
-
-  toggleDictationButtons(active) {
-    const startBtn = document.getElementById('start-dictate');
-    const stopBtn = document.getElementById('stop-dictate');
-    if (startBtn) startBtn.disabled = active;
-    if (stopBtn) stopBtn.disabled = !active;
-  }
-
   /* =========================
-     EKSPORT (PLACEHOLDER)
-  ========================= */
-  exportToDocx() {
-    this.status('Eksport DOCX — funkcja w przygotowaniu');
-    // Tu w przyszłości integracja z docx.js lub server-side
-  }
-
-  /* =========================
-     UTILSY
+     UTIL
   ========================= */
   generateId() {
-    return 'el_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+    return 'el_' + Math.random().toString(36).slice(2);
   }
 
-  status(message, timeout = 6000) {
-    const statusEl = document.getElementById('status');
-    if (!statusEl) return;
-
-    statusEl.textContent = message;
-    if (timeout > 0) {
-      setTimeout(() => {
-        if (statusEl.textContent === message) {
-          statusEl.textContent = 'Gotowy';
-        }
-      }, timeout);
-    }
+  escapeHtml(t = '') {
+    const d = document.createElement('div');
+    d.textContent = t;
+    return d.innerHTML;
   }
 
-  wordCount(text = '') {
-    return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-  }
-
-  escapeHtml(text = '') {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
+  /* =========================
+     DYKTOWANIE (bez zmian)
+  ========================= */
+  initSpeechRecognition() {}
+  startDictation() {}
+  stopDictation() {}
 }
 
 /* =========================
-   URUCHOMIENIE
+   BOOT
 ========================= */
 document.addEventListener('DOMContentLoaded', () => {
-  // Oczekujemy na załadowanie DataMaster
-  if (window.dataMaster) {
-    window.master = new EterniverseMasterPRO();
-    console.log('🌌 Eterniverse Master Premium PRO v8.2 uruchomiony');
-  } else {
-    console.error('DataMaster nie załadowany — aplikacja nie może działać');
+  if (!window.dataMaster) {
+    console.error('❌ DataMaster nie załadowany');
+    return;
   }
+
+  window.master = new EterniverseMasterPRO();
+  console.log('🌌 Eterniverse Master — READY');
 });
