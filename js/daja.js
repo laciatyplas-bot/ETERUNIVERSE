@@ -1,5 +1,5 @@
-// dają.js — Eterniverse Master Premium PRO v14.0
-// PEŁNA, KOMPLETNA OBSŁUGA DYKTOWANIA GŁOSOWEGO
+// dają.js — Eterniverse Master Premium PRO v14.1
+// PEŁNA, KOMPLETNA OBSŁUGA DYKTOWANIA GŁOSOWEGO (PL)
 // WKLEJ 1:1 — NIE EDYTUJ
 
 'use strict';
@@ -9,6 +9,7 @@ class EterniverseVoiceDictation {
     this.app = app;
     this.recognition = null;
     this.isDictating = false;
+    this.interimTranscript = '';
 
     this.init();
   }
@@ -25,45 +26,67 @@ class EterniverseVoiceDictation {
     }
 
     this.setupRecognition();
-    this.app?.setStatus?.('Dyktowanie głosowe gotowe (PL)');
+    this.app?.setStatus?.('Dyktowanie głosowe gotowe (język: polski)', 5000);
   }
 
   isSupported() {
-    return ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+    return 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
   }
 
   setupRecognition() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    this.recognition = new SR();
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    this.recognition = new SpeechRecognition();
 
     this.recognition.lang = 'pl-PL';
     this.recognition.continuous = true;
     this.recognition.interimResults = true;
     this.recognition.maxAlternatives = 1;
 
-    /* === RESULT === */
+    /* === WYNIK === */
     this.recognition.onresult = (event) => {
-      let finalText = '';
+      let interim = '';
+      let final = '';
 
-      for (let i = event.resultIndex; i < event.results.length; i++) {
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
-          finalText += event.results[i][0].transcript.trim() + ' ';
+          final += transcript;
+        } else {
+          interim += transcript;
         }
       }
 
-      if (!finalText) return;
+      // Tymczasowy podgląd
+      if (interim) {
+        this.interimTranscript = interim;
+        this.app?.setStatus?.(`🎤 Słucham... "${interim}"`, 0);
+      }
 
-      const textarea = document.getElementById('element-content');
-      if (!textarea) return;
+      // Finalny tekst
+      if (final) {
+        const textarea = document.getElementById('element-content');
+        if (textarea) {
+          const start = textarea.selectionStart || textarea.value.length;
+          const end = textarea.selectionEnd || textarea.value.length;
 
-      textarea.value += finalText;
-      this.app?.autoSaveCurrent?.();
+          textarea.value =
+            textarea.value.substring(0, start) +
+            final.trim() +
+            ' ' +
+            textarea.value.substring(end);
 
-      const conf = event.results[event.results.length - 1][0].confidence;
-      if (conf !== undefined) {
+          textarea.selectionStart = textarea.selectionEnd = start + final.trim().length + 1;
+
+          textarea.focus();
+          this.app?.autoSaveCurrent?.();
+        }
+
+        const confidence = event.results[event.results.length - 1][0].confidence;
+        const confPercent = confidence !== undefined ? Math.round(confidence * 100) : '?';
+
         this.app?.setStatus?.(
-          `🎤 Rozpoznano: "${finalText.trim()}" (${Math.round(conf * 100)}%)`,
-          4000
+          `🎤 Rozpoznano: "\( {final.trim()}" ( \){confPercent}%)`,
+          5000
         );
       }
     };
@@ -79,24 +102,34 @@ class EterniverseVoiceDictation {
     this.recognition.onend = () => {
       this.isDictating = false;
       this.toggleButtons(false);
-      this.app?.setStatus?.('Dyktowanie zatrzymane', 5000);
+      this.interimTranscript = '';
+      this.app?.setStatus?.('Dyktowanie zatrzymane', 4000);
     };
 
     /* === ERROR === */
     this.recognition.onerror = (event) => {
       this.isDictating = false;
       this.toggleButtons(false);
+      this.interimTranscript = '';
 
       const errors = {
-        'no-speech': 'Nie wykryto mowy',
+        'no-speech': 'Nie wykryto mowy – spróbuj głośniej',
         'audio-capture': 'Brak dostępu do mikrofonu',
-        'not-allowed': 'Mikrofon zablokowany',
-        'network': 'Błąd sieci'
+        'not-allowed': 'Mikrofon zablokowany – zezwól w ustawieniach przeglądarki',
+        'network': 'Błąd sieci – sprawdź połączenie',
+        'service-not-allowed': 'Usługa rozpoznawania mowy niedostępna',
+        'bad-grammar': 'Błąd gramatyki rozpoznawania',
+        'language-not-supported': 'Język polski nieobsługiwany w tej przeglądarce'
       };
 
-      const msg = errors[event.error] || `Błąd dyktowania: ${event.error}`;
-      this.app?.setStatus?.(msg, 10000);
-      console.error('SpeechRecognition error:', event.error);
+      const msg = errors[event.error] || `Nieznany błąd: ${event.error}`;
+      this.app?.setStatus?.(`Błąd dyktowania: ${msg}`, 10000);
+      console.error('SpeechRecognition error:', event);
+    };
+
+    /* === NOMATCH === */
+    this.recognition.onnomatch = () => {
+      this.app?.setStatus?.('Nie rozpoznano mowy – spróbuj ponownie', 5000);
     };
   }
 
@@ -105,15 +138,22 @@ class EterniverseVoiceDictation {
   ========================= */
   start() {
     if (!this.recognition || this.isDictating) return;
+
     try {
       this.recognition.start();
     } catch (e) {
-      console.error('Błąd startu dyktowania', e);
+      if (e.name === 'InvalidStateError') {
+        // Już uruchomione – ignorujemy
+      } else {
+        console.error('Błąd startu dyktowania', e);
+        this.app?.setStatus?.('Nie można uruchomić dyktowania', 8000);
+      }
     }
   }
 
   stop() {
     if (!this.recognition || !this.isDictating) return;
+
     try {
       this.recognition.stop();
     } catch (e) {
@@ -122,20 +162,22 @@ class EterniverseVoiceDictation {
   }
 
   /* =========================
-     UI
+     UI PRZYCISKI
   ========================= */
   toggleButtons(active) {
-    const start = document.getElementById('start-dictate');
-    const stop = document.getElementById('stop-dictate');
-    if (start) start.disabled = active;
-    if (stop) stop.disabled = !active;
+    const startBtn = document.getElementById('start-dictate');
+    const stopBtn = document.getElementById('stop-dictate');
+
+    if (startBtn) startBtn.disabled = active;
+    if (stopBtn) stopBtn.disabled = !active;
   }
 
   disableButtons() {
-    const start = document.getElementById('start-dictate');
-    const stop = document.getElementById('stop-dictate');
-    if (start) start.disabled = true;
-    if (stop) stop.disabled = true;
+    const startBtn = document.getElementById('start-dictate');
+    const stopBtn = document.getElementById('stop-dictate');
+
+    if (startBtn) startBtn.disabled = true;
+    if (stopBtn) stopBtn.disabled = true;
   }
 }
 
@@ -144,16 +186,16 @@ class EterniverseVoiceDictation {
 ========================= */
 document.addEventListener('DOMContentLoaded', () => {
   if (!window.master) {
-    console.warn('Brak EterniverseMaster — dyktowanie niepodpięte');
+    console.warn('Brak instancji EterniverseMaster — dyktowanie niepodpięte');
     return;
   }
 
   const voice = new EterniverseVoiceDictation(window.master);
   window.voiceDictation = voice;
 
-  // Podpinamy metody do mastera (BEZ ZMIAN W app.js)
+  // Udostępnienie metod masterowi
   window.master.startDictation = () => voice.start();
   window.master.stopDictation = () => voice.stop();
 
-  console.log('🎤 Dyktowanie głosowe (dają.js) załadowane');
+  console.log('🎤 Dyktowanie głosowe (dają.js v14.1) załadowane i gotowe');
 });
