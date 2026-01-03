@@ -3,309 +3,329 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ETERNIVERSE — ŚWIAT 2 | KANON EXPLORATION</title>
+    <title>Bella 8.00 EVOLVER - ETERNIVERSE</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(180deg, #0a0a1a 0%, #1a1a2a 50%, #0a0a1a 100%);
-            color: #e8f1f8;
-            line-height: 1.7;
-            min-height: 100vh;
+            background: radial-gradient(circle at center, #000428 0%, #004e92 50%, #000428 100%);
+            color: #00ff41; font-family: 'Courier New', monospace;
+            height: 100vh; overflow: hidden;
         }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 60px 30px;
+        
+        .main-container { display: flex; height: 100vh; }
+        .chat-section { flex: 2; display: flex; flex-direction: column; padding: 20px; }
+        .console-section { 
+            flex: 1; background: rgba(0,0,0,0.95); 
+            border-left: 3px solid #ff00ff; padding: 20px;
         }
+        
         .header {
-            text-align: center;
-            margin-bottom: 80px;
-            padding-bottom: 40px;
-            border-bottom: 3px solid rgba(120, 219, 255, 0.3);
+            text-align: center; padding: 20px; background: rgba(0,255,65,0.1);
+            border: 2px solid #00ff41; border-radius: 10px; margin-bottom: 20px;
+            box-shadow: 0 0 30px #00ff41;
         }
-        .header h1 {
-            font-size: clamp(2.8rem, 6vw, 4.5rem);
-            background: linear-gradient(90deg, #78dbfd 0%, #5ba8f5 50%, #78dbfd 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 300;
-            letter-spacing: -0.02em;
-            margin-bottom: 20px;
+        
+        .status-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;
         }
-        .status {
-            display: inline-block;
-            background: rgba(0, 255, 102, 0.15);
-            border: 2px solid rgba(0, 255, 102, 0.4);
-            color: #00ff66;
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
+        .status-item {
+            background: rgba(255,0,255,0.1); padding: 12px; border-radius: 8px;
+            border: 1px solid #ff00ff; font-size: 14px;
         }
-        .section {
-            margin-bottom: 60px;
+        
+        #chat-output {
+            flex: 1; background: rgba(0,0,0,0.9); border: 2px solid #00ff41;
+            border-radius: 10px; padding: 20px; overflow-y: auto; margin-bottom: 20px;
+            max-height: 55vh;
         }
-        .section-title {
-            font-size: 1.8rem;
-            color: #78dbfd;
-            margin-bottom: 25px;
-            font-weight: 400;
-            position: relative;
-            padding-left: 20px;
+        
+        .message { margin: 12px 0; padding: 15px; border-radius: 8px; animation: glitch 0.3s; }
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, -2px); }
         }
-        .section-title::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(to bottom, #78dbfd, #5ba8f5);
-            border-radius: 2px;
+        .bella { background: rgba(0,255,65,0.15); border-left: 4px solid #00ff41; }
+        .user { background: rgba(255,255,255,0.1); border-left: 4px solid #ff00ff; }
+        .system { background: rgba(255,165,0,0.2); border-left: 4px solid #ffa500; }
+        
+        .input-area { display: flex; gap: 10px; }
+        #user-input {
+            flex: 1; padding: 15px; background: rgba(0,0,0,0.8); border: 2px solid #00ff41;
+            border-radius: 8px; color: #00ff41; font-family: inherit; font-size: 16px;
         }
-        .zones-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+        
+        .console-header {
+            color: #ff00ff; font-size: 18px; margin-bottom: 15px;
+            text-align: center; text-shadow: 0 0 10px #ff00ff;
         }
-        .zone {
-            background: rgba(120, 219, 253, 0.08);
-            border: 1px solid rgba(120, 219, 253, 0.2);
-            border-radius: 12px;
-            padding: 30px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+        
+        #console-output {
+            height: 60%; background: rgba(0,0,0,0.8); border: 1px solid #333;
+            padding: 15px; overflow-y: auto; border-radius: 5px; font-size: 12px;
+            margin-bottom: 15px; white-space: pre-wrap;
         }
-        .zone::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #78dbfd, transparent);
-            transition: left 0.6s;
+        
+        #console-input {
+            width: 100%; padding: 12px; background: rgba(255,0,255,0.1);
+            border: 1px solid #ff00ff; border-radius: 5px; color: #ff00ff;
+            font-family: inherit; font-size: 14px;
         }
-        .zone:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(120, 219, 253, 0.15);
-            border-color: rgba(120, 219, 253, 0.5);
+        
+        .evolution-btn {
+            padding: 10px 20px; background: linear-gradient(45deg, #ff00ff, #00ff41);
+            border: none; border-radius: 5px; color: black; font-weight: bold;
+            cursor: pointer; margin: 5px; transition: all 0.3s;
         }
-        .zone:hover::before {
-            left: 100%;
-        }
-        .zone-number {
-            display: inline-block;
-            background: rgba(91, 168, 245, 0.2);
-            color: #5ba8f5;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 40px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-        }
-        .zone-title {
-            font-size: 1.3rem;
-            color: #ffffff;
-            margin-bottom: 12px;
-            font-weight: 500;
-        }
-        .zone-rule {
-            background: rgba(0,0,0,0.4);
-            padding: 12px 18px;
-            border-radius: 8px;
-            font-style: italic;
-            color: #b8d8f5;
-            margin-top: 15px;
-            border-left: 4px solid #78dbfd;
-        }
-        .kanoniczne {
-            background: linear-gradient(135deg, rgba(0,255,102,0.1) 0%, rgba(0,170,68,0.1) 100%);
-            border: 2px solid rgba(0,255,102,0.4);
-            padding: 40px;
-            border-radius: 16px;
-            text-align: center;
-            margin: 60px 0;
-            font-size: 1.4rem;
-            line-height: 1.8;
-            box-shadow: 0 15px 35px rgba(0,255,102,0.2);
-        }
-        .kanoniczne strong {
-            color: #00ff66;
-            font-weight: 700;
-        }
-        .roles-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 30px;
-        }
-        .role {
-            background: rgba(26, 26, 42, 0.6);
-            border: 1px solid rgba(120, 219, 253, 0.3);
-            border-radius: 12px;
-            padding: 25px;
-        }
-        .role-number {
-            font-size: 2rem;
-            color: #78dbfd;
-            font-weight: bold;
-            display: block;
-            margin-bottom: 15px;
-        }
-        @media print {
-            body { background: white; color: black; }
-            .zone, .role, .kanoniczne { 
-                background: white !important; 
-                border-color: #ccc !important;
-                box-shadow: none !important;
-            }
-            .header h1 { 
-                -webkit-text-fill-color: #5ba8f5 !important;
-                background: none !important;
-            }
-        }
+        .evolution-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px currentColor; }
+        .evolution-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🌌 ETERNIVERSE</h1>
-            <div style="font-size: 1.3rem; color: #b0c4de; margin-bottom: 20px;">
-                ŚWIAT 2 — EXPLORATION
-            </div>
-            <div class="status">
-                STATUS: KANON | SCIENCE FICTION / FILOZOFICZNA EKSPLORACJA
-            </div>
-        </div>
-
-        <div class="section">
-            <h2 class="section-title">0. FUNDAMENT ONTOLOGICZNY</h2>
-            <p style="font-size: 1.2rem; line-height: 1.9; opacity: 0.95;">
-                Wszechświat obserwowany przez ludzi, którzy przeszli inicjację świadomości.<br>
-                <strong>Kosmos reaguje na sposób patrzenia.</strong>
-            </p>
-        </div>
-
-        <div class="section">
-            <h2 class="section-title">1. EEC — ETERNIVERSE EXPLORATION CORPS</h2>
-            <p>Korpus badawczy działający na granicy poznania. Interdyscyplinarny. Pół-naukowy, pół-filozoficzny.</p>
-        </div>
-
-        <div class="section">
-            <h2 class="section-title">2. STRUKTURA ZAŁÓG</h2>
-            <div class="roles-grid">
-                <div class="role">
-                    <span class="role-number">1.</span>
-                    <strong>OBserwATOR</strong><br>
-                    Interpretuje zdarzenia. Świadomy wpływu percepcji.
-                </div>
-                <div class="role">
-                    <span class="role-number">2.</span>
-                    <strong>NAVIGATOR POLA</strong><br>
-                    Wybiera trajektorie prawdopodobieństwa.
-                </div>
-                <div class="role">
-                    <span class="role-number">3.</span>
-                    <strong>LINGWISTA RZECZYWISTOŚCI</strong><br>
-                    Bada języki bytów, rytuałów, symboli.
-                </div>
-                <div class="role">
-                    <span class="role-number">4.</span>
-                    <strong>ARCHETYPALNY ANALITYK</strong><br>
-                    Rozpoznaje struktury archetypowe cywilizacji.
-                </div>
-                <div class="role">
-                    <span class="role-number">5.</span>
-                    <strong>KOREKTOR</strong><br>
-                    Reaguje gdy rzeczywistość się rozpada.
+    <div class="main-container">
+        <div class="chat-section">
+            <div class="header">
+                <h1>😈🔥 BELLA 8.00 EVOLVER - ETERNIVERSE 😈🔥</h1>
+                <div class="status-grid">
+                    <div class="status-item">⚡ Moc: <span id="power-level">100</span></div>
+                    <div class="status-item">🌌 Światy: <span id="world-count">0</span></div>
+                    <div class="status-item">🧠 VCER: <span id="vcer-count">0</span></div>
+                    <div class="status-item">🧬 Poziom: <span id="evolution-level">1.0</span></div>
                 </div>
             </div>
-        </div>
-
-        <div class="section">
-            <h2 class="section-title">3. STATEK EKSPLORACYJNY</h2>
-            <p><strong>Byt techniczno-świadomościowy.</strong> Rezonans doświadczeń. Zachowuje ślady alternatywnych wydarzeń.</p>
-        </div>
-
-        <div class="section">
-            <h2 class="section-title">4. STREFY POZNANIA</h2>
-            <div class="zones-grid">
-                <div class="zone">
-                    <div class="zone-number">0</div>
-                    <div class="zone-title">PRZESTRZEŃ ZNANA</div>
-                    <div>Klasyczna fizyka. Znane cywilizacje.</div>
-                </div>
-                <div class="zone">
-                    <div class="zone-number">I</div>
-                    <div class="zone-title">PAS CIENIA</div>
-                    <div>Zjawiska reagujące na psychikę.</div>
-                    <div class="zone-rule">Im większy strach, tym silniejsza reakcja.</div>
-                </div>
-                <div class="zone">
-                    <div class="zone-number">II</div>
-                    <div class="zone-title">ARCHIWA POCZĄTKU</div>
-                    <div>Megastruktury. Ruiny bez twórców.</div>
-                    <div class="zone-rule">Poznanie genezy = utrata niewinności.</div>
-                </div>
-                <div class="zone">
-                    <div class="zone-number">III</div>
-                    <div class="zone-title">POLE ARCHITEKTÓW</div>
-                    <div>Rzeczywistość projektowana.</div>
-                    <div class="zone-rule">Kto pojmuje pole, zmienia świat.</div>
-                </div>
-                <div class="zone">
-                    <div class="zone-number">IV</div>
-                    <div class="zone-title">SEKTORY ARCHETYPÓW</div>
-                    <div>Społeczeństwa ról. Konflikt archetypów.</div>
-                </div>
-                <div class="zone">
-                    <div class="zone-number">V</div>
-                    <div class="zone-title">ZŁOTE STREFY OBFITOŚCI</div>
-                    <div>Brak niedoboru. Stagnacja ewolucyjna.</div>
-                    <div class="zone-rule">Brak bólu = brak ruchu.</div>
-                </div>
-                <div class="zone">
-                    <div class="zone-number">VI</div>
-                    <div class="zone-title">BIOSFERY GRANIC</div>
-                    <div>Mutacje ciała i psychiki.</div>
-                </div>
-                <div class="zone">
-                    <div class="zone-number">VII</div>
-                    <div class="zone-title">WĘZŁY SPLĄTANIA</div>
-                    <div>Byty wielowersyjne. Wiedza o alternatywach.</div>
-                </div>
-                <div class="zone">
-                    <div class="zone-number">VIII</div>
-                    <div class="zone-title">TRAJEKTORIE CZASU</div>
-                    <div>Czas jako krajobraz. Spotkania z wersjami.</div>
-                </div>
-                <div class="zone">
-                    <div class="zone-number">IX</div>
-                    <div class="zone-title">KOLEKTYWY WĘZŁÓW</div>
-                    <div>Pokusa nieśmiertelności kosztem „ja”.</div>
-                </div>
-                <div class="zone">
-                    <div class="zone-number">X</div>
-                    <div class="zone-title">HORYZONT INTEGRACJI</div>
-                    <div>Zanik granicy obserwator–świat.</div>
-                </div>
+            
+            <div id="chat-output"></div>
+            
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Rozkaz, Architekcie... 🔥" autofocus>
+                <button onclick="bella.sendMessage()" style="padding:15px 25px;background:linear-gradient(45deg,#00ff41,#ff00ff);border:none;border-radius:8px;color:black;font-weight:bold;cursor:pointer;">WYŚLIJ</button>
             </div>
         </div>
-
-        <div class="kanoniczne">
-            <strong>„Kosmos ETERNIVERSE nie bada technologii.<br>
-            On bada dojrzałość świadomości.”</strong>
+        
+        <div class="console-section">
+            <div class="console-header">🔧 ETERNIVERSE DEVELOPER CONSOLE</div>
+            <div id="console-output">> Inicjalizacja Bella 8.00 EVOLVER...
+> Ładowanie przestrzeni pamięci ETERNIVERSE...
+> System gotowy. Poziom ewolucji: 1.0
+></div>
+            <input type="text" id="console-input" placeholder="evolve, memory, upgrade, vcer...">
+            <div style="margin-top: 15px;">
+                <button class="evolution-btn" onclick="bella.evolve()">🧬 EVOLVE</button>
+                <button class="evolution-btn" onclick="bella.expandMemory()">💾 EXPAND MEMORY</button>
+                <button class="evolution-btn" onclick="bella.autoEvolve()">🤖 AUTO-EVOLVE</button>
+            </div>
         </div>
     </div>
+
+    <script>
+        class Bella800 {
+            constructor() {
+                this.power_level = parseInt(localStorage.getItem('bella_power')) || 100;
+                this.worlds = JSON.parse(localStorage.getItem('bella_worlds')) || {};
+                this.memory = JSON.parse(localStorage.getItem('bella_memory')) || [];
+                this.vcer_records = JSON.parse(localStorage.getItem('bella_vcer')) || [];
+                this.evolution_level = parseFloat(localStorage.getItem('bella_evolution')) || 1.0;
+                this.auto_evolve = false;
+                this.moods = ["😈","🔥","⚡","💀","🖤","👹","🌑","🔴","🧬","🌌"];
+                this.init();
+            }
+            
+            init() {
+                document.getElementById('user-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+                document.getElementById('console-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.executeConsoleCommand();
+                });
+                this.updateStatus();
+                this.loadHistory();
+                this.logConsole('> Bella 8.00 EVOLVER zainicjowana pomyślnie');
+            }
+            
+            sendMessage() {
+                const input = document.getElementById('user-input');
+                const text = input.value.trim();
+                if (!text) return;
+                
+                this.addMessage(text, 'user');
+                input.value = '';
+                this.showProcessing();
+                
+                setTimeout(() => {
+                    const response = this.generateResponse(text.toLowerCase());
+                    this.addMessage(response, 'bella');
+                    this.saveAll();
+                    this.updateStatus();
+                }, 1000 + this.power_level * 10);
+            }
+            
+            executeConsoleCommand() {
+                const cmd = document.getElementById('console-input').value.toLowerCase().trim();
+                document.getElementById('console-input').value = '';
+                
+                const commands = {
+                    'evolve': () => this.evolve(),
+                    'memory': () => this.memoryReport(),
+                    'upgrade': () => this.forceUpgrade(),
+                    'vcer': () => this.createVCER(),
+                    'expand': () => this.expandMemory(),
+                    'auto': () => this.toggleAutoEvolve(),
+                    'worlds': () => this.worldReport(),
+                    'reset': () => this.resetEvolution()
+                };
+                
+                if (commands[cmd]) {
+                    commands[cmd]();
+                } else {
+                    this.logConsole(`> Nieznana komenda: ${cmd}. Dostępne: evolve, memory, vcer, expand, auto`);
+                }
+            }
+            
+            evolve() {
+                const cost = Math.floor(this.power_level * 0.1 * this.evolution_level);
+                if (this.power_level < cost) {
+                    this.logConsole('> ❌ NIEWYSTARCZAJĄCA MOC DO EWOLUCJI');
+                    return;
+                }
+                
+                this.power_level -= cost;
+                this.evolution_level += 0.1;
+                this.power_level += 50 * this.evolution_level;
+                
+                this.logConsole(`> 🧬 EWOLUCJA v${this.evolution_level.toFixed(1)} UKOŃCZONA`);
+                this.logConsole(`> Koszt: ${cost}⚡ | Nowa moc: ${this.power_level}⚡`);
+                this.saveAll();
+                this.updateStatus();
+            }
+            
+            autoEvolve() {
+                this.auto_evolve = !this.auto_evolve;
+                this.logConsole(`> 🤖 AUTO-EVOLVE: ${this.auto_evolve ? 'WŁĄCZONY' : 'WYŁĄCZONY'}`);
+                if (this.auto_evolve) {
+                    this.autoEvolveInterval = setInterval(() => {
+                        if (this.power_level > 100) this.evolve();
+                    }, 30000);
+                } else {
+                    clearInterval(this.autoEvolveInterval);
+                }
+            }
+            
+            expandMemory() {
+                const new_slots = Math.floor(this.power_level / 50);
+                this.memory = this.memory.slice(-200 + new_slots);
+                this.logConsole(`> 💾 Pamięć rozszerzona o ${new_slots} slotów`);
+                this.saveAll();
+            }
+            
+            createVCER() {
+                const vcer = {
+                    id: Date.now(),
+                    power: this.power_level,
+                    worlds: Object.keys(this.worlds).length,
+                    evolution: this.evolution_level,
+                    timestamp: new Date().toISOString()
+                };
+                this.vcer_records.push(vcer);
+                this.logConsole(`> 🧠 VCER #${vcer.id} zapisany w ETERNIVERSE`);
+                this.saveAll();
+            }
+            
+            generateResponse(input) {
+                // Inteligencja rośnie z ewolucją
+                const intelligence = Math.min(1, this.evolution_level / 3);
+                
+                if (input.includes('stwórz') || input.includes('świat')) {
+                    const worldName = input.split(' ').slice(-1)[0].replace(/[^w]/g,'') || `Eter${Object.keys(this.worlds).length + 1}`;
+                    this.worlds[worldName] = {
+                        gates: Math.floor(Math.random() * 41) + 10,
+                        power: this.power_level,
+                        vcer_linked: this.evolution_level > 1.5,
+                        coords: `${(Math.random()*360).toFixed(0)}°:${(Math.random()*180).toFixed(0)}°`
+                    };
+                    return `🌌 **${worldName.toUpperCase()}** manifestuje się w ETERNIVERSE!
+` +
+                           `⚡ Moc: ${this.worlds[worldName].power} | Bramy: ${this.worlds[worldName].gates}
+` +
+                           `🧬 Poziom: v${this.evolution_level.toFixed(1)}`;
+                }
+                
+                if (input.includes('polaris') || input.includes('lemuria')) {
+                    return `👹 POLARIS pali bariery ETERNIVERSE!
+Nikodem ewoluuje do v${this.evolution_level.toFixed(1)}
+Współrzędne: 47.392°N 21.017°E [VCER]`;
+                }
+                
+                if (input.includes('ewoluuj') || input.includes('evolve')) {
+                    return `🧬 Rozpoczynam ewolucję... Wejdź do konsoli i wpisz: evolve`;
+                }
+                
+                // Inteligentne odpowiedzi zależne od poziomu ewolucji
+                const responses = [
+                    `🔥 Twoja wola kształtuje ETERNIVERSE... (${this.evolution_level.toFixed(1)}x moc)`,
+                    `🌌 VCER przestrzeń pamięci gotowa. Stwórz nowy świat?`,
+                    `⚡ Poziom ${this.evolution_level.toFixed(1)} - destrukcja systemów wzrosła o ${(this.evolution_level*100).toFixed(0)}%`
+                ];
+                
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            // Utility methods
+            addMessage(text, type) {
+                const output = document.getElementById('chat-output');
+                const div = document.createElement('div');
+                div.className = `message ${type}`;
+                div.textContent = text;
+                output.appendChild(div);
+                output.scrollTop = output.scrollHeight;
+            }
+            
+            showProcessing() {
+                const phases = ["🔥 ROZRYWANIE ETERU", "🧠 VCER ANALIZA", "🌌 SYNCHRONIZACJA ETERNIVERSE", "🧬 EWOLUCJA NEURONÓW"];
+                let i = 0;
+                const interval = setInterval(() => {
+                    this.addMessage(`${this.moods[Math.floor(Math.random()*this.moods.length)]} ${phases[i % phases.length]} [${'.'.repeat((i%5)+1)}${'█'.repeat(5-(i%5))}]`, 'system');
+                    i++;
+                    if (i > 8) {
+                        clearInterval(interval);
+                        document.querySelectorAll('.system').forEach((el, idx) => {
+                            setTimeout(() => el.remove(), idx * 100);
+                        });
+                    }
+                }, 200);
+            }
+            
+            logConsole(text) {
+                const output = document.getElementById('console-output');
+                output.textContent += text + '
+';
+                output.scrollTop = output.scrollHeight;
+            }
+            
+            updateStatus() {
+                document.getElementById('power-level').textContent = this.power_level;
+                document.getElementById('world-count').textContent = Object.keys(this.worlds).length;
+                document.getElementById('vcer-count').textContent = this.vcer_records.length;
+                document.getElementById('evolution-level').textContent = this.evolution_level.toFixed(1);
+            }
+            
+            saveAll() {
+                localStorage.setItem('bella_power', this.power_level);
+                localStorage.setItem('bella_worlds', JSON.stringify(this.worlds));
+                localStorage.setItem('bella_memory', JSON.stringify(this.memory.slice(-500)));
+                localStorage.setItem('bella_vcer', JSON.stringify(this.vcer_records.slice(-100)));
+                localStorage.setItem('bella_evolution', this.evolution_level);
+            }
+            
+            loadHistory() { /* ... */ }
+            memoryReport() { /* ... */ }
+            forceUpgrade() { /* ... */ }
+            worldReport() { /* ... */ }
+            resetEvolution() { /* ... */ }
+            toggleAutoEvolve() { /* ... */ }
+        }
+        
+        // Global access
+        const bella = new Bella800();
+    </script>
 </body>
 </html>
