@@ -1,113 +1,116 @@
 generateBellaSuggestions(element) {
-  const text = element?.content || '';
+  const text = element?.content?.trim() || '';
   const lowerText = text.toLowerCase();
   const type = element?.type || 'Fragment';
   const profile = this.currentProfile || 'wattpad';
 
-  const suggestions = [];
+  const suggestions = new Set(); // Set zapewnia brak duplikatów
 
-  // === 1. ANALIZA PODSTAWOWA ===
+  // === PODSTAWOWA ANALIZA TEKSTU ===
   const wordCount = this.wordCount(text);
-  const paragraphCount = text
+  const paragraphs = text
     .split(/\n\s*\n/)
-    .filter(p => p.trim().length > 0).length;
+    .filter(p => p.trim().length > 0);
+  const paragraphCount = paragraphs.length;
+  const hasDialogues = /["„”][^"„”']{10,}["„”]/.test(text); // dialogi dłuższe niż 10 znaków
 
-  const hasDialogues = /(["„”'][^"„”']+["„”'])/.test(text);
-
-  // Długość
+  // Długość treści
   if (wordCount < 300) {
-    suggestions.push('Rozwiń treść – dłuższe fragmenty zwiększają immersję i zasięg');
+    suggestions.add('Rozwiń treść – dłuższe fragmenty zwiększają immersję i zasięg na platformie.');
   } else if (wordCount > 3000 && ['Rozdział', 'Podrozdział'].includes(type)) {
-    suggestions.push('Rozważ podział na mniejsze podrozdziały – poprawi czytelność');
+    suggestions.add('Rozważ podział na mniejsze podrozdziały – poprawi czytelność i retencję czytelnika.');
   }
 
-  // Akapity
+  // Struktura akapitowa
   if (paragraphCount < 4) {
-    suggestions.push('Dodaj więcej akapitów – każdy nowy impuls myślowy w osobnym bloku');
+    suggestions.add('Dodaj więcej akapitów – każdy nowy impuls myślowy lub zmiana perspektywy w osobnym bloku.');
   } else if (paragraphCount > 20) {
-    suggestions.push('Zbyt wiele krótkich akapitów – połącz część z nich dla lepszego rytmu');
+    suggestions.add('Zbyt wiele krótkich akapitów – połącz część z nich, aby uzyskać lepszy rytm narracji.');
   }
 
   // Dialogi
   if (!hasDialogues && ['Rozdział', 'Podrozdział', 'Fragment'].includes(type)) {
-    suggestions.push('Wprowadź dialogi – ożywiają narrację i relacje między postaciami');
+    suggestions.add('Wprowadź dialogi – ożywiają postaci i dynamizują narrację.');
   }
 
-  // === 2. PROFIL WATTPAD ===
+  // === PROFIL WATTPAD ===
   if (profile === 'wattpad') {
     const emotionKeywords = [
-      'miłość','strach','radość','smutek','gniew','nadzieja','przerażenie',
-      'samotność','euforia','rozpacz','pożądanie','ból','szczęście','żal'
+      'miłość', 'strach', 'radość', 'smutek', 'gniew', 'nadzieja', 'przerażenie',
+      'samotność', 'euforia', 'rozpacz', 'pożądanie', 'ból', 'szczęście', 'żal', 'tęsknota'
     ];
     const emotionHits = emotionKeywords.filter(w => lowerText.includes(w)).length;
 
     if (emotionHits < 4) {
-      suggestions.push('Wzmocnij emocje – Wattpad reaguje na intensywność uczuć');
+      suggestions.add('Wzmocnij warstwę emocjonalną – Wattpad premiuje intensywność uczuć i relacje postaci.');
     }
 
     const sensoryWords = [
-      'zapach','dotyk','smak','dźwięk','widok','chłód','ciepło',
-      'drżenie','szept','krzyk'
+      'zapach', 'dotyk', 'smak', 'dźwięk', 'widok', 'chłód', 'ciepło',
+      'drżenie', 'szept', 'krzyk', 'szum', 'blask', 'mrok'
     ];
     const sensoryHits = sensoryWords.filter(w => lowerText.includes(w)).length;
 
     if (sensoryHits < 3) {
-      suggestions.push('Dodaj opisy sensoryczne – czytelnik musi „wejść” w scenę');
+      suggestions.add('Dodaj więcej opisów sensorycznych – czytelnik musi fizycznie „wejść” w scenę.');
     }
 
-    if (!/(nagle|wtedy|w tym momencie|zrozumiał|nie wiedziała|coś się zmieniło)/i.test(text)) {
-      suggestions.push('Zakończ fragment cliffhangerem – zatrzymaj czytelnika na granicy');
+    const cliffhangerPatterns = /(nagle|wtedy|w tym momencie|zrozumiał|nie wiedziała|coś się zmieniło|drzwi się otworzyły|telefon zadzwonił)/i;
+    if (!cliffhangerPatterns.test(text)) {
+      suggestions.add('Zakończ fragment cliffhangerem lub otwartym pytaniem – zwiększy chęć przejścia do kolejnego rozdziału.');
     }
   }
 
-  // === 3. PROFIL AMAZON ===
+  // === PROFIL AMAZON / SPRZEDAŻ ===
   if (profile === 'amazon') {
     const powerWords = [
-      'rewolucyjny','ekskluzywny','najlepszy','unikalny','limitowany',
-      'premium','bestseller','nr 1','niepowtarzalny','wyjątkowy'
+      'rewolucyjny', 'ekskluzywny', 'najlepszy', 'unikalny', 'limitowany',
+      'premium', 'bestseller', 'nr 1', 'niepowtarzalny', 'wyjątkowy', 'autentyczny'
     ];
     const powerHits = powerWords.filter(w => lowerText.includes(w)).length;
 
     if (powerHits < 2) {
-      suggestions.push('Dodaj słowa mocy (bestseller, premium, unikalny) – budują wartość');
+      suggestions.add('Wpleć słowa mocy (np. „bestseller”, „unikalny”, „rewolucyjny”) – budują postrzeganą wartość produktu.');
     }
 
     const trustWords = [
-      'gwarancja','satysfakcja','darmowa wysyłka','zwrot','bezpieczny','polecany'
+      'gwarancja', 'satysfakcja', 'zwrot', 'bezpieczny', 'polecany', 'sprawdzony', 'recenzje'
     ];
     const trustHits = trustWords.filter(w => lowerText.includes(w)).length;
 
     if (trustHits === 0) {
-      suggestions.push('Dodaj elementy zaufania (gwarancja, satysfakcja, bezpieczeństwo)');
+      suggestions.add('Dodaj elementy budujące zaufanie (gwarancja satysfakcji, zwrot, opinie czytelników).');
     }
 
-    if (!/(zamów|kup|teraz|dziś|nie czekaj|tylko teraz)/i.test(lowerText)) {
-      suggestions.push('Dodaj wyraźne CTA – bez wezwania do działania tekst nie sprzedaje');
+    const ctaPatterns = /(zamów|kup|teraz|dziś|nie czekaj|tylko teraz|ograniczona oferta)/i;
+    if (!ctaPatterns.test(text)) {
+      suggestions.add('Wstaw wyraźne wezwanie do działania (CTA) – bez niego opis nie konwertuje na sprzedaż.');
     }
   }
 
-  // === 4. SPECYFIKA TYPU ELEMENTU ===
+  // === SPECYFIKA TYPU ELEMENTU ===
   if (['Uniwersum', 'Świat'].includes(type)) {
-    if (!/(historia|chronologia|geneza)/i.test(lowerText)) {
-      suggestions.push('Dodaj chronologię lub genezę świata – porządkuje kanon');
+    if (!/(historia|chronologia|geneza|timeline)/i.test(lowerText)) {
+      suggestions.add('Dodaj chronologię lub genezę świata – uporządkuje kanon i ułatwi orientację czytelnikowi.');
     }
-    if (!/(magia|technologia|system)/i.test(lowerText)) {
-      suggestions.push('Opisz system świata (magia / technologia / zasady)');
+    if (!/(magia|technologia|system|zasady|reguły|prawa)/i.test(lowerText)) {
+      suggestions.add('Opisz system świata (magia, technologia, reguły pola) – czytelnik potrzebuje jasnych zasad.');
     }
   }
 
   if (type === 'Tom') {
-    suggestions.push('Dodaj teaser kolejnego tomu lub streszczenie osi narracyjnej');
+    suggestions.add('Dodaj teaser kolejnego tomu lub streszczenie głównej osi narracyjnej serii.');
   }
 
-  // === 5. BRAK UWAG ===
-  if (suggestions.length === 0) {
-    suggestions.push('Tekst jest spójny i dopracowany – brak istotnych uwag redakcyjnych');
+  // === BRAK UWAG ===
+  if (suggestions.size === 0) {
+    suggestions.add('Tekst jest spójny, dobrze zbalansowany i dopracowany – brak istotnych uwag redakcyjnych.');
   }
 
-  return [...new Set(suggestions)];
+  return Array.from(suggestions);
 },
 
 wordCount(text = '') {
-  return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+  if (!text) return 0;
+  return text.trim().split(/\s+/).filter(word => word.length > 0).length;
 }
