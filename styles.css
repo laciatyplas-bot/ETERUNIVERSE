@@ -1,382 +1,346 @@
-/* ========================================
-   Eterniverse - Bella Author Mode + Asystent Redakcyjny
-   Pełny plik CSS - Dark Theme z animacjami
-   ======================================== */
+/* styles.css – Master Edition dla ETERNIVERSE Mapa (2026) */
 
-/* === ZMIENNE CSS === */
 :root {
-  /* Kolory */
-  --bg-primary: #121212;
-  --bg-secondary: #1e1e1e;
-  --bg-panel: #222222;
-  --bg-hover: #333333;
-  --bg-active: #4a5568;
-  --bg-selected: #4a90e2;
-  
-  /* Tekst */
-  --text-primary: #eeeeee;
-  --text-secondary: #bbbbbb;
-  --text-muted: #888888;
-  --text-selected: #000000;
-  
-  /* Akcenty */
-  --accent: #4a90e2;
-  --accent-hover: #5aa0f2;
-  --accent-active: #357abd;
-  
-  /* Statusy */
-  --success: #50c878;
-  --success-hover: #45b06a;
-  --warning: #f39c12;
-  --warning-hover: #e67e22;
-  --danger: #e74c3c;
-  --danger-hover: #c0392b;
-  
-  /* Obramowania i cienie */
-  --border: #333333;
-  --border-light: #444444;
-  --shadow: 0 4px 12px rgba(0,0,0,0.4);
-  --shadow-hover: 0 12px 32px rgba(0,0,0,0.6);
-  --glow: 0 0 20px rgba(74, 144, 226, 0.3);
-  
-  /* Czas animacji */
-  --transition-fast: 0.2s ease;
-  --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 0.6s ease;
+  --bg: #050814;
+  --card: #0A1727;
+  --card-soft: #0D1C30;
+  --text: #E9F4FF;
+  --muted: #9BA9C8;
+  --border: #20324A;
+  --gold: #D9A441;
+  --teal: #28D3C6;
+  --green: #12C65B;
+  --orange: #FFB14B;
+  --red: #FF6B6B;
+  --purple: #9B6BFF;
+  --gray: #8B8FA0;
 }
 
-/* === RESET I PODSTAWY === */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
-  height: 100%;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+body {
+  background: radial-gradient(circle at top, #15223A 0%, #050814 55%, #01030A 100%);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+}
+
+.wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 16px 40px;
+}
+
+header {
+  margin-bottom: 24px;
+}
+
+h1 {
+  font-size: 32px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  margin-top: 8px;
+  color: var(--muted);
   font-size: 14px;
-  line-height: 1.6;
-  overflow: hidden;
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  text-align: center;
 }
 
-/* === ANIMACJE === */
-@keyframes fadeIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(20px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
-}
-
-@keyframes fadeInScale {
-  from { 
-    opacity: 0; 
-    transform: translateY(30px) scale(0.95); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0) scale(1); 
-  }
-}
-
-@keyframes pulseGlow {
-  0%, 100% { 
-    box-shadow: 0 0 10px rgba(74, 144, 226, 0.3); 
-  }
-  50% { 
-    box-shadow: 0 0 30px rgba(74, 144, 226, 0.6); 
-  }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-
-/* === GŁÓWNY KONTENER === */
-.app-container {
+.toolbar {
   display: flex;
-  flex-direction: row;
-  height: 100vh;
-  animation: fadeIn 0.8s ease-out;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+  align-items: center;
+  justify-content: center;
 }
 
-/* === PANEL UNIWERSUM === */
-.universe-panel {
-  width: 340px;
-  min-width: 340px;
-  background: var(--bg-secondary);
-  border-right: 2px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  transition: var(--transition);
-}
-
-.panel-header {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin: 1.5rem 1.5rem 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid var(--accent);
-  color: var(--accent);
+.search {
+  flex: 1 1 220px;
   position: relative;
 }
 
-.panel-header::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 60px;
-  height: 4px;
-  background: var(--accent);
-  border-radius: 2px;
-  animation: pulseGlow 3s infinite;
-}
-
-#universeList {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0 1rem;
-}
-
-/* === HIERARCHIA Z ANIMACJAMI === */
-.hierarchy {
-  list-style: none;
-}
-
-.hierarchy li {
-  padding: 0.9rem 1.2rem;
-  margin: 0.4rem 0;
+.search input {
+  width: 100%;
+  padding: 9px 12px;
   border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #050B16;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.toolbar select,
+.toolbar button {
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 9px 12px;
+  font-size: 13px;
+  background: #050B16;
+  color: var(--text);
   cursor: pointer;
-  transition: all var(--transition);
-  position: relative;
-  border-left: 4px solid transparent;
-  animation: fadeInScale 0.5s ease-out forwards;
-  opacity: 0;
-  animation-delay: calc(var(--order) * 0.05s);
 }
 
-.hierarchy li:hover {
-  background: var(--bg-hover);
-  transform: translateX(12px) scale(1.02);
-  border-left-color: var(--accent);
-  box-shadow: var(--shadow-hover);
+.toolbar button.main {
+  background: var(--gold);
+  color: #02030A;
+  font-weight: 700;
+  border: none;
 }
 
-.hierarchy li.selected {
-  background: linear-gradient(135deg, var(--bg-selected), #3a7bc8);
-  color: var(--text-selected);
-  border-left-color: #ffffff;
-  box-shadow: var(--glow);
-  transform: scale(1.03);
-  animation: pulseGlow 2s infinite;
+.toolbar button.main:hover {
+  filter: brightness(1.03);
 }
 
-.hierarchy li > ul {
-  margin-left: 1.5rem;
-  margin-top: 0.75rem;
-  border-left: 2px dashed var(--accent);
-  padding-left: 1.2rem;
-  opacity: 0.9;
-}
-
-/* === MAPA BRAM – GWIAZDOWE KARTY Z ANIMACJAMI === */
-#mapa-grid {
+.grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-  padding: 1rem;
-  overflow-y: auto;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-top: 20px;
 }
 
 .brama-card {
-  background: linear-gradient(145deg, #1a1a2a, #252540);
-  border: 1px solid var(--border-light);
-  border-radius: 16px;
-  padding: 1.5rem;
-  cursor: pointer;
-  transition: all var(--transition-slow);
-  position: relative;
-  overflow: hidden;
-  animation: fadeInScale 0.6s ease-out forwards;
-  opacity: 0;
-  animation-delay: calc(var(--order) * 0.1s);
-  box-shadow: var(--shadow);
+  background: var(--card);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 14px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
 }
 
-.brama-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(74,144,226,0.1), transparent);
-  transition: left 0.8s ease;
+.brama-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
 }
 
-.brama-card:hover::before {
-  left: 100%;
-}
-
-.brama-card:hover {
-  transform: translateY(-16px) scale(1.05);
-  border-color: var(--accent);
-  box-shadow: 0 20px 50px rgba(74, 144, 226, 0.4);
-  animation: float 4s ease-in-out infinite;
-}
-
-.brama-card .brama-name {
-  font-size: 1.3rem;
+.brama-title {
+  font-size: 14px;
   font-weight: 700;
-  color: var(--accent);
-  margin-bottom: 1rem;
-  text-shadow: 0 0 12px rgba(74,144,226,0.4);
-  transition: var(--transition);
 }
 
-.brama-card:hover .brama-name {
-  color: #ffffff;
-  text-shadow: 0 0 20px rgba(74,144,226,0.8);
-  transform: scale(1.05);
+.brama-sub {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-top: 4px;
 }
 
-.brama-card .brama-books {
-  line-height: 1.7;
-  opacity: 0.9;
+.badge {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(217, 164, 65, 0.15);
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
 }
 
-.brama-card .brama-hint {
-  margin-top: 1.2rem;
-  font-style: italic;
-  opacity: 0.7;
-  text-align: center;
-  font-size: 0.9rem;
-  transition: var(--transition);
-}
-
-.brama-card:hover .brama-hint {
-  opacity: 1;
-  color: var(--accent);
-}
-
-/* === PRZYCISKI Z ANIMACJAMI === */
-button {
-  position: relative;
+.books {
+  margin-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
   overflow: hidden;
-  transition: all var(--transition);
 }
 
-button::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(255,255,255,0.2);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: width 0.6s ease, height 0.6s ease;
-  pointer-events: none;
-}
-
-button:active::after {
-  width: 300px;
-  height: 300px;
-}
-
-button.success:hover {
-  animation: pulseGlow 1.5s infinite;
-}
-
-button:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-hover);
-}
-
-/* === SUGESTIE Z ANIMACJAMI === */
-.suggestion {
-  background: rgba(74, 144, 226, 0.1);
-  border-left: 5px solid var(--accent);
-  padding: 1.2rem;
-  margin: 1rem 0;
+.book {
+  background: var(--card-soft);
   border-radius: 10px;
-  transition: all var(--transition);
-  animation: fadeIn 0.5s ease-out;
-  opacity: 0;
-  animation-fill-mode: forwards;
-  animation-delay: calc(var(--order) * 0.08s);
+  padding: 7px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  position: relative;
 }
 
-.suggestion:hover {
-  background: rgba(74, 144, 226, 0.2);
-  transform: translateX(12px);
-  box-shadow: var(--shadow);
-  border-left-width: 8px;
+.book:hover {
+  background: #0F2138;
+  border-color: rgba(217, 164, 65, 0.35);
+  transform: translateY(-1px);
 }
 
-/* === INNE ANIMACJE === */
-.element-meta, .output-box, .archive-box {
-  animation: fadeInScale 0.6s ease-out;
+.book-cover-thumb {
+  width: 28px;
+  height: 40px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background: #101624;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: var(--gray);
 }
 
-/* === SCROLLBARY Z ANIMACJAMI === */
-::-webkit-scrollbar {
-  width: 10px;
+.book-main {
+  flex: 1;
+  min-width: 0;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--bg-panel);
+.book-title {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-meta {
+  font-size: 10px;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.st-published { background: rgba(18, 198, 91, 0.2); color: var(--green); }
+.st-ready { background: rgba(217, 164, 65, 0.2); color: var(--gold); }
+.st-writing { background: rgba(40, 211, 198, 0.2); color: var(--teal); }
+.st-draft { background: rgba(255, 177, 75, 0.2); color: var(--orange); }
+.st-idea { background: rgba(139, 143, 160, 0.25); color: var(--gray); }
+
+.no-books {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 6px 4px 2px;
+}
+
+/* Modal dodawania księgi */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal {
+  background: #050B16;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  padding: 18px 18px 16px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.9);
+  font-size: 13px;
+}
+
+.modal h2 {
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+.modal-row {
+  margin-bottom: 8px;
+}
+
+.modal label {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+
+.modal input,
+.modal select {
+  width: 100%;
+  padding: 7px 9px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: #050B16;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.modal button {
+  border-radius: 999px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  cursor: pointer;
+  background: #050B16;
+  color: var(--text);
+}
+
+.modal button.primary {
+  background: var(--teal);
+  color: #020308;
+  border: none;
+  font-weight: 600;
+}
+
+/* Podgląd okładki */
+.cover-preview {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2100;
+}
+
+.cover-preview img {
+  max-width: 90vw;
+  max-height: 90vh;
   border-radius: 10px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--text-muted);
-  border-radius: 10px;
-  transition: var(--transition);
+.cover-preview-close {
+  position: fixed;
+  top: 14px;
+  right: 18px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #eee;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
-  box-shadow: 0 0 15px rgba(74,144,226,0.5);
-}
-
-/* === FOKUS === */
-*:focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 3px;
-  border-radius: 6px;
-  animation: pulseGlow 2s infinite;
-}
-
-/* === RESPONSYWNOŚĆ === */
-@media (max-width: 1024px) {
-  .universe-panel { width: 300px; min-width: 300px; }
-  #mapa-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-}
-
+/* Responsywność */
 @media (max-width: 768px) {
-  .app-container { flex-direction: column; }
-  .universe-panel { width: 100%; height: 260px; flex-direction: row; }
-  .controls { flex-direction: column; }
-  #mapa-grid { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 480px) {
-  header h1 { font-size: 1.8rem; }
-  .brama-card:hover { transform: translateY(-8px) scale(1.03); }
+  header { padding-top: 18px; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar button, .toolbar select { width: 100%; }
 }
