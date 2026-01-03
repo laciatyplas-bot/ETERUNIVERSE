@@ -1,4 +1,4 @@
-// dają.js — Eterniverse Master Premium PRO v14.2
+// engine.dictation.js — Eterniverse Master Premium PRO v14.2
 // PEŁNA, KOMPLETNA OBSŁUGA DYKTOWANIA GŁOSOWEGO (PL)
 // WKLEJ 1:1
 
