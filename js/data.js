@@ -9,11 +9,11 @@ class DataMaster {
     this.VERSION = 14.3;
 
     this.KEYS = {
-      STRUCTURE: 'eterniverse_structure_v14',
-      MAPA: 'eterniverse_mapa_v14',
+      STRUCTURE: 
+      MAPA: 
       PROFILE: 'eterniverse_profile_v14',
       SETTINGS: 'eterniverse_settings_v14',
-      DATA_VERSION: 'eterniverse_data_version'
+      DATA_VERSION: 
     };
 
     this.migrateData();
