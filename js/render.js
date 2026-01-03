@@ -1,87 +1,54 @@
-// render.js – Czysty silnik renderowania bram i ksiąg
+// render.js – Renderowanie z edycją
 
 function renderGates(data, container, filters = {}) {
-  const { search = '', gateId = null, status = null } = filters;
+  // ... (kod jak wcześniej)
 
-  container.innerHTML = '';
+  visibleBooks.forEach((book, bookIndex) => {
+    const bookEl = document.createElement('div');
+    bookEl.className = 'book';
 
-  data.forEach(brama => {
-    if (gateId !== null && brama.id !== gateId) return;
-
-    const card = document.createElement('article');
-    card.className = 'brama-card';
-
-    card.innerHTML = `
-      <div class="brama-header">
-        <div>
-          <div class="brama-title">${escapeHtml(brama.name)}</div>
-          <div class="brama-sub">${escapeHtml(brama.sub || '')}</div>
-        </div>
-        <span class="badge">${escapeHtml(brama.tag)}</span>
+    bookEl.innerHTML = `
+      <div class="book-cover-thumb" style="\( {book.cover ? `background-image:url(' \){book.cover}')` : ''}">
+        ${book.cover ? '' : 'okładka'}
       </div>
-      <div class="books"></div>
+      <div class="book-main">
+        <div class="book-title editable" data-gate="\( {brama.id}" data-index=" \){bookIndex}">${escapeHtml(book.title)}</div>
+        <div class="book-meta">
+          <span>${escapeHtml(book.status || 'idea')}</span>
+          <span class="status \( {getStatusClass(book.status)}"> \){(book.status || 'idea').toUpperCase()}</span>
+        </div>
+      </div>
+      <button class="book-edit-btn" data-gate="\( {brama.id}" data-index=" \){bookIndex}">✏️</button>
     `;
 
-    const booksWrap = card.querySelector('.books');
+    // Klik w tytuł → edycja
+    bookEl.querySelector('.book-title').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const gateId = Number(e.target.dataset.gate);
+      const index = Number(e.target.dataset.index);
+      openEditModal(gateId, index);
+    });
 
-    let visibleBooks = brama.books;
+    // Przycisk edycji
+    bookEl.querySelector('.book-edit-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const gateId = Number(e.target.dataset.gate);
+      const index = Number(e.target.dataset.index);
+      openEditModal(gateId, index);
+    });
 
-    // Filtr status
-    if (status) {
-      visibleBooks = visibleBooks.filter(book => book.status === status);
-    }
-
-    // Wyszukiwanie
-    if (search) {
-      visibleBooks = visibleBooks.filter(book =>
-        book.title.toLowerCase().includes(search)
-      );
-    }
-
-    if (visibleBooks.length === 0) {
-      booksWrap.innerHTML = '<div class="no-books">Brak tytułów pasujących do filtrów.</div>';
-    } else {
-      visibleBooks.forEach(book => {
-        const bookEl = document.createElement('div');
-        bookEl.className = 'book';
-
-        const coverStyle = book.cover ? `background-image:url('${book.cover}')` : '';
-        const coverText = book.cover ? '' : 'okładka';
-
-        bookEl.innerHTML = `
-          <div class="book-cover-thumb" style="\( {coverStyle}"> \){coverText}</div>
-          <div class="book-main">
-            <div class="book-title">${escapeHtml(book.title)}</div>
-            <div class="book-meta">
-              <span>${escapeHtml(book.status || 'idea')}</span>
-              <span class="status \( {getStatusClass(book.status)}"> \){(book.status || 'idea').toUpperCase()}</span>
-            </div>
-          </div>
-        `;
-
-        booksWrap.appendChild(bookEl);
+    // Podgląd okładki (bez zmian)
+    const thumb = bookEl.querySelector('.book-cover-thumb');
+    if (book.cover) {
+      thumb.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        coverImg.src = book.cover;
+        coverPreview.style.display = 'flex';
       });
     }
 
-    container.appendChild(card);
+    booksWrap.appendChild(bookEl);
   });
 }
 
-// Bezpieczeństwo HTML
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-// Klasa statusu (duplikat dla niezależności)
-function getStatusClass(status) {
-  const map = {
-    published: 'st-published',
-    ready: 'st-ready',
-    writing: 'st-writing',
-    draft: 'st-draft',
-    idea: 'st-idea'
-  };
-  return map[status] || 'st-idea';
-}
+// Dodatkowy styl przycisku edycji (dodaj do styles.css)
