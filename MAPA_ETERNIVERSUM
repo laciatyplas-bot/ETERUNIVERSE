@@ -1,5 +1,5 @@
 {
-  "MAPA_ETERNIVERSE": {
+  "MAPA_ETERNIVERSE": { 
     "titles": [
       { "id": 1, "title": "InterSeeker – Atlas Wewnętrzny", "hook": "Wejdź tam, gdzie nawet twoje myśli boją się wejść.", "pitch": "Podróż w głąb psyche, która rozbiera cię do kości i zmusza, byś zobaczył, kim naprawdę jesteś." },
       { "id": 2, "title": "ShadowSeeker – Anatomia Cienia", "hook": "Twój cień zna cię lepiej niż ty.", "pitch": "To, czego w sobie unikasz, jest kluczem do pełnej mocy." },
