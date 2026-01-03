@@ -7,7 +7,7 @@
 class DataMaster {
   constructor() {
     this.VERSION = 14.3;
-
+ 
     this.KEYS = {
       STRUCTURE: 'eterniverse_structure_v14',
       MAPA: 'eterniverse_mapa_v14',
