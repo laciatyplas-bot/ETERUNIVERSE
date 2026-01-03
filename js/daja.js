@@ -1,6 +1,6 @@
-// dają.js — Eterniverse Master Premium PRO v14.1
+// dają.js — Eterniverse Master Premium PRO v14.2
 // PEŁNA, KOMPLETNA OBSŁUGA DYKTOWANIA GŁOSOWEGO (PL)
-// WKLEJ 1:1 — NIE EDYTUJ
+// WKLEJ 1:1
 
 'use strict';
 
@@ -197,5 +197,5 @@ document.addEventListener('DOMContentLoaded', () => {
   window.master.startDictation = () => voice.start();
   window.master.stopDictation = () => voice.stop();
 
-  console.log('🎤 Dyktowanie głosowe (dają.js v14.1) załadowane i gotowe');
+  console.log('🎤 Dyktowanie głosowe (dają.js v14.2) załadowane i gotowe');
 });
