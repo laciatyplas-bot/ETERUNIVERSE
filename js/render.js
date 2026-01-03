@@ -1,59 +1,83 @@
-// render.js — Renderowanie z edycją (FIXED / MOBILE SAFE)
+// render.js — ETERNIVERSE ENGINE
+// Renderowanie Bram i Ksiąg (KANON / MOBILE SAFE)
+
+'use strict';
 
 function renderGates(data, container, filters = {}) {
-  const { search = '', gateId = null, status = null } = filters;
+  if (!container || !Array.isArray(data)) {
+    console.warn('[renderGates] Brak danych lub kontenera');
+    return;
+  }
+
+  const {
+    search = '',
+    gateId = null,
+    status = null
+  } = filters;
+
   container.innerHTML = '';
 
   data.forEach(brama => {
+    if (!brama || typeof brama !== 'object') return;
     if (gateId !== null && brama.id !== gateId) return;
 
     const card = document.createElement('article');
     card.className = 'brama-card';
+    card.dataset.gateId = brama.id;
 
     card.innerHTML = `
       <div class="brama-header">
         <div>
           <div class="brama-title">${escapeHtml(brama.name)}</div>
-          <div class="brama-sub">${escapeHtml(brama.sub)}</div>
+          <div class="brama-sub">${escapeHtml(brama.sub || '')}</div>
         </div>
-        <span class="badge">${escapeHtml(brama.tag || '')}</span>
+        ${brama.tag ? `<span class="badge">${escapeHtml(brama.tag)}</span>` : ''}
       </div>
       <div class="books"></div>
     `;
 
     const booksWrap = card.querySelector('.books');
 
-    let visibleBooks = brama.books || [];
+    let books = Array.isArray(brama.books) ? [...brama.books] : [];
 
+    // filtr statusu
     if (status && status !== 'all') {
-      visibleBooks = visibleBooks.filter(b => b.status === status);
+      books = books.filter(b => b.status === status);
     }
 
+    // filtr tekstowy
     if (search) {
       const q = search.toLowerCase();
-      visibleBooks = visibleBooks.filter(b =>
+      books = books.filter(b =>
         (b.title || '').toLowerCase().includes(q)
       );
     }
 
-    visibleBooks.forEach((book, bookIndex) => {
+    if (books.length === 0) {
+      booksWrap.innerHTML = `
+        <div class="no-books">Brak pozycji w tej Bramie</div>
+      `;
+    }
+
+    books.forEach((book, bookIndex) => {
+      if (!book) return;
+
       const bookEl = document.createElement('div');
       bookEl.className = 'book';
+      bookEl.dataset.gateId = brama.id;
+      bookEl.dataset.bookIndex = bookIndex;
 
-      const coverStyle = book.cover
-        ? `style="background-image:url('${book.cover}')"`
-        : '';
+      const hasCover = Boolean(book.cover);
 
       bookEl.innerHTML = `
-        <div class="book-cover-thumb" ${coverStyle}>
-          ${book.cover ? '' : 'okładka'}
+        <div class="book-cover-thumb"
+             ${hasCover ? `style="background-image:url('${book.cover}')"` : ''}>
+          ${hasCover ? '' : 'okładka'}
         </div>
 
         <div class="book-main">
-          <div class="book-title editable"
-               data-gate="${brama.id}"
-               data-index="${bookIndex}">
-            ${escapeHtml(book.title)}
+          <div class="book-title">
+            ${escapeHtml(book.title || 'Bez tytułu')}
           </div>
 
           <div class="book-meta">
@@ -64,32 +88,33 @@ function renderGates(data, container, filters = {}) {
           </div>
         </div>
 
-        <button class="book-edit-btn"
-                data-gate="${brama.id}"
-                data-index="${bookIndex}">
-          ✏️
-        </button>
+        <button class="book-edit-btn" title="Edytuj">✏️</button>
       `;
 
-      // klik w tytuł
-      bookEl.querySelector('.book-title').addEventListener('click', e => {
-        e.stopPropagation();
-        openEditModal(Number(e.target.dataset.gate), Number(e.target.dataset.index));
-      });
+      // ===== EDYCJA =====
+      const editHandler = () => {
+        if (typeof openEditModal === 'function') {
+          openEditModal(brama.id, bookIndex);
+        } else {
+          console.warn('[renderGates] openEditModal nie istnieje');
+        }
+      };
 
-      // klik w ikonę
-      bookEl.querySelector('.book-edit-btn').addEventListener('click', e => {
-        e.stopPropagation();
-        openEditModal(Number(e.target.dataset.gate), Number(e.target.dataset.index));
-      });
+      bookEl.querySelector('.book-title')
+        .addEventListener('click', editHandler);
 
-      // podgląd okładki
-      const thumb = bookEl.querySelector('.book-cover-thumb');
-      if (book.cover) {
-        thumb.addEventListener('click', ev => {
-          ev.stopPropagation();
-          coverImg.src = book.cover;
-          coverPreview.style.display = 'flex';
+      bookEl.querySelector('.book-edit-btn')
+        .addEventListener('click', editHandler);
+
+      // ===== OKŁADKA =====
+      if (hasCover) {
+        const thumb = bookEl.querySelector('.book-cover-thumb');
+        thumb.addEventListener('click', e => {
+          e.stopPropagation();
+          if (window.coverImg && window.coverPreview) {
+            coverImg.src = book.cover;
+            coverPreview.style.display = 'flex';
+          }
         });
       }
 
@@ -100,7 +125,9 @@ function renderGates(data, container, filters = {}) {
   });
 }
 
-/* ===== HELPERS ===== */
+/* =========================
+   HELPERS — KANON
+========================= */
 
 function escapeHtml(text) {
   const div = document.createElement('div');
