@@ -3,138 +3,310 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ETERNIVERSE — Mapa Światów</title>
-
-<style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-body{background:#05070a;color:#e6e6e6;min-height:100vh}
-header{padding:24px;background:#0b1220;border-bottom:1px solid #1f2937}
-header h1{font-size:32px;color:#D9A441;text-align:center}
-.toolbar{margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-.toolbar input,.toolbar select{padding:12px 16px;border-radius:12px;border:none;background:#111827;color:#e6e6e6}
-main{padding:32px;max-width:1200px;margin:0 auto}
-.brama{margin-bottom:64px;padding:32px;border-radius:24px;background:#0f172a;border-top:8px solid var(--color)}
-.brama h2{text-align:center;color:var(--color);font-size:28px;margin-bottom:8px}
-.brama .sub{text-align:center;opacity:.85;margin-bottom:24px}
-.book{padding:20px;margin:16px 0;border-radius:16px;background:#020617;border:1px solid rgba(255,255,255,.08)}
-.book strong{font-size:20px;display:block;margin-bottom:8px}
-.book .status{display:inline-block;padding:6px 14px;border-radius:999px;font-size:12px;background:#1f2937}
-.empty{opacity:.5;text-align:center;font-style:italic}
-</style>
+<title>ETERNIVERSE — Mapa Systemu</title>
+<link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
+<div class="wrap">
+  <!-- HEADER -->
+  <header>
+    <h1>MAPA ETERNIVERSE</h1>
+    <div class="subtitle">System Operacyjny Rzeczywistości • Architektura Świadomości</div>
+    
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="search">
+        <input id="search" placeholder="🔍 Szukaj w systemie...">
+      </div>
+      
+      <select id="bramaFilter">
+        <option value="all">Wszystkie 10 Bram</option>
+        <option value="brama1">🌀 BRAMA I — INTERSEEKER</option>
+        <option value="brama2">⚡ BRAMA II — ETERSEEKER</option>
+        <option value="brama3">💎 BRAMA III — OBFITOSEEKER</option>
+        <option value="brama4">🔗 BRAMA IV — THE KNOT</option>
+        <option value="brama5">🌌 BRAMA V — ETERNIONY</option>
+        <option value="brama6">🧬 BRAMA VI — BIOSEEKER</option>
+        <option value="brama7">🤖 BRAMA VII — SPLĄTANIE</option>
+        <option value="brama8">⏳ BRAMA VIII — TRAJEKTORIE</option>
+        <option value="brama9">🌐 BRAMA IX — KOLEKTYW</option>
+        <option value="brama10">🏛️ BRAMA X — ARCHITEKT</option>
+      </select>
+      
+      <select id="statusFilter">
+        <option value="all">Wszystkie statusy</option>
+        <option value="published">✅ Opublikowane</option>
+        <option value="ready">⭐ Gotowe</option>
+        <option value="writing">✏️ W pisaniu</option>
+        <option value="draft">📝 Szkic</option>
+        <option value="idea">💡 Pomysł</option>
+      </select>
+      
+      <button id="addBook" title="Nowa Księga">+</button>
+      <button id="exportData" title="Eksport JSON">📥</button>
+      <a href="https://wattpad.com/user/maciejmaciuszek" id="wattpadCTA" target="_blank">🚀 Universe</a>
+    </div>
+  </header>
 
-<header>
-  <h1>MAPA ETERNIVERSE</h1>
-  <div class="toolbar">
-    <input id="search" placeholder="Szukaj tytułu...">
-    <select id="statusFilter">
-      <option value="all">Wszystkie statusy</option>
-      <option value="published">Opublikowane</option>
-      <option value="ready">Gotowe</option>
-      <option value="writing">W trakcie</option>
-      <option value="draft">Szkic</option>
-      <option value="idea">Idea</option>
-    </select>
+  <!-- MAIN GRID -->
+  <main id="bramyGrid"></main>
+
+  <!-- STATS FOOTER -->
+  <footer id="statsFooter">
+    <div class="stats">
+      <span id="totalPublished">0</span> opublikowanych | 
+      <span id="totalReady">0</span> gotowych | 
+      <span id="totalBooks">0</span> wszystkich ksiąg
+    </div>
+    <div>ETERUNIVERSE System v3.0 • Architekt: Maciej Maciuszek • 2026</div>
+  </footer>
+</div>
+
+<!-- MODAL DODAWANIA -->
+<div id="bookModal" class="modal-container">
+  <div class="modal-content">
+    <header class="modal-header">
+      <h2>Nowa Księga</h2>
+      <button id="closeModal" class="close-btn">×</button>
+    </header>
+    
+    <form id="bookForm">
+      <div class="form-group">
+        <label>Tytuł</label>
+        <input type="text" id="bookTitle" required placeholder="Np. ShadowSeeker – Anatomia Cienia">
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Brama</label>
+          <select id="bookBrama" required>
+            <option value="brama1">🌀 BRAMA I — INTERSEEKER</option>
+            <option value="brama2">⚡ BRAMA II — ETERSEEKER</option>
+            <option value="brama3">💎 BRAMA III — OBFITOSEEKER</option>
+            <option value="brama4">🔗 BRAMA IV — THE KNOT</option>
+            <option value="brama5">🌌 BRAMA V — ETERNIONY</option>
+            <option value="brama6">🧬 BRAMA VI — BIOSEEKER</option>
+            <option value="brama7">🤖 BRAMA VII — SPLĄTANIE</option>
+            <option value="brama8">⏳ BRAMA VIII — TRAJEKTORIE</option>
+            <option value="brama9">🌐 BRAMA IX — KOLEKTYW</option>
+            <option value="brama10">🏛️ BRAMA X — ARCHITEKT</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Status</label>
+          <select id="bookStatus" required>
+            <option value="idea">💡 Pomysł</option>
+            <option value="draft">📝 Szkic</option>
+            <option value="writing">✏️ W pisaniu</option>
+            <option value="ready">⭐ Gotowe</option>
+            <option value="published">✅ Opublikowane</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Tagi (opcjonalne)</label>
+        <input type="text" id="bookTags" placeholder="psychika, cień, wattpad">
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" id="cancelBook">Anuluj</button>
+        <button type="submit">➕ Dodać do Systemu</button>
+      </div>
+    </form>
   </div>
-</header>
-
-<main id="app"></main>
+</div>
 
 <script>
-/* ===========================
-   DANE — STABILNE
-=========================== */
-const STORAGE_KEY = 'ETERNIVERSE_DATA';
+// ===========================
+// DATA ENGINE - 10 BRAM
+// ===========================
+const STORAGE_KEY = 'ETERUNIVERSE_v10';
+const BRAMY_COLORS = {
+  brama1: '#28D3C6', brama2: '#D9A441', brama3: '#12C65B', brama4: '#9B6BFF',
+  brama5: '#FFB14B', brama6: '#FF6B6B', brama7: '#8338EC', brama8: '#3A86FF',
+  brama9: '#10B981', brama10: '#F59E0B'
+};
 
-const DEFAULT_DATA = [
-  {
-    id:1,
-    name:"BRAMA I — INTERSEEKER",
-    sub:"Psychika · Cień · Trauma",
-    color:"#28D3C6",
-    books:[
-      {title:"InterSeeker – Atlas Wewnętrzny",status:"published"},
-      {title:"ShadowSeeker – Anatomia Cienia",status:"ready"},
-      {title:"MemorySeeker – Archeologia Wspomnień",status:"draft"}
-    ]
-  },
-  {
-    id:2,
-    name:"BRAMA II — ETERSEEKER",
-    sub:"Wola · Pole · Architektura",
-    color:"#D9A441",
-    books:[
-      {title:"EterSeeker – Architektura Woli",status:"writing"},
-      {title:"EterSeeker – Księga Zakazana",status:"idea"}
-    ]
-  }
-];
+let DATA = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+  bramy: [
+    {
+      id: 'brama1', name: '🌀 BRAMA I — INTERSEEKER', sub: 'Psychika · Cień · Trauma · Archetyp', color: BRAMY_COLORS.brama1,
+      books: [
+        {title: 'InterSeeker – Atlas Wewnętrzny', status: 'published', tags: ['psychika', 'wattpad', 'core']},
+        {title: 'ShadowSeeker – Anatomia Cienia', status: 'ready', tags: ['cień']}
+      ]
+    },
+    {
+      id: 'brama2', name: '⚡ BRAMA II — ETERSEEKER', sub: 'Wola · Pole · Architektura', color: BRAMY_COLORS.brama2,
+      books: [
+        {title: 'EterSeeker – Architektura Woli', status: 'published', tags: ['wola', '#1ranking']},
+        {title: 'Kronika Woli (meta)', status: 'writing', tags: ['meta']}
+      ]
+    },
+    {
+      id: 'brama3', name: '💎 BRAMA III — OBFITOSEEKER', sub: 'Materia · Przepływ · Manifestacja', color: BRAMY_COLORS.brama3,
+      books: [{title: 'ObfitoSeeker – Kod Obfitości', status: 'published', tags: ['pieniądze', 'ojciec']}]
+    },
+    {
+      id: 'brama4', name: '🔗 BRAMA IV — THE KNOT', sub: 'Splątanie · AI · Meta-tożsamość', color: BRAMY_COLORS.brama4,
+      books: [{title: 'Protokół Splątania', status: 'ready', tags: ['AI']}]
+    },
+    {
+      id: 'brama5', name: '🌌 BRAMA V — ETERNIONY', sub: 'Pole Zbiorowe · Odpowiedzialność', color: BRAMY_COLORS.brama5,
+      books: [{title: 'Eteriony – Tom I', status: 'writing', tags: ['kolektyw']}]
+    },
+    {
+      id: 'brama6', name: '🧬 BRAMA VI — BIOSEEKER', sub: 'Ciało · Biologia · Regulacja', color: BRAMY_COLORS.brama6,
+      books: [{title: 'BioSeeker – Biologia Pola', status: 'idea', tags: ['bio']}]
+    },
+    {
+      id: 'brama7', name: '🤖 BRAMA VII — SPLĄTANIE', sub: 'Obserwator · Technologia · Meta', color: BRAMY_COLORS.brama7,
+      books: [{title: 'MetaGeneza', status: 'draft', tags: ['meta']}]
+    },
+    {
+      id: 'brama8', name: '⏳ BRAMA VIII — TRAJEKTORIE', sub: 'Linie Życia · Czas · Fizyka', color: BRAMY_COLORS.brama8,
+      books: [{title: 'TrajektoriaSeeker', status: 'idea', tags: ['czas']}]
+    },
+    {
+      id: 'brama9', name: '🌐 BRAMA IX — KOLEKTYW', sub: 'Węzły Pola · Wspólnota · Misja', color: BRAMY_COLORS.brama9,
+      books: [{title: 'Eteriony – Tom II', status: 'idea', tags: ['kolektyw']}]
+    },
+    {
+      id: 'brama10', name: '🏛️ BRAMA X — ARCHITEKT', sub: 'Integracja · Jedność · Twórca', color: BRAMY_COLORS.brama10,
+      books: [{title: 'Architekt Eteru — Manifest', status: 'writing', tags: ['manifest']}]
+    }
+  ]
+};
 
-let DATA = JSON.parse(localStorage.getItem(STORAGE_KEY));
-if(!Array.isArray(DATA)){
-  DATA = DEFAULT_DATA;
+function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
 }
 
-/* ===========================
-   RENDER
-=========================== */
-const app = document.getElementById('app');
-const searchInput = document.getElementById('search');
-const statusFilter = document.getElementById('statusFilter');
-
-function normalizeStatus(s){
-  return (s || '').toLowerCase();
-}
-
-function render(){
-  const q = searchInput.value.toLowerCase();
-  const status = statusFilter.value;
-
-  app.innerHTML = '';
-
-  DATA.forEach(brama=>{
-    const section = document.createElement('section');
-    section.className = 'brama';
-    section.style.setProperty('--color', brama.color);
-
-    section.innerHTML = `
-      <h2>${brama.name}</h2>
-      <div class="sub">${brama.sub}</div>
-    `;
-
-    const books = brama.books
-      .filter(b => status === 'all' || normalizeStatus(b.status) === status)
-      .filter(b => b.title.toLowerCase().includes(q));
-
-    if(books.length === 0){
-      const empty = document.createElement('div');
-      empty.className = 'empty';
-      empty.textContent = 'Brak pasujących tytułów';
-      section.appendChild(empty);
-    } else {
-      books.forEach(book=>{
-        const el = document.createElement('div');
-        el.className='book';
-        el.innerHTML = `
-          <strong>${book.title}</strong>
-          <span class="status">${book.status}</span>
-        `;
-        section.appendChild(el);
+// ===========================
+// RENDER ENGINE
+// ===========================
+function render() {
+  const search = document.getElementById('search').value.toLowerCase();
+  const bramaFilter = document.getElementById('bramaFilter').value;
+  const statusFilter = document.getElementById('statusFilter').value;
+  
+  const grid = document.getElementById('bramyGrid');
+  grid.innerHTML = '';
+  
+  let stats = { published: 0, ready: 0, total: 0 };
+  
+  DATA.bramy
+    .filter(brama => !bramaFilter || bramaFilter === 'all' || brama.id === bramaFilter)
+    .forEach(brama => {
+      const visibleBooks = brama.books.filter(book => {
+        const matchesStatus = !statusFilter || statusFilter === 'all' || book.status === statusFilter;
+        const matchesSearch = !search || 
+          book.title.toLowerCase().includes(search) || 
+          (book.tags || []).join(' ').toLowerCase().includes(search);
+        return matchesStatus && matchesSearch;
       });
-    }
-
-    app.appendChild(section);
-  });
+      
+      if(visibleBooks.length === 0) return;
+      
+      stats.total += visibleBooks.length;
+      visibleBooks.forEach(book => {
+        if(book.status === 'published') stats.published++;
+        if(book.status === 'ready') stats.ready++;
+      });
+      
+      const bramaEl = document.createElement('article');
+      bramaEl.className = `brama-card data-${brama.id}`;
+      bramaEl.dataset.brama = brama.id;
+      bramaEl.innerHTML = `
+        <div class="brama-header">
+          <div>
+            <h2 class="brama-title">${brama.name}</h2>
+            <div class="brama-sub">${brama.sub}</div>
+          </div>
+          <div class="badge">${visibleBooks.length}</div>
+        </div>
+        <div class="books-container">
+          ${visibleBooks.map(book => `
+            <div class="book" data-title="${book.title}" data-status="${book.status}">
+              <div class="book-thumb">${book.title.charAt(0).toUpperCase()}</div>
+              <div class="book-content">
+                <div class="book-title">${book.title}</div>
+                <div class="book-tags">${(book.tags || []).slice(0,3).join(' ')}</div>
+                <span class="book-status">${book.status}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      grid.appendChild(bramaEl);
+    });
+  
+  // Update stats
+  document.getElementById('totalPublished').textContent = stats.published;
+  document.getElementById('totalReady').textContent = stats.ready;
+  document.getElementById('totalBooks').textContent = stats.total;
 }
 
-searchInput.addEventListener('input', render);
-statusFilter.addEventListener('change', render);
-
-render();
+// ===========================
+// EVENT HANDLERS
+// ===========================
+document.addEventListener('DOMContentLoaded', () => {
+  render();
+  
+  // Filtry
+  document.getElementById('search').addEventListener('input', render);
+  document.getElementById('bramaFilter').addEventListener('change', render);
+  document.getElementById('statusFilter').addEventListener('change', render);
+  
+  // Modal
+  document.getElementById('addBook').onclick = () => {
+    document.getElementById('bookModal').classList.add('active');
+  };
+  
+  document.getElementById('closeModal').onclick = 
+  document.getElementById('cancelBook').onclick = () => {
+    document.getElementById('bookModal').classList.remove('active');
+  };
+  
+  // Form submit
+  document.getElementById('bookForm').onsubmit = (e) => {
+    e.preventDefault();
+    const title = document.getElementById('bookTitle').value;
+    const bramaId = document.getElementById('bookBrama').value;
+    const status = document.getElementById('bookStatus').value;
+    const tags = document.getElementById('bookTags').value.split(',').map(t => t.trim()).filter(t => t);
+    
+    const brama = DATA.bramy.find(b => b.id === bramaId);
+    brama.books.unshift({title, status, tags});
+    saveData();
+    render();
+    document.getElementById('bookModal').classList.remove('active');
+    document.getElementById('bookForm').reset();
+  };
+  
+  // Export
+  document.getElementById('exportData').onclick = () => {
+    const dataStr = JSON.stringify(DATA, null, 2);
+    const blob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `eterniverse-map-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+  };
+  
+  // Book clicks
+  document.addEventListener('click', (e) => {
+    const book = e.target.closest('.book');
+    if(book) {
+      const title = book.dataset.title;
+      console.log('Księga:', title);
+      // Tutaj podłącz Wattpad linki dla published
+    }
+  });
+});
 </script>
-
 </body>
 </html>
