@@ -11,7 +11,7 @@ class EterniverseVoiceDictation {
     this.isDictating = false;
     this.interimTranscript = '';
 
-    this.init();
+    this.init(); 
   }
 
   /* =========================
