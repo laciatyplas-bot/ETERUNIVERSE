@@ -1,208 +1,87 @@
-'use strict';
+// render.js – Czysty silnik renderowania bram i ksiąg
 
-/*
-  =========================================
-  ETERNIVERSE — RENDER ENGINE v14.1
-  Bella Author Mode Compatible
-  =========================================
-  ZASADY:
-  - TYLKO render DOM
-  - ZERO logiki danych
-  - ZERO inline onclick
-*/
+function renderGates(data, container, filters = {}) {
+  const { search = '', gateId = null, status = null } = filters;
 
-class Renderer {
-  constructor(app) {
-    this.app = app;
+  container.innerHTML = '';
 
-    this.elements = {
-      structureTree: document.getElementById('structure-tree'),
-      mapaGrid: document.getElementById('mapa-grid'),
-      suggestions: document.getElementById('suggestions'),
-      elementTitle: document.getElementById('element-title'),
-      elementContent: document.getElementById('element-content'),
-      currentPath: document.getElementById('current-path'),
-      status: document.getElementById('status')
-    };
-  }
+  data.forEach(brama => {
+    if (gateId !== null && brama.id !== gateId) return;
 
-  /* =========================
-     GŁÓWNY RENDER
-  ========================= */
-  renderAll() {
-    this.renderStructure();
-    this.renderMapa();
-    this.renderEditPanel(this.app.currentElement || null);
-  }
+    const card = document.createElement('article');
+    card.className = 'brama-card';
 
-  /* =========================
-     1. STRUKTURA / DRZEWO
-  ========================= */
-  renderStructure() {
-    const container = this.elements.structureTree;
-    if (!container) return;
-
-    const structure = this.app.data.getStructure();
-
-    if (!structure || structure.length === 0) {
-      container.innerHTML = `
-        <p style="opacity:.6;text-align:center;padding:3rem;">
-          Brak struktury.<br>
-          Utwórz pierwsze Uniwersum.
-        </p>`;
-      return;
-    }
-
-    container.innerHTML = structure
-      .map(node => this.buildTreeNode(node))
-      .join('');
-  }
-
-  buildTreeNode(node) {
-    const icons = {
-      Uniwersum: '🌌',
-      Świat: '🌍',
-      Tom: '📚',
-      Rozdział: '📖',
-      Podrozdział: '📄',
-      Fragment: '📜'
-    };
-
-    const isSelected =
-      this.app.currentElement &&
-      String(this.app.currentElement.id) === String(node.id);
-
-    return `
-      <div class="tree-node ${isSelected ? 'selected' : ''}"
-           data-id="${node.id}"
-           data-type="${node.type}">
-        <span class="icon">${icons[node.type] || '📄'}</span>
-        <strong>${this.escape(node.title || '(Bez tytułu)')}</strong>
-        <small style="margin-left:6px;opacity:.7;">${node.type}</small>
-
-        ${
-          node.children && node.children.length
-            ? `<div class="nested">
-                ${node.children.map(child => this.buildTreeNode(child)).join('')}
-               </div>`
-            : ''
-        }
+    card.innerHTML = `
+      <div class="brama-header">
+        <div>
+          <div class="brama-title">${escapeHtml(brama.name)}</div>
+          <div class="brama-sub">${escapeHtml(brama.sub || '')}</div>
+        </div>
+        <span class="badge">${escapeHtml(brama.tag)}</span>
       </div>
+      <div class="books"></div>
     `;
-  }
 
-  /* =========================
-     2. MAPA BRAM
-  ========================= */
-  renderMapa() {
-    const container = this.elements.mapaGrid;
-    if (!container) return;
+    const booksWrap = card.querySelector('.books');
 
-    const mapa = this.app.data.getMapa();
+    let visibleBooks = brama.books;
 
-    if (!mapa || mapa.length === 0) {
-      container.innerHTML = `
-        <p style="opacity:.6;text-align:center;padding:3rem;">
-          Brak Bram
-        </p>`;
-      return;
+    // Filtr status
+    if (status) {
+      visibleBooks = visibleBooks.filter(book => book.status === status);
     }
 
-    container.innerHTML = mapa.map((brama, index) => `
-      <div class="brama-card"
-           data-id="${brama.id}"
-           style="--order:${index}">
-        <div class="brama-name">${this.escape(brama.name)}</div>
-        <div class="brama-books">
-          ${brama.books ? brama.books.length : 0} książek
-        </div>
-        <div class="brama-hint">
-          Kliknij, aby wstawić do treści
-        </div>
-      </div>
-    `).join('');
-  }
-
-  /* =========================
-     3. PANEL EDYCJI
-  ========================= */
-  renderEditPanel(element) {
-    if (this.elements.elementTitle) {
-      this.elements.elementTitle.value = element?.title || '';
+    // Wyszukiwanie
+    if (search) {
+      visibleBooks = visibleBooks.filter(book =>
+        book.title.toLowerCase().includes(search)
+      );
     }
 
-    if (this.elements.elementContent) {
-      this.elements.elementContent.value = element?.content || '';
+    if (visibleBooks.length === 0) {
+      booksWrap.innerHTML = '<div class="no-books">Brak tytułów pasujących do filtrów.</div>';
+    } else {
+      visibleBooks.forEach(book => {
+        const bookEl = document.createElement('div');
+        bookEl.className = 'book';
+
+        const coverStyle = book.cover ? `background-image:url('${book.cover}')` : '';
+        const coverText = book.cover ? '' : 'okładka';
+
+        bookEl.innerHTML = `
+          <div class="book-cover-thumb" style="\( {coverStyle}"> \){coverText}</div>
+          <div class="book-main">
+            <div class="book-title">${escapeHtml(book.title)}</div>
+            <div class="book-meta">
+              <span>${escapeHtml(book.status || 'idea')}</span>
+              <span class="status \( {getStatusClass(book.status)}"> \){(book.status || 'idea').toUpperCase()}</span>
+            </div>
+          </div>
+        `;
+
+        booksWrap.appendChild(bookEl);
+      });
     }
 
-    this.renderCurrentPath(element);
-  }
-
-  renderCurrentPath(element) {
-    const container = this.elements.currentPath;
-    if (!container) return;
-
-    if (!element) {
-      container.textContent = '';
-      return;
-    }
-
-    const path = this.app.getPathToElement(element);
-    container.textContent = path
-      .map(p => p.title || p.type)
-      .join(' → ');
-  }
-
-  /* =========================
-     4. SUGESTIE AI
-  ========================= */
-  renderSuggestions(items = []) {
-    const panel = this.elements.suggestions;
-    if (!panel) return;
-
-    if (!items.length) {
-      panel.innerHTML = `
-        <p style="opacity:.6;text-align:center;padding:3rem;">
-          Brak sugestii
-        </p>`;
-      return;
-    }
-
-    panel.innerHTML = items.map((item, index) => `
-      <div class="suggestion" style="--order:${index}">
-        ${this.escape(item.text || '')}
-      </div>
-    `).join('');
-  }
-
-  /* =========================
-     5. STATUS
-  ========================= */
-  setStatus(message = 'Gotowy', timeout = 5000) {
-    if (!this.elements.status) return;
-
-    this.elements.status.textContent = message;
-
-    if (timeout > 0) {
-      setTimeout(() => {
-        if (this.elements.status.textContent === message) {
-          this.elements.status.textContent = 'Gotowy';
-        }
-      }, timeout);
-    }
-  }
-
-  /* =========================
-     HELPERS
-  ========================= */
-  escape(text = '') {
-    return String(text)
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-  }
+    container.appendChild(card);
+  });
 }
 
-/* =========================
-   EKSPORT GLOBALNY
-========================= */
-window.Renderer = Renderer;
+// Bezpieczeństwo HTML
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Klasa statusu (duplikat dla niezależności)
+function getStatusClass(status) {
+  const map = {
+    published: 'st-published',
+    ready: 'st-ready',
+    writing: 'st-writing',
+    draft: 'st-draft',
+    idea: 'st-idea'
+  };
+  return map[status] || 'st-idea';
+}
