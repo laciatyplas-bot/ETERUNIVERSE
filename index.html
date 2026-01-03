@@ -3,116 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ETERNIVERSE ENGINE — Architekt Woli</title>
-
-  <!-- CORE STYLES -->
+  <title>ETERNIVERSE MASTER — Architekt Woli</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+<body>
 
-<body data-engine="eterniverse">
-
-  <div id="app-root">
-
-    <!-- =========================
-         HEADER
-    ========================= -->
-    <header id="app-header">
-      <h1 class="app-title">ETERNIVERSE ENGINE</h1>
-      <div class="app-subtitle">
-        Architekt Woli • 10 Bram • System Światów • Bella AI
+  <div class="wrap">
+    <header>
+      <h1>ETERNIVERSE MASTER</h1>
+      <div class="subtitle">
+        Interaktywny system Architekta • 10 Bram • Pełna edycja • Dyktowanie • Bella AI
       </div>
     </header>
 
-    <!-- =========================
-         TOOLBAR
-    ========================= -->
-    <nav id="app-toolbar">
+    <div id="app">
 
-      <button id="btn-add-universe" type="button">
-        + Nowy Świat
-      </button>
+      <div id="toolbar">
+        <button id="add-universe">+ Nowe Uniwersum</button>
+        <button id="add-child">+ Dodaj dziecko</button>
+        <button id="bella-analyze">Bella AI — Analiza</button>
+        <button id="start-dictate">🎤 Start dyktowania</button>
+        <button id="stop-dictate" disabled>⏹ Stop</button>
 
-      <button id="btn-add-node" type="button">
-        + Dodaj Element
-      </button>
+        <select id="profile-select">
+          <option value="wattpad">Profil: Wattpad</option>
+          <option value="amazon">Profil: Amazon</option>
+        </select>
+      </div>
 
-      <button id="btn-bella-analyze" type="button">
-        Bella AI — Analiza
-      </button>
+      <div id="main-layout">
 
-      <button id="btn-dictate-start" type="button">
-        🎤 Dyktowanie
-      </button>
+        <div id="structure-panel">
+          <h2>Struktura</h2>
+          <div id="structure-tree"></div>
+        </div>
 
-      <button id="btn-dictate-stop" type="button" disabled>
-        ⏹ Stop
-      </button>
+        <div id="editor-panel">
+          <input type="text" id="element-title" placeholder="Tytuł elementu">
+          <textarea id="element-content" placeholder="Treść... (dyktuj lub wklej)"></textarea>
+          <div id="suggestions"></div>
+        </div>
 
-      <select id="profile-select">
-        <option value="wattpad">Profil: Wattpad</option>
-        <option value="amazon">Profil: Amazon</option>
-        <option value="eterniverse">Profil: ETERNIVERSE</option>
-      </select>
+        <div id="mapa-panel">
+          <h2>Mapa Bram</h2>
+          <div id="mapa-grid"></div>
+        </div>
 
-    </nav>
+      </div>
 
-    <!-- =========================
-         MAIN LAYOUT
-    ========================= -->
-    <main id="app-main">
-
-      <!-- STRUCTURE -->
-      <section id="panel-structure">
-        <h2>Struktura Świata</h2>
-        <div id="structure-tree"></div>
-      </section>
-
-      <!-- EDITOR -->
-      <section id="panel-editor">
-        <input
-          type="text"
-          id="editor-title"
-          placeholder="Tytuł elementu"
-          autocomplete="off"
-        >
-
-        <textarea
-          id="editor-content"
-          placeholder="Treść… (pisz lub dyktuj)"
-        ></textarea>
-
-        <div id="editor-suggestions"></div>
-      </section>
-
-      <!-- MAP -->
-      <section id="panel-mapa">
-        <h2>Mapa Bram</h2>
-        <div id="mapa-grid"></div>
-      </section>
-
-    </main>
-
-    <!-- =========================
-         STATUS
-    ========================= -->
-    <footer id="status-bar">
-      Gotowy
-    </footer>
-
+      <div id="status">Gotowy</div>
+    </div>
   </div>
 
   <!-- =========================
        SCRIPTS — KOLEJNOŚĆ KRYTYCZNA
-  ========================= -->
+       ========================= -->
 
-  <!-- DANE / KANON -->
-  <script src="data.js"></script>
+  <!-- 1. DATA / STAN / STORAGE -->
+  <script src="js/data.js"></script>
 
-  <!-- RENDER UI -->
-  <script src="render.js"></script>
+  <!-- 2. RENDER / UI -->
+  <script src="js/render.js"></script>
 
-  <!-- LOGIKA APLIKACJI -->
-  <script src="script.js"></script>
+  <!-- 3. LOGIKA / KONTROLER -->
+  <script src="js/script.js"></script>
+
+  <!-- 4. NARZĘDZIA / AI / EKSPERYMENTY -->
+  <script src="js/daja.js"></script>
 
 </body>
 </html>
