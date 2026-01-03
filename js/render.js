@@ -1,54 +1,119 @@
-// render.js – Renderowanie z edycją
+// render.js — Renderowanie z edycją (FIXED / MOBILE SAFE)
 
 function renderGates(data, container, filters = {}) {
-  // ... (kod jak wcześniej)
+  const { search = '', gateId = null, status = null } = filters;
+  container.innerHTML = '';
 
-  visibleBooks.forEach((book, bookIndex) => {
-    const bookEl = document.createElement('div');
-    bookEl.className = 'book';
+  data.forEach(brama => {
+    if (gateId !== null && brama.id !== gateId) return;
 
-    bookEl.innerHTML = `
-      <div class="book-cover-thumb" style="\( {book.cover ? `background-image:url(' \){book.cover}')` : ''}">
-        ${book.cover ? '' : 'okładka'}
-      </div>
-      <div class="book-main">
-        <div class="book-title editable" data-gate="\( {brama.id}" data-index=" \){bookIndex}">${escapeHtml(book.title)}</div>
-        <div class="book-meta">
-          <span>${escapeHtml(book.status || 'idea')}</span>
-          <span class="status \( {getStatusClass(book.status)}"> \){(book.status || 'idea').toUpperCase()}</span>
+    const card = document.createElement('article');
+    card.className = 'brama-card';
+
+    card.innerHTML = `
+      <div class="brama-header">
+        <div>
+          <div class="brama-title">${escapeHtml(brama.name)}</div>
+          <div class="brama-sub">${escapeHtml(brama.sub)}</div>
         </div>
+        <span class="badge">${escapeHtml(brama.tag || '')}</span>
       </div>
-      <button class="book-edit-btn" data-gate="\( {brama.id}" data-index=" \){bookIndex}">✏️</button>
+      <div class="books"></div>
     `;
 
-    // Klik w tytuł → edycja
-    bookEl.querySelector('.book-title').addEventListener('click', (e) => {
-      e.stopPropagation();
-      const gateId = Number(e.target.dataset.gate);
-      const index = Number(e.target.dataset.index);
-      openEditModal(gateId, index);
-    });
+    const booksWrap = card.querySelector('.books');
 
-    // Przycisk edycji
-    bookEl.querySelector('.book-edit-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      const gateId = Number(e.target.dataset.gate);
-      const index = Number(e.target.dataset.index);
-      openEditModal(gateId, index);
-    });
+    let visibleBooks = brama.books || [];
 
-    // Podgląd okładki (bez zmian)
-    const thumb = bookEl.querySelector('.book-cover-thumb');
-    if (book.cover) {
-      thumb.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        coverImg.src = book.cover;
-        coverPreview.style.display = 'flex';
-      });
+    if (status && status !== 'all') {
+      visibleBooks = visibleBooks.filter(b => b.status === status);
     }
 
-    booksWrap.appendChild(bookEl);
+    if (search) {
+      const q = search.toLowerCase();
+      visibleBooks = visibleBooks.filter(b =>
+        (b.title || '').toLowerCase().includes(q)
+      );
+    }
+
+    visibleBooks.forEach((book, bookIndex) => {
+      const bookEl = document.createElement('div');
+      bookEl.className = 'book';
+
+      const coverStyle = book.cover
+        ? `style="background-image:url('${book.cover}')"`
+        : '';
+
+      bookEl.innerHTML = `
+        <div class="book-cover-thumb" ${coverStyle}>
+          ${book.cover ? '' : 'okładka'}
+        </div>
+
+        <div class="book-main">
+          <div class="book-title editable"
+               data-gate="${brama.id}"
+               data-index="${bookIndex}">
+            ${escapeHtml(book.title)}
+          </div>
+
+          <div class="book-meta">
+            <span>${escapeHtml(book.status || 'idea')}</span>
+            <span class="status ${getStatusClass(book.status)}">
+              ${(book.status || 'idea').toUpperCase()}
+            </span>
+          </div>
+        </div>
+
+        <button class="book-edit-btn"
+                data-gate="${brama.id}"
+                data-index="${bookIndex}">
+          ✏️
+        </button>
+      `;
+
+      // klik w tytuł
+      bookEl.querySelector('.book-title').addEventListener('click', e => {
+        e.stopPropagation();
+        openEditModal(Number(e.target.dataset.gate), Number(e.target.dataset.index));
+      });
+
+      // klik w ikonę
+      bookEl.querySelector('.book-edit-btn').addEventListener('click', e => {
+        e.stopPropagation();
+        openEditModal(Number(e.target.dataset.gate), Number(e.target.dataset.index));
+      });
+
+      // podgląd okładki
+      const thumb = bookEl.querySelector('.book-cover-thumb');
+      if (book.cover) {
+        thumb.addEventListener('click', ev => {
+          ev.stopPropagation();
+          coverImg.src = book.cover;
+          coverPreview.style.display = 'flex';
+        });
+      }
+
+      booksWrap.appendChild(bookEl);
+    });
+
+    container.appendChild(card);
   });
 }
 
-// Dodatkowy styl przycisku edycji (dodaj do styles.css)
+/* ===== HELPERS ===== */
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text ?? '';
+  return div.innerHTML;
+}
+
+function getStatusClass(status) {
+  return {
+    published: 'st-published',
+    ready: 'st-ready',
+    writing: 'st-writing',
+    draft: 'st-draft',
+    idea: 'st-idea'
+  }[status] || 'st-idea';
+}
