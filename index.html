@@ -1,249 +1,57 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ETERNIVERSE — System 10 Bram</title>
-<link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ETERNIVERSE MASTER — Architekt Woli</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="wrap">
-  <!-- HEADER + CONTROLS -->
-  <header>
-    <h1>ETERUNIVERSE</h1>
-    <div class="subtitle">MAPA SYSTEMU • 10 BRAM • 80+ KSIĄG</div>
-    
-    <div class="toolbar">
-      <input id="globalSearch" placeholder="🔍 Szukaj w całym systemie..." class="search">
-      
-      <select id="bramaFilter">
-        <option value="">Wszystkie Bramy</option>
-        <option value="brama1">🌀 BRAMA I — INTERSEEKER</option>
-        <option value="brama2">⚡ BRAMA II — ETERSEEKER</option>
-        <option value="brama3">💎 BRAMA III — OBFITOSEEKER</option>
-        <option value="brama4">🔗 BRAMA IV — THE KNOT</option>
-        <option value="brama5">🌌 BRAMA V — ETERNIONY</option>
-        <option value="brama6">🧬 BRAMA VI — BIOSEEKER</option>
-        <option value="brama7">🤖 BRAMA VII — SPLĄTANIE</option>
-        <option value="brama8">⏳ BRAMA VIII — TRAJEKTORIE</option>
-        <option value="brama9">🌐 BRAMA IX — KOLEKTYW</option>
-        <option value="brama10">🏛️ BRAMA X — ARCHITEKT</option>
-      </select>
-      
-      <select id="statusFilter">
-        <option value="">Wszystkie Statusy</option>
-        <option value="published">✅ Opublikowane</option>
-        <option value="ready">⭐ Gotowe</option>
-        <option value="writing">✏️ Pisanie</option>
-        <option value="draft">📝 Szkic</option>
-        <option value="idea">💡 Idea</option>
-      </select>
-      
-      <button id="addBookBtn">+</button>
-      <button id="exportBtn">📥 JSON</button>
-      <a href="https://wattpad.com/user/maciejmaciuszek" target="_blank" id="wattpadBtn">🚀 Wattpad</a>
-    </div>
-  </header>
+  <div class="wrap">
+    <header>
+      <h1>ETERNIVERSE MASTER</h1>
+      <div class="subtitle">Interaktywny system Architekta • 10 Bram • Pełna edycja • Dyktowanie • Bella AI</div>
+    </header>
 
-  <!-- 10 BRAM CONTAINER -->
-  <main id="bramyContainer"></main>
-
-  <!-- LIVE STATS -->
-  <footer id="statsBar">
-    <span id="statsPublished">-</span> opublikowanych | 
-    <span id="statsReady">-</span> gotowych | 
-    <span id="statsTotal">-</span> ksiąg | 
-    <span id="statsBramy">-</span> aktywnych bram
-  </footer>
-</div>
-
-<!-- ADD BOOK MODAL -->
-<div id="addBookModal" class="modal">
-  <div class="modal-content">
-    <h2 id="modalTitle">Dodaj Nową Księgę</h2>
-    <form id="bookForm">
-      <input type="text" id="bookTitleInput" placeholder="Tytuł księgi" required>
-      <select id="bookBramaSelect">
-        <option value="brama1">🌀 BRAMA I — INTERSEEKER</option>
-        <option value="brama2">⚡ BRAMA II — ETERSEEKER</option>
-        <option value="brama3">💎 BRAMA III — OBFITOSEEKER</option>
-        <option value="brama4">🔗 BRAMA IV — THE KNOT</option>
-        <option value="brama5">🌌 BRAMA V — ETERNIONY</option>
-        <option value="brama6">🧬 BRAMA VI — BIOSEEKER</option>
-        <option value="brama7">🤖 BRAMA VII — SPLĄTANIE</option>
-        <option value="brama8">⏳ BRAMA VIII — TRAJEKTORIE</option>
-        <option value="brama9">🌐 BRAMA IX — KOLEKTYW</option>
-        <option value="brama10">🏛️ BRAMA X — ARCHITEKT</option>
-      </select>
-      <select id="bookStatusSelect">
-        <option value="idea">💡 Idea</option>
-        <option value="draft">📝 Szkic</option>
-        <option value="writing">✏️ Pisanie</option>
-        <option value="ready">⭐ Gotowe</option>
-        <option value="published">✅ Opublikowane</option>
-      </select>
-      <input type="text" id="bookTagsInput" placeholder="Tagi (opcjonalne)">
-      <div class="modal-actions">
-        <button type="button" id="cancelBtn">Anuluj</button>
-        <button type="submit">Dodaj do Systemu</button>
+    <div id="app">
+      <div id="toolbar">
+        <button id="add-universe">+ Nowe Uniwersum</button>
+        <button id="add-child">+ Dodaj dziecko</button>
+        <button id="bella-analyze">Bella AI — Analiza</button>
+        <button id="start-dictate">🎤 Start dyktowania</button>
+        <button id="stop-dictate" disabled>⏹ Stop</button>
+        <select id="profile-select">
+          <option value="wattpad">Profil: Wattpad</option>
+          <option value="amazon">Profil: Amazon</option>
+        </select>
       </div>
-    </form>
-  </div>
-</div>
 
-<script>
-// ===========================
-// ETERSEEKER JS ENGINE
-// ===========================
-const STORAGE_KEY = 'eteruniverse_v10';
-const BRAMA_COLORS = {
-  brama1: '#28D3C6', brama2: '#D9A441', brama3: '#12C65B', brama4: '#9B6BFF',
-  brama5: '#FFB14B', brama6: '#FF6B6B', brama7: '#8338EC', brama8: '#3A86FF',
-  brama9: '#10B981', brama10: '#F59E0B'
-};
-
-// Inicjalizacja danych (10 Bram z przykładowymi księgami)
-let DATA = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
-  bramy: [
-    {id:'brama1', name:'🌀 BRAMA I — INTERSEEKER', sub:'Psychika · Cień · Trauma', books:[]},
-    {id:'brama2', name:'⚡ BRAMA II — ETERSEEKER', sub:'Wola · Pole · Decyzja', books:[]},
-    {id:'brama3', name:'💎 BRAMA III — OBFITOSEEKER', sub:'Materia · Relacje · Przepływ', books:[]},
-    {id:'brama4', name:'🔗 BRAMA IV — THE KNOT', sub:'Splątanie · AI · Meta', books:[]},
-    {id:'brama5', name:'🌌 BRAMA V — ETERNIONY', sub:'Pole Zbiorowe · Misja', books:[]},
-    {id:'brama6', name:'🧬 BRAMA VI — BIOSEEKER', sub:'Ciało · Biologia · Regulacja', books:[]},
-    {id:'brama7', name:'🤖 BRAMA VII — SPLĄTANIE', sub:'Obserwator · Technologia', books:[]},
-    {id:'brama8', name:'⏳ BRAMA VIII — TRAJEKTORIE', sub:'Czas · Linie Życia', books:[]},
-    {id:'brama9', name:'🌐 BRAMA IX — KOLEKTYW', sub:'Wspólnota · Węzły Pola', books:[]},
-    {id:'brama10', name:'🏛️ BRAMA X — ARCHITEKT', sub:'Integracja · Twórca', books:[]}
-  ]
-};
-
-function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
-}
-
-// ===========================
-// RENDER ENGINE
-// ===========================
-function renderGrid() {
-  const searchTerm = document.getElementById('globalSearch').value.toLowerCase();
-  const bramaFilter = document.getElementById('bramaFilter').value;
-  const statusFilter = document.getElementById('statusFilter').value;
-  
-  const container = document.getElementById('bramyContainer');
-  container.innerHTML = '';
-  
-  let stats = {published:0, ready:0, total:0, activeBrams:0};
-  
-  DATA.bramy.forEach(brama => {
-    // Filtruj książki
-    const visibleBooks = brama.books.filter(book => {
-      const matchesStatus = !statusFilter || book.status === statusFilter;
-      const matchesSearch = !searchTerm || 
-        book.title.toLowerCase().includes(searchTerm) ||
-        book.tags?.some(tag => tag.toLowerCase().includes(searchTerm));
-      return matchesStatus && matchesSearch;
-    });
-    
-    if(visibleBooks.length === 0 && bramaFilter !== brama.id) return;
-    
-    stats.total += visibleBooks.length;
-    if(book.status === 'published') stats.published++;
-    if(book.status === 'ready') stats.ready++;
-    stats.activeBrams++;
-    
-    const bramaEl = document.createElement('section');
-    bramaEl.className = `brama brama-${brama.id}`;
-    bramaEl.dataset.bramaId = brama.id;
-    bramaEl.innerHTML = `
-      <header class="brama-header">
-        <div class="brama-info">
-          <h2>${brama.name}</h2>
-          <div class="brama-subtitle">${brama.sub}</div>
+      <div id="main-layout">
+        <div id="structure-panel">
+          <h2>Struktura</h2>
+          <div id="structure-tree"></div>
         </div>
-        <div class="brama-badge">${visibleBooks.length}</div>
-      </header>
-      <div class="books-list">
-        ${visibleBooks.map(book => `
-          <article class="book-item" data-title="${book.title}" data-status="${book.status}">
-            <div class="book-header">
-              <div class="book-thumb">${book.title.charAt(0).toUpperCase()}</div>
-              <h3 class="book-title">${book.title}</h3>
-            </div>
-            <div class="book-meta">
-              <span class="status-badge status-${book.status}">${book.status}</span>
-              ${book.tags?.length ? `<div class="book-tags">${book.tags.slice(0,3).join(' ')}</div>` : ''}
-            </div>
-          </article>
-        `).join('')}
-      </div>
-    `;
-    container.appendChild(bramaEl);
-  });
-  
-  // Update stats
-  document.getElementById('statsPublished').textContent = stats.published;
-  document.getElementById('statsReady').textContent = stats.ready;
-  document.getElementById('statsTotal').textContent = stats.total;
-  document.getElementById('statsBramy').textContent = stats.activeBrams;
-}
 
-// ===========================
-// EVENT LISTENERS
-// ===========================
-document.addEventListener('DOMContentLoaded', () => {
-  renderGrid();
-  
-  // Filtry
-  document.getElementById('globalSearch').addEventListener('input', renderGrid);
-  document.getElementById('bramaFilter').addEventListener('change', renderGrid);
-  document.getElementById('statusFilter').addEventListener('change', renderGrid);
-  
-  // Modal controls
-  document.getElementById('addBookBtn').onclick = () => document.getElementById('addBookModal').classList.add('show');
-  document.getElementById('cancelBtn').onclick = 
-  document.getElementById('closeModal').onclick = () => document.getElementById('addBookModal').classList.remove('show');
-  
-  // Form submit
-  document.getElementById('bookForm').onsubmit = (e) => {
-    e.preventDefault();
-    const title = document.getElementById('bookTitleInput').value;
-    const bramaId = document.getElementById('bookBramaSelect').value;
-    const status = document.getElementById('bookStatusSelect').value;
-    const tagsInput = document.getElementById('bookTagsInput').value;
-    const tags = tagsInput ? tagsInput.split(',').map(t=>t.trim()).filter(Boolean) : [];
-    
-    const brama = DATA.bramy.find(b => b.id === bramaId);
-    brama.books.unshift({title, status, tags});
-    saveData();
-    renderGrid();
-    document.getElementById('addBookModal').classList.remove('show');
-    document.getElementById('bookForm').reset();
-  };
-  
-  // Export JSON
-  document.getElementById('exportBtn').onclick = () => {
-    const data = JSON.stringify(DATA, null, 2);
-    const blob = new Blob([data], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `eteruniverse-${new Date().toISOString().slice(0,10)}.json`;
-    a.click(); URL.revokeObjectURL(url);
-  };
-  
-  // Book clicks (analytics + Wattpad)
-  document.addEventListener('click', e => {
-    const book = e.target.closest('.book-item');
-    if(book) {
-      const title = book.dataset.title;
-      const status = book.dataset.status;
-      console.log(`Księga: ${title} (${status})`);
-      if(status === 'published') {
-        // window.open(`https://wattpad.com/search/${encodeURIComponent(title)}`, '_blank');
-      }
-    }
-  });
-});
-</script>
+        <div id="editor-panel">
+          <input type="text" id="element-title" placeholder="Tytuł elementu">
+          <textarea id="element-content" placeholder="Treść... (dyktuj głosowo lub wklej)"></textarea>
+          <div id="suggestions"></div>
+        </div>
+
+        <div id="mapa-panel">
+          <h2>Mapa Bram</h2>
+          <div id="mapa-grid"></div>
+        </div>
+      </div>
+
+      <div id="status-bar">Gotowy</div>
+    </div>
+  </div>
+
+  <!-- Ładujemy skrypty w kolejności -->
+  <script src="data.js"></script>
+  <script src="render.js"></script>
+  <script src="dają.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
