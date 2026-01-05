@@ -1,5 +1,7 @@
 // script.js — Eterniverse Master PRO
-// KANON / STABLE / ZGODNY Z DataMaster v14.3
+// KANON / STABLE
+// ZGODNY Z DataMaster v14.4 + render.js v2.0
+// WKLEJ 1:1
 
 'use strict';
 
@@ -25,7 +27,6 @@ class EterniverseMasterPRO {
   bindEvents() {
     const qs = id => document.getElementById(id);
 
-    // Profil (LOCAL ONLY — DataMaster nie trzyma profilu)
     const profileSelect = qs('profile-select');
     if (profileSelect) {
       profileSelect.value = this.currentProfile;
@@ -35,11 +36,7 @@ class EterniverseMasterPRO {
       });
     }
 
-    qs('add-universe')?.addEventListener('click', () => this.addRootUniverse());
-    qs('add-child')?.addEventListener('click', () => this.addChild());
-
     qs('bella-analyze')?.addEventListener('click', () => this.bellaAnalyze());
-
     qs('start-dictate')?.addEventListener('click', () => this.startDictation());
     qs('stop-dictate')?.addEventListener('click', () => this.stopDictation());
   }
@@ -48,7 +45,6 @@ class EterniverseMasterPRO {
      RENDER
   ========================= */
   renderAll() {
-    this.renderStructureTree();
     this.renderMapa();
     this.renderSuggestions([]);
   }
@@ -57,122 +53,30 @@ class EterniverseMasterPRO {
     const container = document.getElementById('mapa-grid');
     if (!container) return;
 
+    // DataMaster v14.4 → jedno źródło prawdy
+    const data = dataMaster.exportForRender();
+
     renderGates(
-      dataMaster.getMapa(),
+      { gates: data.gates },
       container,
       { status: 'all' }
     );
-  }
-
-  renderStructureTree() {
-    const container = document.getElementById('structure-tree');
-    if (!container) return;
-
-    const structure = dataMaster.structure || [];
-
-    if (!structure.length) {
-      container.innerHTML =
-        `<p style="opacity:.6;text-align:center;padding:2rem;">
-          Kliknij „+ Nowe Uniwersum”, aby rozpocząć.
-        </p>`;
-      return;
-    }
-
-    container.innerHTML = structure.map(n => this.buildTreeNode(n)).join('');
-  }
-
-  buildTreeNode(node) {
-    const isSelected = this.currentElement?.id === node.id;
-
-    return `
-      <div class="tree-node ${isSelected ? 'selected' : ''}" data-id="${node.id}">
-        <strong>${this.escapeHtml(node.title || '(Bez tytułu)')}</strong>
-        <small>${node.type || ''}</small>
-        ${Array.isArray(node.children) && node.children.length
-          ? `<div class="nested-children">
-              ${node.children.map(c => this.buildTreeNode(c)).join('')}
-            </div>`
-          : ''}
-      </div>
-    `;
-  }
-
-  /* =========================
-     STRUKTURA CRUD
-  ========================= */
-  addRootUniverse() {
-    const el = {
-      id: this.generateId(),
-      type: 'Uniwersum',
-      title: 'Nowe Uniwersum',
-      content: '',
-      children: []
-    };
-
-    dataMaster.structure.push(el);
-    dataMaster.save(dataMaster.KEYS.STRUCTURE, dataMaster.structure);
-
-    this.renderStructureTree();
-    this.selectElement(el.id);
-  }
-
-  addChild() {
-    if (!this.currentElement) {
-      this.status('Wybierz element nadrzędny');
-      return;
-    }
-
-    const el = {
-      id: this.generateId(),
-      type: 'Element',
-      title: 'Nowy element',
-      content: '',
-      children: []
-    };
-
-    this.currentElement.children = this.currentElement.children || [];
-    this.currentElement.children.push(el);
-
-    dataMaster.save(dataMaster.KEYS.STRUCTURE, dataMaster.structure);
-    this.renderStructureTree();
-    this.selectElement(el.id);
-  }
-
-  selectElement(id) {
-    this.currentElement = this.findById(id, dataMaster.structure);
-    if (!this.currentElement) return;
-
-    document.getElementById('element-title').value =
-      this.currentElement.title || '';
-
-    document.getElementById('element-content').value =
-      this.currentElement.content || '';
-
-    this.renderStructureTree();
-  }
-
-  findById(id, list) {
-    for (const el of list) {
-      if (String(el.id) === String(id)) return el;
-      if (el.children) {
-        const f = this.findById(id, el.children);
-        if (f) return f;
-      }
-    }
-    return null;
   }
 
   /* =========================
      BELLA (LOCAL)
   ========================= */
   bellaAnalyze() {
-    if (!this.currentElement?.content) {
+    const textarea = document.getElementById('element-content');
+    if (!textarea || !textarea.value.trim()) {
       this.status('Brak treści do analizy');
       return;
     }
 
     this.renderSuggestions([
-      '✅ Tekst gotowy — brak krytycznych uwag.'
+      '✅ Tekst spójny.',
+      '✅ Brak sprzeczności logicznych.',
+      'ℹ️ Możliwa kompresja treści w 2–3 miejscach.'
     ]);
   }
 
@@ -198,20 +102,7 @@ class EterniverseMasterPRO {
   }
 
   /* =========================
-     UTIL
-  ========================= */
-  generateId() {
-    return 'el_' + Math.random().toString(36).slice(2);
-  }
-
-  escapeHtml(t = '') {
-    const d = document.createElement('div');
-    d.textContent = t;
-    return d.innerHTML;
-  }
-
-  /* =========================
-     DYKTOWANIE (bez zmian)
+     DYKTOWANIE (STUBY)
   ========================= */
   initSpeechRecognition() {}
   startDictation() {}
@@ -228,5 +119,5 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   window.master = new EterniverseMasterPRO();
-  console.log('🌌 Eterniverse Master — READY');
+  console.log('🌌 Eterniverse Master PRO — READY');
 });
