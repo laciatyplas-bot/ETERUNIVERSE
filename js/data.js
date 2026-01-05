@@ -1,27 +1,21 @@
-// data.js — Eterniverse Master PRO — KANON BRAM v14.3
-// JEDYNE ŹRÓDŁO PRAWDY — ZGODNE Z app.js / render.js
-// WKLEJ 1:1
+// data.js — Eterniverse Master PRO — KANON v14.4
+// JEDYNE ŹRÓDŁO PRAWDY
+// ZGODNE 1:1 z app.js v2.0 + render.js v2.0
+// WKLEJ BEZ ZMIAN
 
 'use strict';
 
 class DataMaster {
   constructor() {
-    this.VERSION = 14.3;
+    this.VERSION = 14.4;
 
     this.KEYS = {
-      STRUCTURE: 'eterniverse_structure_v14',
-      MAPA: 'eterniverse_mapa_v14',
-      PROFILE: 'eterniverse_profile_v14',
-      SETTINGS: 'eterniverse_settings_v14',
+      DATA: 'eterniverse_data_v14',
       DATA_VERSION: 'eterniverse_data_version'
     };
 
-    this.migrateData();
-
-    this.structure = this.load(this.KEYS.STRUCTURE, []);
-    this.mapa = this.load(this.KEYS.MAPA, this.getCanonicalMapa());
-    this.profile = this.load(this.KEYS.PROFILE, 'wattpad');
-    this.settings = this.load(this.KEYS.SETTINGS, { theme: 'eter', autoSave: true });
+    this.migrate();
+    this.data = this.load(this.KEYS.DATA, this.getCanonicalData());
 
     console.log('[DataMaster] OK | v', this.VERSION);
   }
@@ -29,16 +23,14 @@ class DataMaster {
   /* =========================
      MIGRACJA
   ========================= */
-  migrateData() {
+  migrate() {
     const raw = localStorage.getItem(this.KEYS.DATA_VERSION);
     const prev = raw ? Number(raw) : 0;
 
     if (prev < this.VERSION) {
-      if (prev < 14.0) {
-        localStorage.removeItem(this.KEYS.STRUCTURE);
-        console.log('[DataMaster] Migracja: struktura wyczyszczona');
-      }
+      localStorage.removeItem(this.KEYS.DATA);
       localStorage.setItem(this.KEYS.DATA_VERSION, String(this.VERSION));
+      console.log('[DataMaster] Migracja wykonana');
     }
   }
 
@@ -47,84 +39,93 @@ class DataMaster {
   ========================= */
   normalizeStatus(s) {
     const map = {
-      'opublikowana': 'published',
-      'published': 'published',
-      'gotowa': 'ready',
-      'ready': 'ready',
+      opublikowana: 'published',
+      published: 'published',
+      gotowa: 'ready',
+      ready: 'ready',
       'w przygotowaniu': 'writing',
-      'writing': 'writing',
-      'szkic': 'draft',
-      'draft': 'draft',
-      'idea': 'idea',
-      'planowana': 'idea'
+      writing: 'writing',
+      szkic: 'draft',
+      draft: 'draft',
+      idea: 'idea',
+      planowana: 'idea'
     };
     return map[s] || 'idea';
   }
 
   /* =========================
-     KANON BRAM
+     KANON CAŁOŚCI
   ========================= */
-  getCanonicalMapa() {
-    const canon = [
-      {
-        id: 1,
-        name: 'BRAMA 1 — INTERSEEKER',
-        color: '#28D3C6',
-        sub: 'Psychika · Cień · Trauma · Mechanizmy przetrwania',
-        tag: 'CORE/PSYCHE',
-        books: [
-          { title: 'INTERSEEKER: Geneza', status: 'published' },
-          { title: 'INTERSEEKER: Efekt Cienia', status: 'published' },
-          { title: 'INTERSEEKER: Kod Jaźni', status: 'writing' }
-        ]
-      },
-      {
-        id: 2,
-        name: 'BRAMA 2 — ETERSEEKER',
-        color: '#12C65B',
-        sub: 'Wola · Pole · Architektura rzeczywistości',
-        tag: 'CORE/FIELD',
-        books: [
-          { title: 'EterSeeker: Kronika Woli', status: 'published' },
-          { title: 'Interfejs Świadomości', status: 'published' },
-          { title: 'Protokół Reprogramowania', status: 'idea' }
-        ]
-      },
-      {
-        id: 3,
-        name: 'BRAMA 3 — OBFITOSEEKER',
-        color: '#FFB14B',
-        sub: 'Przepływ · Manifestacja · Reguły gry',
-        tag: 'EMBODIED/FLOW',
-        books: [
-          { title: 'ObfitoSeeker – Kod Obfitości', status: 'published' },
-          { title: 'Reguły Gry', status: 'writing' },
-          { title: 'Dla Nikosia', status: 'idea' }
-        ]
-      },
-      {
-        id: 4,
-        name: 'BRAMA 4 — THE KNOT',
-        color: '#9B6BFF',
-        sub: 'Splątanie · Węzły pola · Eterniony',
-        tag: 'META/KNOT',
-        books: [
-          { title: 'Kronika Splątania', status: 'writing' },
-          { title: 'Eterniony Tom I', status: 'idea' },
-          { title: 'Narodziny Eteriona³', status: 'idea' }
-        ]
-      }
-    ];
+  getCanonicalData() {
+    const data = {
+      meta: { version: this.VERSION },
+      worlds: [
+        {
+          id: 1,
+          name: 'Świat I — INTERSEEKER',
+          desc: 'Psychika · Cień · Trauma · Integracja'
+        },
+        {
+          id: 2,
+          name: 'Świat II — POLARIS',
+          desc: 'Wola · Pole · Ekspansja'
+        }
+      ],
+      gates: [
+        {
+          id: 1,
+          name: 'BRAMA I — INTERSEEKER',
+          sub: 'Psychika · Cień · Trauma · Mechanizmy przetrwania',
+          tag: 'CORE/PSYCHE',
+          books: [
+            { title: 'INTERSEEKER: Geneza', status: 'published', desc: '', cover: '' },
+            { title: 'INTERSEEKER: Efekt Cienia', status: 'published', desc: '', cover: '' },
+            { title: 'INTERSEEKER: Kod Jaźni', status: 'writing', desc: '', cover: '' }
+          ]
+        },
+        {
+          id: 2,
+          name: 'BRAMA II — ETERSEEKER',
+          sub: 'Wola · Pole · Architektura rzeczywistości',
+          tag: 'CORE/FIELD',
+          books: [
+            { title: 'EterSeeker: Kronika Woli', status: 'published', desc: '', cover: '' },
+            { title: 'Interfejs Świadomości', status: 'published', desc: '', cover: '' },
+            { title: 'Protokół Reprogramowania', status: 'idea', desc: '', cover: '' }
+          ]
+        },
+        {
+          id: 3,
+          name: 'BRAMA III — OBFITOSEEKER',
+          sub: 'Przepływ · Manifestacja · Reguły gry',
+          tag: 'EMBODIED/FLOW',
+          books: [
+            { title: 'ObfitoSeeker – Kod Obfitości', status: 'published', desc: '', cover: '' },
+            { title: 'Reguły Gry', status: 'writing', desc: '', cover: '' },
+            { title: 'Dla Nikosia', status: 'idea', desc: '', cover: '' }
+          ]
+        },
+        {
+          id: 4,
+          name: 'BRAMA IV — THE KNOT',
+          sub: 'Splątanie · Węzły pola · Eterniony',
+          tag: 'META/KNOT',
+          books: [
+            { title: 'Kronika Splątania', status: 'writing', desc: '', cover: '' },
+            { title: 'Eterniony Tom I', status: 'idea', desc: '', cover: '' },
+            { title: 'Narodziny Eteriona³', status: 'idea', desc: '', cover: '' }
+          ]
+        }
+      ]
+    };
 
-    // normalizacja statusów
-    canon.forEach(g =>
+    data.gates.forEach(g =>
       g.books.forEach(b => {
         b.status = this.normalizeStatus(b.status);
-        b.cover = b.cover || '';
       })
     );
 
-    return canon;
+    return data;
   }
 
   /* =========================
@@ -139,30 +140,26 @@ class DataMaster {
     }
   }
 
-  save(key, val) {
-    localStorage.setItem(key, JSON.stringify(val));
+  save() {
+    localStorage.setItem(this.KEYS.DATA, JSON.stringify(this.data));
   }
 
   /* =========================
-     API PUBLICZNE
+     API
   ========================= */
-  getMapa() { return this.mapa; }
-
-  setMapa(val) {
-    this.mapa = val;
-    this.save(this.KEYS.MAPA, val);
+  exportForRender() {
+    return JSON.parse(JSON.stringify(this.data));
   }
 
-  exportForRender() {
-    return JSON.parse(JSON.stringify(this.mapa));
+  setData(val) {
+    this.data = val;
+    this.save();
   }
 
   resetToCanon() {
-    if (!confirm('RESET DO KANONU? (utrata danych)')) return;
-    this.structure = [];
-    this.mapa = this.getCanonicalMapa();
-    this.save(this.KEYS.STRUCTURE, []);
-    this.save(this.KEYS.MAPA, this.mapa);
+    if (!confirm('RESET DO KANONU?')) return;
+    this.data = this.getCanonicalData();
+    this.save();
     location.reload();
   }
 }
@@ -171,4 +168,4 @@ class DataMaster {
    BOOT
 ========================= */
 window.dataMaster = new DataMaster();
-console.log('🌌 DataMaster v14.3 — GOTOWE');
+console.log('🌌 DataMaster v14.4 — GOTOWE');
