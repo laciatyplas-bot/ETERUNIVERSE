@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>ETERUNIVERSE — Console Edition</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body{
+    margin:0;
+    font-family:system-ui,Segoe UI,Roboto,sans-serif;
+    background:#050814;
+    color:#E9F4FF;
+    display:flex;
+    height:100vh;
+    overflow:hidden;
+  }
+  #left{
+    width:55%;
+    padding:20px;
+    overflow:auto;
+    border-right:1px solid #20324A;
+  }
+  #right{
+    width:45%;
+    display:flex;
+    flex-direction:column;
+    background:#03060F;
+  }
+  h1{
+    margin:0 0 12px;
+    color:#D9A441;
+    letter-spacing:2px;
+  }
+  .gate{
+    background:#0A1727;
+    border-left:6px solid;
+    padding:14px;
+    border-radius:10px;
+    margin-bottom:14px;
+  }
+  .gate h2{
+    margin:0 0 6px;
+    font-size:16px;
+  }
+  .gate p{
+    margin:0 0 8px;
+    opacity:.8;
+    font-size:13px;
+  }
+  .book{
+    font-size:13px;
+    padding:6px;
+    border-radius:6px;
+    background:rgba(255,255,255,.04);
+    margin:4px 0;
+  }
+
+  /* CONSOLE */
+  #console{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+  }
+  #consoleOutput{
+    flex:1;
+    background:#000;
+    color:#0f0;
+    font-family:monospace;
+    padding:10px;
+    overflow:auto;
+    font-size:12px;
+  }
+  #consoleInput{
+    border:none;
+    outline:none;
+    resize:none;
+    height:120px;
+    padding:10px;
+    font-family:monospace;
+    background:#050814;
+    color:#E9F4FF;
+    border-top:1px solid #20324A;
+  }
+  #consoleBar{
+    display:flex;
+    gap:10px;
+    padding:8px;
+    background:#071626;
+    border-top:1px solid #20324A;
+  }
+  button{
+    background:#D9A441;
+    color:#020308;
+    border:none;
+    border-radius:6px;
+    padding:6px 14px;
+    font-weight:700;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<div id="left">
+  <h1>MAPA ETERNIVERSE</h1>
+  <div id="map"></div>
+</div>
+
+<div id="right">
+  <div id="console">
+    <div id="consoleOutput">// ETERNIVERSE INLINE CONSOLE READY</div>
+    <textarea id="consoleInput">// wpisz JS i kliknij EXECUTE</textarea>
+    <div id="consoleBar">
+      <button onclick="run()">EXECUTE</button>
+      <button onclick="clearConsole()">CLEAR</button>
+      <button onclick="render()">RENDER</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =======================
+   KANON DATA (BAZA)
+======================= */
+window.DATA = {
+  system:"ETERUNIVERSE",
+  version:"Console-1.0",
+  gates:[
+    {id:1,name:"BRAMA I — INTERSEEKER",color:"#28D3C6",sub:"Psychika · Cień · Trauma",books:[]},
+    {id:2,name:"BRAMA II — CUSTOS",color:"#D9A441",sub:"Geneza · Rdzeń",books:[]},
+    {id:3,name:"BRAMA III — ETERSEEKER",color:"#12C65B",sub:"Wola · Pole",books:[]},
+    {id:4,name:"BRAMA IV — ARCHETYPY",color:"#9B6BFF",sub:"Role · Konstrukcja",books:[]},
+    {id:5,name:"BRAMA V — OBFITOSEEKER",color:"#FFB14B",sub:"Przepływ · Materia",books:[]},
+    {id:6,name:"BRAMA VI — BIOSEEKER",color:"#FF6B6B",sub:"Ciało · Biologia",books:[]},
+    {id:7,name:"BRAMA VII — SPLĄTANIE",color:"#5DADE2",sub:"AI · Obserwator",books:[]},
+    {id:8,name:"BRAMA VIII — TRAJEKTORIE",color:"#FF9FF3",sub:"Linie Czasu",books:[]},
+    {id:9,name:"BRAMA IX — ETERNIONY",color:"#667eea",sub:"Kolektyw",books:[]},
+    {id:10,name:"BRAMA X — ETERUNIVERSE",color:"#12C65B",sub:"Integracja",books:[]}
+  ]
+};
+
+/* =======================
+   RENDER
+======================= */
+function render(){
+  const map = document.getElementById('map');
+  map.innerHTML='';
+  DATA.gates.forEach(g=>{
+    const d=document.createElement('div');
+    d.className='gate';
+    d.style.borderColor=g.color;
+    d.innerHTML=`<h2 style="color:${g.color}">${g.name}</h2><p>${g.sub}</p>`;
+    g.books.forEach(b=>{
+      const bb=document.createElement('div');
+      bb.className='book';
+      bb.textContent='📘 '+b.title;
+      d.appendChild(bb);
+    });
+    map.appendChild(d);
+  });
+}
+
+/* =======================
+   INLINE CONSOLE
+======================= */
+function log(msg){
+  const out=document.getElementById('consoleOutput');
+  out.textContent+='\n'+msg;
+  out.scrollTop=out.scrollHeight;
+}
+
+function run(){
+  const code=document.getElementById('consoleInput').value;
+  try{
+    const result=eval(code);
+    log('> '+String(result));
+  }catch(e){
+    log('❌ '+e.message);
+  }
+}
+
+function clearConsole(){
+  document.getElementById('consoleOutput').textContent='';
+}
+
+/* INIT */
+render();
+log('DATA loaded. You can modify DATA via this console.');
+</script>
+
+</body>
+</html>
