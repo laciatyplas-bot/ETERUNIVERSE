@@ -1,207 +1,141 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ETERNIVERSE · BELLA CONSOLE</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETERNIVERSE · BELLA ENGINE</title>
 
-  <style>
-    * { box-sizing:border-box; margin:0; padding:0; font-family: system-ui, sans-serif; }
-
-    body {
-      background:#050814;
-      color:#e9f4ff;
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-    }
-
-    h1 {
-      margin-bottom:12px;
-      letter-spacing:2px;
-    }
-
-    .panel {
-      width:95%;
-      max-width:900px;
-      background:#0a1727;
-      border:1px solid #20324a;
-      border-radius:16px;
-      padding:16px;
-      box-shadow:0 20px 60px rgba(0,0,0,.6);
-    }
-
-    .buttons {
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      margin-bottom:12px;
-    }
-
-    button {
-      padding:10px 16px;
-      border-radius:999px;
-      border:none;
-      cursor:pointer;
-      font-weight:700;
-      font-size:13px;
-      background:#d9a441;
-      color:#050814;
-    }
-
-    button.alt { background:#28d3c6; }
-    button.warn { background:#ff6b6b; }
-
-    button:hover { opacity:.85; }
-
-    #console {
-      background:#020617;
-      border:1px solid #20324a;
-      border-radius:12px;
-      padding:12px;
-      height:260px;
-      overflow-y:auto;
-      font-family:monospace;
-      font-size:13px;
-      margin-bottom:8px;
-    }
-
-    #inputRow {
-      display:flex;
-      gap:8px;
-    }
-
-    #cmd {
-      flex:1;
-      padding:10px;
-      border-radius:10px;
-      border:1px solid #20324a;
-      background:#020617;
-      color:#e9f4ff;
-      font-family:monospace;
-    }
-
-    #run {
-      padding:10px 18px;
-      border-radius:10px;
-      border:none;
-      background:#12c65b;
-      color:#050814;
-      font-weight:800;
-      cursor:pointer;
-    }
-
-    .log-info { color:#9bb0d4; }
-    .log-ok { color:#12c65b; }
-    .log-warn { color:#ffb14b; }
-  </style>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,sans-serif}
+body{background:#050814;color:#e9f4ff;min-height:100vh;display:flex;justify-content:center;align-items:center}
+.panel{width:95%;max-width:1000px;background:#0a1727;border:1px solid #20324a;border-radius:18px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.7)}
+h1{text-align:center;margin-bottom:10px;letter-spacing:2px}
+.buttons{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+button{padding:10px 16px;border-radius:999px;border:none;cursor:pointer;font-weight:700}
+.gold{background:#d9a441;color:#050814}
+.teal{background:#28d3c6;color:#050814}
+.green{background:#12c65b;color:#050814}
+.red{background:#ff6b6b;color:#050814}
+#console{background:#020617;border:1px solid #20324a;border-radius:12px;padding:12px;height:260px;overflow-y:auto;font-family:monospace;font-size:13px;margin-bottom:8px}
+#inputRow{display:flex;gap:8px}
+#cmd{flex:1;padding:10px;border-radius:10px;border:1px solid #20324a;background:#020617;color:#e9f4ff;font-family:monospace}
+#run{padding:10px 20px;border-radius:10px;border:none;background:#12c65b;font-weight:800;cursor:pointer}
+.log{opacity:.85}
+.ok{color:#12c65b}
+.warn{color:#ffb14b}
+.err{color:#ff6b6b}
+</style>
 </head>
 
 <body>
+<div class="panel">
+<h1>ETERNIVERSE · BELLA MASTER ENGINE</h1>
 
-  <h1>ETERNIVERSE · BELLA MASTER</h1>
+<div class="buttons">
+<button class="gold" onclick="UI.send('help')">HELP</button>
+<button class="teal" onclick="UI.send('status')">STATUS</button>
+<button class="green" onclick="UI.send('generate text')">GENERUJ TEKST</button>
+<button class="teal" onclick="UI.send('generate image')">DALL·E</button>
+<button class="red" onclick="UI.send('clear')">CLEAR</button>
+</div>
 
-  <div class="panel">
+<div id="console"></div>
 
-    <!-- GUZIKI -->
-    <div class="buttons">
-      <button onclick="bella.help()">HELP</button>
-      <button class="alt" onclick="bella.status()">STATUS</button>
-      <button class="alt" onclick="bella.generateText()">GENERUJ TEKST</button>
-      <button class="alt" onclick="bella.generateImage()">DALL·E (IMAGE)</button>
-      <button class="warn" onclick="bella.clear()">CLEAR</button>
-    </div>
-
-    <!-- KONSOla -->
-    <div id="console"></div>
-
-    <!-- INPUT -->
-    <div id="inputRow">
-      <input id="cmd" placeholder="Wpisz komendę i ENTER (np. generate, dalle)" />
-      <button id="run">▶</button>
-    </div>
-
-  </div>
+<div id="inputRow">
+<input id="cmd" placeholder="np: generate text | generate image | status">
+<button id="run">▶</button>
+</div>
+</div>
 
 <script>
 /* =========================
-   BELLA MINI ENGINE
+   CORE ENGINE (SILNIK)
 ========================= */
-
-const consoleEl = document.getElementById('console');
-const cmdInput = document.getElementById('cmd');
-const runBtn = document.getElementById('run');
-
-function log(msg, cls='log-info') {
-  const div = document.createElement('div');
-  div.className = cls;
-  div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-  consoleEl.appendChild(div);
-  consoleEl.scrollTop = consoleEl.scrollHeight;
-}
-
-const bella = {
-  help() {
-    log('Dostępne komendy:', 'log-ok');
-    log('help');
-    log('status');
-    log('generate');
-    log('dalle');
-    log('clear');
+const Engine = {
+  state: {
+    version: '1.0',
+    worlds: 2,
+    gates: 10
   },
 
-  status() {
-    log('BELLA: ONLINE', 'log-ok');
-    log('Tryb: LOCAL');
-  },
+  exec(command) {
+    switch(command) {
+      case 'help':
+        return [
+          'DOSTĘPNE KOMENDY:',
+          'help',
+          'status',
+          'generate text',
+          'generate image',
+          'clear'
+        ];
 
-  generateText() {
-    log('Generuję tekst...', 'log-warn');
-    log('„W ciszy zapadła decyzja, która zmieniła wszystko.”', 'log-ok');
-  },
+      case 'status':
+        return [
+          'ENGINE: ONLINE',
+          'Version: ' + this.state.version,
+          'Worlds: ' + this.state.worlds,
+          'Gates: ' + this.state.gates
+        ];
 
-  generateImage() {
-    log('DALL·E: trigger image generation', 'log-warn');
-    log('➡ Tu podłączasz DALL·E API / image_gen', 'log-info');
-  },
+      case 'generate text':
+        return [
+          'GENERATED TEXT:',
+          '„W punkcie zerowym zapadła decyzja, której nie da się cofnąć.”'
+        ];
 
-  clear() {
-    consoleEl.innerHTML = '';
-    log('Konsola wyczyszczona', 'log-ok');
-  },
+      case 'generate image':
+        return [
+          'DALL·E TRIGGER',
+          '➡ tutaj podpinasz image_gen API',
+          '➡ prompt z Belly / ETERNIVERSE'
+        ];
 
-  exec(cmd) {
-    switch(cmd) {
-      case 'help': return this.help();
-      case 'status': return this.status();
-      case 'generate': return this.generateText();
-      case 'dalle': return this.generateImage();
-      case 'clear': return this.clear();
       default:
-        log('Nieznana komenda: ' + cmd, 'log-warn');
+        return ['Nieznana komenda: ' + command];
     }
   }
 };
 
-/* INPUT */
-runBtn.onclick = () => {
-  const v = cmdInput.value.trim().toLowerCase();
-  if (!v) return;
-  log('> ' + v);
-  bella.exec(v);
-  cmdInput.value = '';
+/* =========================
+   UI / CONSOLE
+========================= */
+const consoleEl = document.getElementById('console');
+const input = document.getElementById('cmd');
+const run = document.getElementById('run');
+
+function log(text, cls='log') {
+  const d=document.createElement('div');
+  d.className=cls;
+  d.textContent='['+new Date().toLocaleTimeString()+'] '+text;
+  consoleEl.appendChild(d);
+  consoleEl.scrollTop=consoleEl.scrollHeight;
+}
+
+const UI = {
+  send(cmd) {
+    if(cmd==='clear'){consoleEl.innerHTML='';return}
+    log('> '+cmd,'warn');
+    const res = Engine.exec(cmd);
+    res.forEach(r=>log(r,'ok'));
+  }
 };
 
-cmdInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter') runBtn.click();
+run.onclick=()=>{
+  const v=input.value.trim();
+  if(!v)return;
+  UI.send(v);
+  input.value='';
+};
+
+input.addEventListener('keydown',e=>{
+  if(e.key==='Enter')run.click();
 });
 
-/* START */
-log('BELLA MASTER GOTOWA', 'log-ok');
-log('Klikaj guziki albo pisz komendy', 'log-info');
+/* BOOT */
+log('ENGINE ZAINICJOWANY','ok');
+log('UI PODPIĘTE POD SILNIK','ok');
+log('SYSTEM GOTOWY','ok');
 </script>
-
 </body>
 </html>
