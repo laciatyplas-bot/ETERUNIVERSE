@@ -2,56 +2,60 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="ETERNIVERSE PRO MASTER — System 10 Bram Architekta Woli. Edycja, analiza i struktura świata.">
-  <title>ETERNIVERSE PRO MASTER</title>
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌌</text></svg>">
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="styles.css">
+  <title>ETERNIVERSE PRO — Tabela Światów</title>
 </head>
-
 <body>
-  <noscript>
-    <div style="padding:24px;text-align:center;color:#d9a441;background:#05070a;">
-      Ta aplikacja wymaga włączonego JavaScript.
-    </div>
-  </noscript>
 
-  <div id="app">
-    <div class="loading-screen" aria-live="polite">
-      <div class="spinner"></div>
-      <p>Ładowanie ETERNIVERSE PRO MASTER…</p>
-    </div>
-  </div>
+  <h1>ETERNIVERSE — MAPA SYSTEMOWA</h1>
+  <p>Tabela kanoniczna: Światy → Bramy → Księgi</p>
 
-  <!-- Modal edycji księgi -->
-  <div id="modalBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal" tabindex="-1" role="document">
-      <h2 id="modalTitle">Księga</h2>
-      <div id="modalContent"></div>
-      <button class="modal-close" aria-label="Zamknij modal">✕</button>
-    </div>
-  </div>
+  <table border="1" cellpadding="10" cellspacing="0" width="100%">
+    <thead>
+      <tr>
+        <th>ŚWIAT</th>
+        <th>BRAMA</th>
+        <th>KSIĘGA</th>
+        <th>STATUS</th>
+      </tr>
+    </thead>
 
-  <!-- Toasty -->
-  <div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+    <tbody>
 
-  <!-- Podgląd okładki -->
-  <div id="coverPreview" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="cover-container">
-      <img id="coverImg" src="" alt="Okładka księgi">
-      <button id="coverClose" aria-label="Zamknij podgląd okładki">Zamknij</button>
-    </div>
-  </div>
+      <!-- ŚWIAT 1 — INTERSEEKER -->
+      <tr>
+        <td rowspan="3">Świat 1 — INTERSEEKER</td>
+        <td rowspan="3">BRAMA I — INTERSEEKER</td>
+        <td>INTERSEEKER: Geneza</td>
+        <td>published</td>
+      </tr>
+      <tr>
+        <td>INTERSEEKER: Efekt Cienia</td>
+        <td>published</td>
+      </tr>
+      <tr>
+        <td>INTERSEEKER: Kod Jaźni</td>
+        <td>writing</td>
+      </tr>
 
-  <!-- Scripts -->
-  <script src="js/data.js"></script>
-  <script src="js/render.js"></script>
-  <script src="js/app.js"></script>
+      <!-- ŚWIAT 2 — POLARIS / ETER -->
+      <tr>
+        <td rowspan="3">Świat 2 — POLARIS / ETER</td>
+        <td rowspan="3">BRAMA VIII — ETERSEEKER</td>
+        <td>EterSeeker: Architektura Woli</td>
+        <td>ready</td>
+      </tr>
+      <tr>
+        <td>EterSeeker: Księga Woli</td>
+        <td>ready</td>
+      </tr>
+      <tr>
+        <td>WolaSeeker: Kwant Woli</td>
+        <td>writing</td>
+      </tr>
+
+    </tbody>
+  </table>
 
 </body>
 </html>
