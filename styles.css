@@ -90,34 +90,3 @@ body { overflow-x: hidden; }
   .master-actions { justify-content: stretch; }
   .master-actions button { width: 100%; }
 }
-  </style>
-</head>
-<body>
-  <div id="app">
-    <div class="loading-screen" style="text-align:center;padding:40px 0;font-size:14px;color:#9BB0D4;">
-      Ładowanie ETERNIVERSE PRO MASTER…
-    </div>
-  </div>
-
-  <!-- MODAL EDYCJI KSIĘGI -->
-  <div id="modalBackdrop">
-    <div class="modal">
-      <h2 id="modalTitle">Księga</h2>
-      <div id="modalContent"></div>
-    </div>
-  </div>
-
-  <!-- TOASTY -->
-  <div id="toastContainer"></div>
-
-  <!-- PODGLĄD OKŁADKI -->
-  <div id="coverPreview">
-    <div class="cover-container">
-      <img id="coverImg" src="" alt="Okładka">
-      <button id="coverClose">Zamknij</button>
-    </div>
-  </div>
-
-  <script src="app.js"></script>
-</body>
-</html>
