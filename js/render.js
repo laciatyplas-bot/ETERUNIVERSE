@@ -1,11 +1,71 @@
-// render.js — ETERNIVERSE ENGINE
-// Renderowanie Bram i Ksiąg (KANON / MOBILE SAFE)
+// render.js — ETERNIVERSE ENGINE v2.0
+// Pełne renderowanie: Dashboard (światy + statystyki) + Bramy i Księgi
+// KANON / MOBILE SAFE / ZGODNY Z MASTER v2.0 (z worldami)
 
 'use strict';
 
+function renderDashboard(data, container) {
+  if (!container || !data || !Array.isArray(data.worlds)) {
+    console.warn('[renderDashboard] Brak danych światów lub kontenera');
+    return;
+  }
+
+  const totalBooks = data.gates.reduce((sum, gate) => 
+    sum + (Array.isArray(gate.books) ? gate.books.length : 0), 0);
+
+  const publishedCount = data.gates.reduce((sum, gate) => 
+    sum + (gate.books?.filter(b => b.status === 'published').length || 0), 0);
+
+  const readyCount = data.gates.reduce((sum, gate) => 
+    sum + (gate.books?.filter(b => b.status === 'ready').length || 0), 0);
+
+  const writingCount = data.gates.reduce((sum, gate) => 
+    sum + (gate.books?.filter(b => b.status === 'writing').length || 0), 0);
+
+  container.innerHTML = `
+    <div class="dashboard-header">
+      <h1>ETERNIVERSE PRO MASTER</h1>
+      <div class="dashboard-subtitle">Architektura uniwersum • 10 Bram • ${data.worlds.length} Światy</div>
+      
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-value">${data.worlds.length}</span>
+          <span class="stat-label">Światy</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">${totalBooks}</span>
+          <span class="stat-label">Księgi</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value st-published">${publishedCount}</span>
+          <span class="stat-label">Published</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value st-ready">${readyCount}</span>
+          <span class="stat-label">Ready</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value st-writing">${writingCount}</span>
+          <span class="stat-label">Writing</span>
+        </div>
+      </div>
+
+      <div class="worlds-list">
+        ${data.worlds.map(world => `
+          <div class="world-card">
+            <div class="world-name">${escapeHtml(world.name)}</div>
+            <div class="world-desc">${escapeHtml(world.desc || '')}</div>
+            <div class="world-books-count">${world.books?.length || 0} pozycji</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
 function renderGates(data, container, filters = {}) {
-  if (!container || !Array.isArray(data)) {
-    console.warn('[renderGates] Brak danych lub kontenera');
+  if (!container || !Array.isArray(data.gates)) {
+    console.warn('[renderGates] Brak danych bram lub kontenera');
     return;
   }
 
@@ -17,7 +77,7 @@ function renderGates(data, container, filters = {}) {
 
   container.innerHTML = '';
 
-  data.forEach(brama => {
+  data.gates.forEach(brama => {
     if (!brama || typeof brama !== 'object') return;
     if (gateId !== null && brama.id !== gateId) return;
 
@@ -31,7 +91,7 @@ function renderGates(data, container, filters = {}) {
           <div class="brama-title">${escapeHtml(brama.name)}</div>
           <div class="brama-sub">${escapeHtml(brama.sub || '')}</div>
         </div>
-        ${brama.tag ? `<span class="badge">${escapeHtml(brama.tag)}</span>` : ''}
+        \( {brama.tag ? `<span class="badge"> \){escapeHtml(brama.tag)}</span>` : ''}
       </div>
       <div class="books"></div>
     `;
@@ -49,7 +109,8 @@ function renderGates(data, container, filters = {}) {
     if (search) {
       const q = search.toLowerCase();
       books = books.filter(b =>
-        (b.title || '').toLowerCase().includes(q)
+        (b.title || '').toLowerCase().includes(q) ||
+        (b.desc || '').toLowerCase().includes(q)
       );
     }
 
@@ -67,11 +128,11 @@ function renderGates(data, container, filters = {}) {
       bookEl.dataset.gateId = brama.id;
       bookEl.dataset.bookIndex = bookIndex;
 
-      const hasCover = Boolean(book.cover);
+      const hasCover = Boolean(book.cover && book.cover.trim());
 
       bookEl.innerHTML = `
         <div class="book-cover-thumb"
-             ${hasCover ? `style="background-image:url('${book.cover}')"` : ''}>
+             \( {hasCover ? `style="background-image:url(' \){escapeHtml(book.cover)}')"` : ''}>
           ${hasCover ? '' : 'okładka'}
         </div>
 
@@ -79,9 +140,10 @@ function renderGates(data, container, filters = {}) {
           <div class="book-title">
             ${escapeHtml(book.title || 'Bez tytułu')}
           </div>
-
+          <div class="book-desc">
+            ${escapeHtml(book.desc || '')}
+          </div>
           <div class="book-meta">
-            <span>${escapeHtml(book.status || 'idea')}</span>
             <span class="status ${getStatusClass(book.status)}">
               ${(book.status || 'idea').toUpperCase()}
             </span>
@@ -100,11 +162,8 @@ function renderGates(data, container, filters = {}) {
         }
       };
 
-      bookEl.querySelector('.book-title')
-        .addEventListener('click', editHandler);
-
-      bookEl.querySelector('.book-edit-btn')
-        .addEventListener('click', editHandler);
+      bookEl.querySelector('.book-title').addEventListener('click', editHandler);
+      bookEl.querySelector('.book-edit-btn').addEventListener('click', editHandler);
 
       // ===== OKŁADKA =====
       if (hasCover) {
@@ -130,17 +189,19 @@ function renderGates(data, container, filters = {}) {
 ========================= */
 
 function escapeHtml(text) {
+  if (!text) return '';
   const div = document.createElement('div');
-  div.textContent = text ?? '';
+  div.textContent = text;
   return div.innerHTML;
 }
 
 function getStatusClass(status) {
-  return {
+  const map = {
     published: 'st-published',
     ready: 'st-ready',
     writing: 'st-writing',
     draft: 'st-draft',
     idea: 'st-idea'
-  }[status] || 'st-idea';
+  };
+  return map[status] || 'st-idea';
 }
