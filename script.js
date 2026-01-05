@@ -1,7 +1,7 @@
 class EterSeekerMaster {
     constructor() {
-        this.power = 100;
-        this.books = 54;
+        this.power = parseInt(localStorage.getItem('power')) || 100;
+        this.books = parseInt(localStorage.getItem('books')) || 54;
         this.worlds = 2;
         this.init();
     }
@@ -44,6 +44,7 @@ class EterSeekerMaster {
             const response = this.processCommand(cmd.toLowerCase());
             this.addMessage(response, 'bella');
             this.power += 10;
+            localStorage.setItem('power', this.power);
             this.updateStatus();
         }, 800 + Math.random() * 1200);
     }
@@ -74,9 +75,28 @@ class EterSeekerMaster {
     initEditor() {
         document.getElementById('save-chapter').onclick = () => {
             const content = document.getElementById('story-editor').value;
-            console.log('ROZDZIAŁ ZAPISANY:', content);
+            localStorage.setItem('lastChapter', content);
             this.showToast('Rozdział zapisany w eterze! 🔥');
         };
+        
+        document.getElementById('new-chapter').onclick = () => {
+            document.getElementById('story-editor').value = '';
+            this.showToast('Nowy rozdział gotowy! ✍️');
+        };
+        
+        document.getElementById('export-md').onclick = () => {
+            const content = document.getElementById('story-editor').value;
+            const blob = new Blob([content], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'eterseeker-rozdial.md';
+            a.click();
+        };
+        
+        // Load last chapter
+        const saved = localStorage.getItem('lastChapter');
+        if (saved) document.getElementById('story-editor').value = saved;
     }
     
     initBooks() {
@@ -104,11 +124,12 @@ class EterSeekerMaster {
     
     showToast(message) {
         const toast = document.createElement('div');
-        toast.className = 'toast';
+        toast.style.cssText = `
+            position: fixed; bottom: 40px; right: 40px; 
+            background: rgba(0,0,0,0.9); border: 2px solid var(--wattpad-orange);
+            padding: 1.5rem 2.5rem; border-radius: 16px; 
+            box-shadow: 0 0 60px rgba(255,102,0,0.6);
+            animation: quantumToast 0.8s ease; color: white; z-index: 1000;
+        `;
         toast.textContent = message;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-}
-
-new EterSeekerMaster();
+        docu
