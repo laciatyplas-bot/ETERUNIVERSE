@@ -3,139 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ETERNIVERSE · BELLA ENGINE</title>
+<title>ETERNIVERSE — MASTER ONE PAGE</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,sans-serif}
-body{background:#050814;color:#e9f4ff;min-height:100vh;display:flex;justify-content:center;align-items:center}
-.panel{width:95%;max-width:1000px;background:#0a1727;border:1px solid #20324a;border-radius:18px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.7)}
-h1{text-align:center;margin-bottom:10px;letter-spacing:2px}
-.buttons{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-button{padding:10px 16px;border-radius:999px;border:none;cursor:pointer;font-weight:700}
-.gold{background:#d9a441;color:#050814}
-.teal{background:#28d3c6;color:#050814}
-.green{background:#12c65b;color:#050814}
-.red{background:#ff6b6b;color:#050814}
-#console{background:#020617;border:1px solid #20324a;border-radius:12px;padding:12px;height:260px;overflow-y:auto;font-family:monospace;font-size:13px;margin-bottom:8px}
-#inputRow{display:flex;gap:8px}
-#cmd{flex:1;padding:10px;border-radius:10px;border:1px solid #20324a;background:#020617;color:#e9f4ff;font-family:monospace}
-#run{padding:10px 20px;border-radius:10px;border:none;background:#12c65b;font-weight:800;cursor:pointer}
-.log{opacity:.85}
-.ok{color:#12c65b}
-.warn{color:#ffb14b}
-.err{color:#ff6b6b}
+*{box-sizing:border-box;font-family:system-ui,Segoe UI,Roboto}
+body{margin:0;background:#05070a;color:#e6e6e6;display:grid;grid-template-columns:2fr 1fr;height:100vh}
+
+header{
+  grid-column:1/3;
+  padding:16px;
+  background:#020617;
+  border-bottom:1px solid #1f2937;
+  text-align:center;
+}
+header h1{margin:0;color:#38bdf8;letter-spacing:2px}
+
+#library{padding:20px;overflow:auto}
+#console{padding:20px;border-left:1px solid #1f2937;background:#020617;display:flex;flex-direction:column}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#0b1220;
+  border-radius:12px;
+  overflow:hidden;
+}
+th,td{padding:12px;border-bottom:1px solid #1f2937;text-align:left}
+th{background:#020617;color:#facc15;font-size:12px;text-transform:uppercase}
+
+.tag{padding:4px 10px;border-radius:20px;background:#1e293b;font-size:12px;color:#93c5fd}
+
+#output{
+  flex:1;
+  background:#000;
+  padding:12px;
+  margin-bottom:12px;
+  overflow:auto;
+  font-family:monospace;
+  font-size:13px;
+}
+#input{display:flex;gap:8px}
+#cmd{flex:1;padding:10px;background:#020617;color:#fff;border:1px solid #1f2937;border-radius:8px}
+button{padding:10px 16px;border:none;border-radius:8px;background:#2563eb;color:#fff;font-weight:700;cursor:pointer}
+button:hover{background:#1d4ed8}
 </style>
 </head>
 
 <body>
-<div class="panel">
-<h1>ETERNIVERSE · BELLA MASTER ENGINE</h1>
 
-<div class="buttons">
-<button class="gold" onclick="UI.send('help')">HELP</button>
-<button class="teal" onclick="UI.send('status')">STATUS</button>
-<button class="green" onclick="UI.send('generate text')">GENERUJ TEKST</button>
-<button class="teal" onclick="UI.send('generate image')">DALL·E</button>
-<button class="red" onclick="UI.send('clear')">CLEAR</button>
-</div>
+<header>
+  <h1>ETERNIVERSE — MASTER ONE PAGE</h1>
+</header>
 
-<div id="console"></div>
+<!-- ================= LIBRARY ================= -->
+<section id="library">
+  <h2>📚 Biblioteka</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Świat</th>
+        <th>Brama</th>
+        <th>Księga</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</section>
 
-<div id="inputRow">
-<input id="cmd" placeholder="np: generate text | generate image | status">
-<button id="run">▶</button>
-</div>
-</div>
+<!-- ================= CONSOLE ================= -->
+<section id="console">
+  <h2>🖥 BELLA CONSOLE</h2>
+  <div id="output"></div>
+  <div id="input">
+    <input id="cmd" placeholder="help | add world | add gate | add book">
+    <button onclick="run()">▶</button>
+  </div>
+</section>
 
 <script>
 /* =========================
-   CORE ENGINE (SILNIK)
+   DATA — JEDNO ŹRÓDŁO
 ========================= */
-const Engine = {
-  state: {
-    version: '1.0',
-    worlds: 2,
-    gates: 10
-  },
-
-  exec(command) {
-    switch(command) {
-      case 'help':
-        return [
-          'DOSTĘPNE KOMENDY:',
-          'help',
-          'status',
-          'generate text',
-          'generate image',
-          'clear'
-        ];
-
-      case 'status':
-        return [
-          'ENGINE: ONLINE',
-          'Version: ' + this.state.version,
-          'Worlds: ' + this.state.worlds,
-          'Gates: ' + this.state.gates
-        ];
-
-      case 'generate text':
-        return [
-          'GENERATED TEXT:',
-          '„W punkcie zerowym zapadła decyzja, której nie da się cofnąć.”'
-        ];
-
-      case 'generate image':
-        return [
-          'DALL·E TRIGGER',
-          '➡ tutaj podpinasz image_gen API',
-          '➡ prompt z Belly / ETERNIVERSE'
-        ];
-
-      default:
-        return ['Nieznana komenda: ' + command];
-    }
-  }
+const DATA = {
+  worlds:[
+    {name:"Świat I — INTERSEEKER",gates:[
+      {name:"INTERSEEKER",books:["Geneza","Efekt Cienia"]},
+      {name:"SHADOWSEEKER",books:["Anatomia Cienia"]}
+    ]},
+    {name:"Świat II — POLARIS",gates:[
+      {name:"ETERSEEKER",books:["Architektura Woli"]}
+    ]}
+  ]
 };
 
 /* =========================
-   UI / CONSOLE
+   RENDER
 ========================= */
-const consoleEl = document.getElementById('console');
-const input = document.getElementById('cmd');
-const run = document.getElementById('run');
-
-function log(text, cls='log') {
-  const d=document.createElement('div');
-  d.className=cls;
-  d.textContent='['+new Date().toLocaleTimeString()+'] '+text;
-  consoleEl.appendChild(d);
-  consoleEl.scrollTop=consoleEl.scrollHeight;
+function render(){
+  const body=document.getElementById('tableBody');
+  body.innerHTML='';
+  DATA.worlds.forEach(w=>{
+    w.gates.forEach(g=>{
+      g.books.forEach(b=>{
+        body.innerHTML+=`
+          <tr>
+            <td>${w.name}</td>
+            <td><span class="tag">${g.name}</span></td>
+            <td>${b}</td>
+          </tr>`;
+      });
+    });
+  });
 }
+render();
 
-const UI = {
-  send(cmd) {
-    if(cmd==='clear'){consoleEl.innerHTML='';return}
-    log('> '+cmd,'warn');
-    const res = Engine.exec(cmd);
-    res.forEach(r=>log(r,'ok'));
+/* =========================
+   BELLA CONSOLE
+========================= */
+const out=document.getElementById('output');
+function log(t){out.innerHTML+=t+"<br>";out.scrollTop=out.scrollHeight}
+
+function run(){
+  const v=document.getElementById('cmd').value.trim();
+  document.getElementById('cmd').value='';
+  log("> "+v);
+
+  if(v==="help"){
+    log("add world NAZWA");
+    log("add gate WORLD BRAMA");
+    log("add book WORLD BRAMA KSIĘGA");
+    return;
   }
-};
 
-run.onclick=()=>{
-  const v=input.value.trim();
-  if(!v)return;
-  UI.send(v);
-  input.value='';
-};
+  const p=v.split(" ");
+  if(p[0]==="add" && p[1]==="world"){
+    DATA.worlds.push({name:p.slice(2).join(" "),gates:[]});
+    log("Dodano świat");
+  }
 
-input.addEventListener('keydown',e=>{
-  if(e.key==='Enter')run.click();
-});
+  if(p[0]==="add" && p[1]==="gate"){
+    const w=DATA.worlds.find(x=>x.name===p[2]);
+    if(w){w.gates.push({name:p.slice(3).join(" "),books:[]});log("Dodano bramę");}
+  }
 
-/* BOOT */
-log('ENGINE ZAINICJOWANY','ok');
-log('UI PODPIĘTE POD SILNIK','ok');
-log('SYSTEM GOTOWY','ok');
+  if(p[0]==="add" && p[1]==="book"){
+    const w=DATA.worlds.find(x=>x.name===p[2]);
+    const g=w?.gates.find(x=>x.name===p[3]);
+    if(g){g.books.push(p.slice(4).join(" "));log("Dodano księgę");}
+  }
+
+  render();
+}
 </script>
+
 </body>
 </html>
