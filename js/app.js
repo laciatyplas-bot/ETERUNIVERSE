@@ -2,117 +2,143 @@
 
 /*
   =========================================
-  ETERNIVERSE TABLE ENGINE
-  - ZERO frameworków
-  - ZERO magii
-  - Renderuje TABELĘ z danych
+  ETERNIVERSE APP CORE v2.1
+  - Jedno źródło prawdy: window.app
+  - Dane: gates / books
+  - Render TABELI
+  - Zgodny z render.js (table click → details)
   =========================================
 */
 
-/* =========================
-   DANE (JEŚLI SĄ GLOBALNE)
-   Jeśli masz je w innym pliku – TO USUŃ
-========================= */
-
-// window.ETERNIVERSE_DATA = { ... }
-
-/* =========================
-   APP
-========================= */
-
 class EterniverseApp {
-  constructor(data) {
-    if (!data || !data.gates) {
-      console.error('❌ Brak danych ETERNIVERSE');
-      return;
-    }
-
-    this.data = data;
-    this.root = document.getElementById('app');
-
-    if (!this.root) {
-      console.error('❌ Brak #app w HTML');
-      return;
-    }
+  constructor() {
+    this.VERSION = '2.1';
+    this.STORAGE_KEY = 'eterniverse_app_v2_1';
+    this.data = this.loadData();
+    this.table = null;
 
     this.init();
   }
 
   init() {
-    this.clear();
-    this.renderHeader();
+    this.cache();
     this.renderTable();
+    this.bindGlobal();
+    console.log('✅ EterniverseApp v2.1 READY');
   }
 
-  clear() {
-    this.root.innerHTML = '';
+  cache() {
+    this.table = document.querySelector('table');
+    if (!this.table) {
+      console.error('❌ Brak <table> w HTML');
+    }
   }
 
-  renderHeader() {
-    const header = document.createElement('div');
-    header.innerHTML = `
-      <h1>ETERNIVERSE</h1>
-      <p>System Bram · Księgi · Status</p>
-    `;
-    this.root.appendChild(header);
+  /* =========================
+     DANE
+  ========================= */
+
+  loadData() {
+    try {
+      const raw = localStorage.getItem(this.STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {
+      console.warn('⚠️ Storage error, ładuję domyślne');
+    }
+    return this.getDefaultData();
   }
+
+  saveData() {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.data));
+  }
+
+  getDefaultData() {
+    return {
+      meta: { version: this.VERSION },
+      gates: [
+        {
+          id: 1,
+          name: 'BRAMA I — INTERSEEKER',
+          books: [
+            {
+              title: 'INTERSEEKER: Geneza',
+              status: 'published',
+              desc: 'Podstawa psyche'
+            }
+          ]
+        },
+        {
+          id: 2,
+          name: 'BRAMA II — ETERSEEKER',
+          books: [
+            {
+              title: 'EterSeeker: Kronika Woli',
+              status: 'ready',
+              desc: 'Architektura woli i pola'
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /* =========================
+     TABELA
+  ========================= */
 
   renderTable() {
-    const table = document.createElement('table');
+    if (!this.table) return;
 
-    table.innerHTML = `
-      <thead>
-        <tr>
-          <th>Brama</th>
-          <th>Księga</th>
-          <th>Opis</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${this.buildRows()}
-      </tbody>
+    const thead = this.table.querySelector('thead');
+    const tbody = this.table.querySelector('tbody');
+
+    if (!thead || !tbody) {
+      console.error('❌ Tabela musi mieć thead i tbody');
+      return;
+    }
+
+    thead.innerHTML = `
+      <tr>
+        <th>#</th>
+        <th>Tytuł</th>
+        <th>Brama</th>
+        <th>Status</th>
+      </tr>
     `;
 
-    this.root.appendChild(table);
-  }
+    tbody.innerHTML = '';
 
-  buildRows() {
-    const rows = [];
+    let idx = 1;
 
     this.data.gates.forEach(gate => {
-      if (!gate.books || !gate.books.length) return;
-
       gate.books.forEach(book => {
-        rows.push(`
-          <tr>
-            <td data-label="Brama">
-              ${this.escape(gate.name)}
-            </td>
+        const tr = document.createElement('tr');
 
-            <td data-label="Księga">
-              ${this.escape(book.title)}
-            </td>
+        tr.innerHTML = `
+          <td>${idx++}</td>
+          <td>${this.escape(book.title)}</td>
+          <td>${this.escape(gate.name)}</td>
+          <td>${this.escape(book.status)}</td>
+        `;
 
-            <td data-label="Opis">
-              ${this.escape(book.desc || '')}
-            </td>
-
-            <td data-label="Status" data-status="${book.status}">
-              ${this.escape(book.status)}
-            </td>
-          </tr>
-        `);
+        tbody.appendChild(tr);
       });
     });
-
-    return rows.join('');
   }
 
-  escape(text) {
-    if (!text) return '';
+  /* =========================
+     GLOBAL
+  ========================= */
+
+  bindGlobal() {
+    window.addEventListener('beforeunload', () => {
+      this.saveData();
+    });
+  }
+
+  escape(t = '') {
     const d = document.createElement('div');
-    d.textContent = text;
+    d.textContent = t;
     return d.innerHTML;
   }
 }
@@ -122,11 +148,5 @@ class EterniverseApp {
 ========================= */
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (!window.ETERNIVERSE_DATA) {
-    console.error('❌ window.ETERNIVERSE_DATA nie istnieje');
-    return;
-  }
-
-  window.app = new EterniverseApp(window.ETERNIVERSE_DATA);
-  console.log('✅ ETERNIVERSE TABLE — READY');
+  window.app = new EterniverseApp();
 });
