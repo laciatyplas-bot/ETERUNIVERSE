@@ -2,12 +2,14 @@
 
 /*
   =========================================
-  BELLA MASTER CONSOLE v1.1
-  Eterniverse Compatible
+  BELLA MASTER CONSOLE v1.2
+  Eterniverse Compatible — FIXED / HARDENED
   =========================================
-  - Brak inline onclick
-  - Bezpieczne eventy
-  - Działa obok META Console
+  ✔ brak inline onclick
+  ✔ bezpieczne eventy
+  ✔ historia komend
+  ✔ zero konfliktów z META / Master
+  ✔ defensywne sprawdzanie DOM
 */
 
 class BellaConsole {
@@ -26,6 +28,8 @@ class BellaConsole {
      UI
   ========================= */
   initUI() {
+    if (document.getElementById('bella-console')) return;
+
     const html = `
       <div id="bella-console" style="
         position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
@@ -50,7 +54,7 @@ class BellaConsole {
           justify-content:space-between;
           align-items:center;
         ">
-          <span>🌌 BELLA MASTER CONSOLE v1.1</span>
+          <span>🌌 BELLA MASTER CONSOLE v1.2</span>
           <span id="bella-console-close" style="cursor:pointer;font-size:1.6rem;">✕</span>
         </div>
 
@@ -69,7 +73,8 @@ class BellaConsole {
         ">
           <input id="bella-console-input"
                  type="text"
-                 placeholder="help | status | add | generate | profile"
+                 autocomplete="off"
+                 placeholder="help | status | generate | profile"
                  style="
                    flex:1;
                    background:transparent;
@@ -109,6 +114,7 @@ class BellaConsole {
       if (e.key === 'Enter') this.execute();
       if (e.key === 'ArrowUp') { e.preventDefault(); this.historyUp(); }
       if (e.key === 'ArrowDown') { e.preventDefault(); this.historyDown(); }
+      if (e.key === 'Escape') this.toggle();
     });
 
     document.addEventListener('keydown', e => {
@@ -148,7 +154,7 @@ class BellaConsole {
 
     line.style.margin = '6px 0';
     line.style.color = colors[type] || colors.info;
-    line.innerHTML = `<span style="opacity:.6;">[${time}]</span> ${message}`;
+    line.innerHTML = `<span style="opacity:.6;">[${time}]</span> ${this.escapeHtml(message)}`;
 
     out.appendChild(line);
     out.scrollTop = out.scrollHeight;
@@ -205,19 +211,18 @@ class BellaConsole {
   }
 
   help() {
-    this.log('<strong>BELLA CONSOLE — KOMENDY</strong>');
+    this.log('BELLA CONSOLE — KOMENDY');
     this.log('help – lista');
     this.log('clear – wyczyść');
     this.log('status – status systemu');
-    this.log('profile wattpad/amazon');
-    this.log('generate – wygeneruj przykładową treść');
+    this.log('profile wattpad | amazon');
+    this.log('generate – przykładowa treść');
   }
 
   generate() {
     const text = this.profile === 'amazon'
       ? '⭐ Bestseller klasy premium. Odkryj teraz.'
       : 'W ciszy nocy zapadła decyzja, która zmieniła wszystko.';
-
     this.log(text, 'generated');
   }
 
@@ -227,7 +232,8 @@ class BellaConsole {
   historyUp() {
     if (!this.history.length) return;
     this.historyIndex = Math.min(this.historyIndex + 1, this.history.length - 1);
-    document.getElementById('bella-console-input').value = this.history[this.historyIndex];
+    document.getElementById('bella-console-input').value =
+      this.history[this.historyIndex];
   }
 
   historyDown() {
@@ -235,6 +241,15 @@ class BellaConsole {
     this.historyIndex = Math.max(this.historyIndex - 1, -1);
     document.getElementById('bella-console-input').value =
       this.historyIndex === -1 ? '' : this.history[this.historyIndex];
+  }
+
+  /* =========================
+     UTIL
+  ========================= */
+  escapeHtml(t = '') {
+    const d = document.createElement('div');
+    d.textContent = t;
+    return d.innerHTML;
   }
 }
 
