@@ -2,119 +2,119 @@
 
 /*
   =========================================
-  ETERNIVERSE TABLE RENDER
-  - Obsługa interakcji tabeli
-  - Klik → szczegóły księgi
-  - ZERO zależności
+  ETERNIVERSE RENDER ENGINE v2.1
+  - Czyta window.app.data
+  - Obsługa klików w tabeli
+  - Panel szczegółów książki
+  - ZERO logiki danych (tylko render)
   =========================================
 */
 
-class EterniverseRenderer {
-  constructor(app) {
-    if (!app || !app.data) {
-      console.error('❌ Renderer: brak app lub danych');
-      return;
-    }
-
-    this.app = app;
-    this.data = app.data;
-    this.table = document.querySelector('table');
-    this.detailsPanel = null;
-
-    if (!this.table) {
-      console.error('❌ Renderer: brak tabeli');
-      return;
-    }
+class EterniverseRender {
+  constructor() {
+    this.tableBody = null;
+    this.detailPanel = null;
 
     this.init();
   }
 
   init() {
-    this.injectDetailsPanel();
-    this.bindTableEvents();
-    console.log('✅ Renderer: aktywny');
+    this.cache();
+    this.bindTableClicks();
+    console.log('✅ RenderEngine v2.1 READY');
+  }
+
+  cache() {
+    this.tableBody = document.querySelector('table tbody');
+    this.detailPanel = document.getElementById('details');
+
+    if (!this.tableBody) {
+      console.error('❌ Brak <tbody> tabeli');
+    }
+    if (!this.detailPanel) {
+      console.warn('⚠️ Brak #details — panel szczegółów nie będzie widoczny');
+    }
   }
 
   /* =========================
-     PANEL SZCZEGÓŁÓW
+     TABLE INTERACTION
   ========================= */
 
-  injectDetailsPanel() {
-    const panel = document.createElement('div');
-    panel.id = 'book-details';
-    panel.style.marginTop = '24px';
-    panel.style.padding = '16px';
-    panel.style.border = '1px solid var(--border, #333)';
-    panel.style.borderRadius = '12px';
-    panel.style.display = 'none';
+  bindTableClicks() {
+    if (!this.tableBody) return;
 
-    panel.innerHTML = `
-      <h2 id="details-title"></h2>
-      <p id="details-gate" style="opacity:.7;"></p>
-      <p id="details-desc"></p>
-      <p><strong>Status:</strong> <span id="details-status"></span></p>
-    `;
+    this.tableBody.addEventListener('click', e => {
+      const row = e.target.closest('tr');
+      if (!row) return;
 
-    this.table.parentNode.appendChild(panel);
-    this.detailsPanel = panel;
-  }
+      const index = row.dataset.index;
+      if (index === undefined) return;
 
-  /* =========================
-     EVENTY
-  ========================= */
+      const flat = this.flattenBooks();
+      const book = flat[index];
 
-  bindTableEvents() {
-    const rows = this.table.querySelectorAll('tbody tr');
+      if (!book) return;
 
-    rows.forEach(row => {
-      row.addEventListener('click', () => {
-        this.clearSelection();
-        row.classList.add('active');
-
-        const bookTitle = row.children[1]?.textContent.trim();
-        this.showBookDetails(bookTitle);
-      });
+      this.highlightRow(row);
+      this.renderDetails(book);
     });
   }
 
-  clearSelection() {
-    this.table
-      .querySelectorAll('tbody tr.active')
-      .forEach(r => r.classList.remove('active'));
+  highlightRow(row) {
+    this.tableBody.querySelectorAll('tr').forEach(tr =>
+      tr.classList.remove('active')
+    );
+    row.classList.add('active');
   }
 
   /* =========================
-     LOGIKA
+     DETAILS
   ========================= */
 
-  showBookDetails(title) {
-    const found = this.findBookByTitle(title);
+  renderDetails(book) {
+    if (!this.detailPanel) return;
 
-    if (!found) {
-      console.warn('⚠️ Nie znaleziono księgi:', title);
-      return;
-    }
-
-    const { gate, book } = found;
-
-    this.detailsPanel.style.display = 'block';
-    document.getElementById('details-title').textContent = book.title;
-    document.getElementById('details-gate').textContent = gate.name;
-    document.getElementById('details-desc').textContent = book.desc || '';
-    document.getElementById('details-status').textContent = book.status;
+    this.detailPanel.innerHTML = `
+      <h2>${this.escape(book.title)}</h2>
+      <p><strong>Status:</strong> ${this.escape(book.status)}</p>
+      <p><strong>Brama:</strong> ${this.escape(book.gate)}</p>
+      <p style="opacity:.8;margin-top:1rem;">
+        ${this.escape(book.desc || 'Brak opisu')}
+      </p>
+    `;
   }
 
-  findBookByTitle(title) {
-    for (const gate of this.data.gates) {
-      if (!gate.books) continue;
+  /* =========================
+     DATA FLATTEN
+  ========================= */
 
-      for (const book of gate.books) {
-        if (book.title === title) {
-          return { gate, book };
-        }
-      }
-    }
-    return null;
+  flattenBooks() {
+    if (!window.app || !window.app.data) return [];
+
+    const out = [];
+
+    window.app.data.gates.forEach(gate => {
+      gate.books.forEach(book => {
+        out.push({
+          title: book.title,
+          status: book.status,
+          desc: book.desc || '',
+          gate: gate.name
+        });
+      });
+    });
+
+    return out;
+  }
+
+  /* =========================
+     UTIL
+  ========================= */
+
+  escape(t = '') {
+    const d = document.createElement('div');
+    d.textContent = t;
+    return d.innerHTML;
   }
 }
 
@@ -123,10 +123,5 @@ class EterniverseRenderer {
 ========================= */
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (!window.app) {
-    console.error('❌ Renderer: window.app nie istnieje');
-    return;
-  }
-
-  window.renderer = new EterniverseRenderer(window.app);
+  window.renderEngine = new EterniverseRender();
 });
