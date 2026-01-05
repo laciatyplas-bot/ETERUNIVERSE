@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IndexedDB - Eterniverse Storage</title>
+  <style>
+    body { margin:0; background:#01030A; color:#E9F4FF; font-family:monospace; padding:20px; }
+    pre { background:#0A1727; padding:20px; border-radius:12px; overflow:auto; }
+    button { padding:12px; background:#D9A441; color:#050814; border:none; border-radius:8px; margin:10px; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <h1>🗄️ IndexedDB / LocalStorage Mock</h1>
+  <button onclick="showData()">Pokaż dane Eterniverse</button>
+  <button onclick="clearData()">Wyczyść storage</button>
+  <pre id="output">Kliknij przycisk...</pre>
+
+  <script>
+    function showData() {
+      const data = localStorage.getItem('eterniverse-pro-master-v2.0') || 'Brak danych';
+      document.getElementById('output').textContent = JSON.stringify(JSON.parse(data || '{}'), null, 2);
+    }
+    function clearData() {
+      localStorage.clear();
+      document.getElementById('output').textContent = 'Storage wyczyszczony!';
+    }
+  </script>
+</body>
+</html>
