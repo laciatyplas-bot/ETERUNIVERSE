@@ -1,0 +1,6 @@
+# Ignoruj tymczasowe
+.DS_Store
+Thumbs.db
+
+# Ignoruj node_modules jeśli kiedyś dodasz
+node_modules/
