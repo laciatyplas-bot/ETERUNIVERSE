@@ -1,272 +1,50 @@
-/* ======================================================
-   ETERNIVERSE ENGINE — MASTER STYLES (2026)
-   ====================================================== */
-
-:root {
-  --bg: #050814;
-  --card: #0A1727;
-  --card-soft: #0D1C30;
-  --text: #E9F4FF;
-  --muted: #9BA9C8;
-  --border: #20324A;
-
-  --gold: #D9A441;
-  --teal: #28D3C6;
-  --green: #12C65B;
-  --orange: #FFB14B;
-  --red: #FF6B6B;
-  --purple: #9B6BFF;
-  --gray: #8B8FA0;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  min-height: 100vh;
-  background: radial-gradient(circle at top, #15223A 0%, #050814 55%, #01030A 100%);
-  color: var(--text);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-
-/* ======================================================
-   APP ROOT
-   ====================================================== */
-
-#app-root {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 24px 16px 40px;
-}
-
-/* ======================================================
-   HEADER
-   ====================================================== */
-
-#app-header {
-  text-align: center;
-  margin-bottom: 22px;
-}
-
-.app-title {
-  font-size: 32px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--gold);
-}
-
-.app-subtitle {
-  margin-top: 6px;
-  font-size: 14px;
-  color: var(--muted);
-}
-
-/* ======================================================
-   TOOLBAR
-   ====================================================== */
-
-#app-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-#app-toolbar button,
-#app-toolbar select {
-  background: #050B16;
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 9px 14px;
-  border-radius: 10px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-#app-toolbar button:hover {
-  border-color: var(--gold);
-}
-
-/* ======================================================
-   MAIN LAYOUT
-   ====================================================== */
-
-#app-main {
-  display: grid;
-  grid-template-columns: 260px 1fr 420px;
-  gap: 14px;
-}
-
-/* ======================================================
-   PANELS
-   ====================================================== */
-
-#panel-structure,
-#panel-editor,
-#panel-mapa {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 14px;
-  min-height: 420px;
-}
-
-#panel-structure h2,
-#panel-editor h2,
-#panel-mapa h2 {
-  font-size: 14px;
-  margin-bottom: 10px;
-  color: var(--gold);
-}
-
-/* ======================================================
-   STRUCTURE TREE
-   ====================================================== */
-
-#structure-tree {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* ======================================================
-   EDITOR
-   ====================================================== */
-
-#editor-title {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: #050B16;
-  color: var(--text);
-  font-size: 13px;
-  margin-bottom: 10px;
-}
-
-#editor-content {
-  width: 100%;
-  min-height: 260px;
-  resize: vertical;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: #050B16;
-  color: var(--text);
-  font-size: 13px;
-}
-
-#editor-suggestions {
-  margin-top: 10px;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* ======================================================
-   MAPA BRAM
-   ====================================================== */
-
-#mapa-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 14px;
-}
-
-/* ======================================================
-   BRAMA CARD
-   ====================================================== */
-
-.brama-card {
-  background: var(--card-soft);
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-}
-
-.brama-header {
-  margin-bottom: 8px;
-}
-
-.brama-title {
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.brama-sub {
-  font-size: 10px;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-top: 4px;
-}
-
-.books {
-  margin-top: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-/* ======================================================
-   BOOK
-   ====================================================== */
-
-.book {
-  background: #0F2138;
-  border-radius: 10px;
-  padding: 7px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  gap: 8px;
-  cursor: pointer;
-}
-
-.book:hover {
-  border-color: var(--gold);
-}
-
-.book-title {
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.book-meta {
-  font-size: 10px;
-  color: var(--muted);
-}
-
-/* ======================================================
-   STATUS
-   ====================================================== */
-
-.st-published { color: var(--green); }
-.st-ready { color: var(--gold); }
-.st-writing { color: var(--teal); }
-.st-draft { color: var(--orange); }
-.st-idea { color: var(--gray); }
-
-/* ======================================================
-   FOOTER / STATUS BAR
-   ====================================================== */
-
-#status-bar {
-  margin-top: 14px;
-  font-size: 12px;
-  color: var(--muted);
-  text-align: center;
-}
-
-/* ======================================================
-   RESPONSIVE
-   ====================================================== */
-
-@media (max-width: 1100px) {
-  #app-main {
-    grid-template-columns: 1fr;
+(function addEterniverseCSS(){
+  if(document.getElementById('eterniverse-extra-css')){
+    console.log('CSS already loaded');
+    return;
   }
-}
+
+  const style = document.createElement('style');
+  style.id = 'eterniverse-extra-css';
+  style.textContent = `
+    .gate {
+      position: relative;
+      box-shadow: 0 0 40px rgba(0,0,0,0.6);
+      transition: all .4s ease;
+    }
+
+    .gate:hover {
+      box-shadow: 0 0 60px currentColor;
+      transform: scale(1.02);
+    }
+
+    .book {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all .3s ease;
+    }
+
+    .book:hover {
+      background: rgba(255,255,255,0.08);
+      transform: translateX(6px);
+    }
+
+    .book::before {
+      content: '';
+      width: 28px;
+      height: 40px;
+      border-radius: 4px;
+      background: linear-gradient(135deg,#222,#555);
+      box-shadow: 0 0 12px rgba(217,164,65,0.6);
+      flex-shrink: 0;
+    }
+
+    .gate h2 {
+      text-shadow: 0 0 25px currentColor;
+    }
+  `;
+  document.head.appendChild(style);
+  console.log('✅ Eterniverse CSS PRO loaded');
+})();
