@@ -1,32 +1,42 @@
 // render.js — ETERNIVERSE ENGINE v2.0
-// Pełne renderowanie: Dashboard (światy + statystyki) + Bramy i Księgi
-// KANON / MOBILE SAFE / ZGODNY Z MASTER v2.0 (z worldami)
+// FIXED / CLEAN / 1:1 / ZGODNY Z app.js v2.0
+// Dashboard + Bramy + Księgi + Światy
 
 'use strict';
 
+/* =========================
+   DASHBOARD
+========================= */
+
 function renderDashboard(data, container) {
-  if (!container || !data || !Array.isArray(data.worlds)) {
-    console.warn('[renderDashboard] Brak danych światów lub kontenera');
+  if (!container || !data || !Array.isArray(data.worlds) || !Array.isArray(data.gates)) {
+    console.warn('[renderDashboard] Brak danych lub kontenera');
     return;
   }
 
-  const totalBooks = data.gates.reduce((sum, gate) => 
-    sum + (Array.isArray(gate.books) ? gate.books.length : 0), 0);
+  const totalBooks = data.gates.reduce(
+    (sum, gate) => sum + (Array.isArray(gate.books) ? gate.books.length : 0),
+    0
+  );
 
-  const publishedCount = data.gates.reduce((sum, gate) => 
-    sum + (gate.books?.filter(b => b.status === 'published').length || 0), 0);
+  const countByStatus = status =>
+    data.gates.reduce(
+      (sum, gate) =>
+        sum + (gate.books?.filter(b => b.status === status).length || 0),
+      0
+    );
 
-  const readyCount = data.gates.reduce((sum, gate) => 
-    sum + (gate.books?.filter(b => b.status === 'ready').length || 0), 0);
-
-  const writingCount = data.gates.reduce((sum, gate) => 
-    sum + (gate.books?.filter(b => b.status === 'writing').length || 0), 0);
+  const publishedCount = countByStatus('published');
+  const readyCount = countByStatus('ready');
+  const writingCount = countByStatus('writing');
 
   container.innerHTML = `
     <div class="dashboard-header">
       <h1>ETERNIVERSE PRO MASTER</h1>
-      <div class="dashboard-subtitle">Architektura uniwersum • 10 Bram • ${data.worlds.length} Światy</div>
-      
+      <div class="dashboard-subtitle">
+        Architektura uniwersum • 10 Bram • ${data.worlds.length} Światy
+      </div>
+
       <div class="stats-grid">
         <div class="stat-item">
           <span class="stat-value">${data.worlds.length}</span>
@@ -51,30 +61,35 @@ function renderDashboard(data, container) {
       </div>
 
       <div class="worlds-list">
-        ${data.worlds.map(world => `
+        ${data.worlds
+          .map(
+            world => `
           <div class="world-card">
             <div class="world-name">${escapeHtml(world.name)}</div>
             <div class="world-desc">${escapeHtml(world.desc || '')}</div>
-            <div class="world-books-count">${world.books?.length || 0} pozycji</div>
+            <div class="world-books-count">
+              ${(world.gates?.length || 0)} Bram
+            </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     </div>
   `;
 }
 
+/* =========================
+   BRAMY + KSIĘGI
+========================= */
+
 function renderGates(data, container, filters = {}) {
   if (!container || !Array.isArray(data.gates)) {
-    console.warn('[renderGates] Brak danych bram lub kontenera');
+    console.warn('[renderGates] Brak danych lub kontenera');
     return;
   }
 
-  const {
-    search = '',
-    gateId = null,
-    status = null
-  } = filters;
-
+  const { search = '', gateId = null, status = null } = filters;
   container.innerHTML = '';
 
   data.gates.forEach(brama => {
@@ -91,58 +106,58 @@ function renderGates(data, container, filters = {}) {
           <div class="brama-title">${escapeHtml(brama.name)}</div>
           <div class="brama-sub">${escapeHtml(brama.sub || '')}</div>
         </div>
-        \( {brama.tag ? `<span class="badge"> \){escapeHtml(brama.tag)}</span>` : ''}
+        ${
+          brama.tag
+            ? `<span class="badge">${escapeHtml(brama.tag)}</span>`
+            : ''
+        }
       </div>
       <div class="books"></div>
     `;
 
     const booksWrap = card.querySelector('.books');
-
     let books = Array.isArray(brama.books) ? [...brama.books] : [];
 
-    // filtr statusu
     if (status && status !== 'all') {
       books = books.filter(b => b.status === status);
     }
 
-    // filtr tekstowy
     if (search) {
       const q = search.toLowerCase();
-      books = books.filter(b =>
-        (b.title || '').toLowerCase().includes(q) ||
-        (b.desc || '').toLowerCase().includes(q)
+      books = books.filter(
+        b =>
+          (b.title || '').toLowerCase().includes(q) ||
+          (b.desc || '').toLowerCase().includes(q)
       );
     }
 
     if (books.length === 0) {
-      booksWrap.innerHTML = `
-        <div class="no-books">Brak pozycji w tej Bramie</div>
-      `;
+      booksWrap.innerHTML = `<div class="no-books">Brak pozycji w tej Bramie</div>`;
     }
 
     books.forEach((book, bookIndex) => {
       if (!book) return;
 
+      const hasCover = Boolean(book.cover && book.cover.trim());
       const bookEl = document.createElement('div');
       bookEl.className = 'book';
       bookEl.dataset.gateId = brama.id;
       bookEl.dataset.bookIndex = bookIndex;
 
-      const hasCover = Boolean(book.cover && book.cover.trim());
-
       bookEl.innerHTML = `
-        <div class="book-cover-thumb"
-             \( {hasCover ? `style="background-image:url(' \){escapeHtml(book.cover)}')"` : ''}>
+        <div class="book-cover-thumb" ${
+          hasCover
+            ? `style="background-image:url('${escapeHtml(book.cover)}')"`
+            : ''
+        }>
           ${hasCover ? '' : 'okładka'}
         </div>
 
         <div class="book-main">
-          <div class="book-title">
-            ${escapeHtml(book.title || 'Bez tytułu')}
-          </div>
-          <div class="book-desc">
-            ${escapeHtml(book.desc || '')}
-          </div>
+          <div class="book-title">${escapeHtml(
+            book.title || 'Bez tytułu'
+          )}</div>
+          <div class="book-desc">${escapeHtml(book.desc || '')}</div>
           <div class="book-meta">
             <span class="status ${getStatusClass(book.status)}">
               ${(book.status || 'idea').toUpperCase()}
@@ -153,26 +168,24 @@ function renderGates(data, container, filters = {}) {
         <button class="book-edit-btn" title="Edytuj">✏️</button>
       `;
 
-      // ===== EDYCJA =====
-      const editHandler = () => {
+      const editHandler = e => {
+        e.stopPropagation();
         if (typeof openEditModal === 'function') {
           openEditModal(brama.id, bookIndex);
-        } else {
-          console.warn('[renderGates] openEditModal nie istnieje');
         }
       };
 
       bookEl.querySelector('.book-title').addEventListener('click', editHandler);
-      bookEl.querySelector('.book-edit-btn').addEventListener('click', editHandler);
+      bookEl
+        .querySelector('.book-edit-btn')
+        .addEventListener('click', editHandler);
 
-      // ===== OKŁADKA =====
       if (hasCover) {
-        const thumb = bookEl.querySelector('.book-cover-thumb');
-        thumb.addEventListener('click', e => {
+        bookEl.querySelector('.book-cover-thumb').addEventListener('click', e => {
           e.stopPropagation();
           if (window.coverImg && window.coverPreview) {
             coverImg.src = book.cover;
-            coverPreview.style.display = 'flex';
+            coverPreview.classList.add('show');
           }
         });
       }
@@ -185,7 +198,7 @@ function renderGates(data, container, filters = {}) {
 }
 
 /* =========================
-   HELPERS — KANON
+   HELPERS
 ========================= */
 
 function escapeHtml(text) {
