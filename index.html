@@ -2,88 +2,206 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="ETERNIVERSE PRO MASTER – Multi-World System · 10 Bram · DataMaster v14.3" />
-  <title>ETERNIVERSE PRO MASTER</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ETERNIVERSE · BELLA CONSOLE</title>
 
-  <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,
-  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-    <text y='.9em' font-size='90'>🌌</text>
-  </svg>">
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; font-family: system-ui, sans-serif; }
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="styles.css" />
+    body {
+      background:#050814;
+      color:#e9f4ff;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+    }
 
+    h1 {
+      margin-bottom:12px;
+      letter-spacing:2px;
+    }
+
+    .panel {
+      width:95%;
+      max-width:900px;
+      background:#0a1727;
+      border:1px solid #20324a;
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 20px 60px rgba(0,0,0,.6);
+    }
+
+    .buttons {
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    button {
+      padding:10px 16px;
+      border-radius:999px;
+      border:none;
+      cursor:pointer;
+      font-weight:700;
+      font-size:13px;
+      background:#d9a441;
+      color:#050814;
+    }
+
+    button.alt { background:#28d3c6; }
+    button.warn { background:#ff6b6b; }
+
+    button:hover { opacity:.85; }
+
+    #console {
+      background:#020617;
+      border:1px solid #20324a;
+      border-radius:12px;
+      padding:12px;
+      height:260px;
+      overflow-y:auto;
+      font-family:monospace;
+      font-size:13px;
+      margin-bottom:8px;
+    }
+
+    #inputRow {
+      display:flex;
+      gap:8px;
+    }
+
+    #cmd {
+      flex:1;
+      padding:10px;
+      border-radius:10px;
+      border:1px solid #20324a;
+      background:#020617;
+      color:#e9f4ff;
+      font-family:monospace;
+    }
+
+    #run {
+      padding:10px 18px;
+      border-radius:10px;
+      border:none;
+      background:#12c65b;
+      color:#050814;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .log-info { color:#9bb0d4; }
+    .log-ok { color:#12c65b; }
+    .log-warn { color:#ffb14b; }
+  </style>
 </head>
+
 <body>
 
-  <!-- APP ROOT -->
-  <div id="app">
+  <h1>ETERNIVERSE · BELLA MASTER</h1>
 
-    <!-- LOADING -->
-    <div class="loading-screen" id="loadingScreen">
-      <div class="spinner"></div>
-      <div>Ładowanie ETERNIVERSE PRO MASTER…</div>
+  <div class="panel">
+
+    <!-- GUZIKI -->
+    <div class="buttons">
+      <button onclick="bella.help()">HELP</button>
+      <button class="alt" onclick="bella.status()">STATUS</button>
+      <button class="alt" onclick="bella.generateText()">GENERUJ TEKST</button>
+      <button class="alt" onclick="bella.generateImage()">DALL·E (IMAGE)</button>
+      <button class="warn" onclick="bella.clear()">CLEAR</button>
     </div>
 
-    <!-- DASHBOARD -->
-    <section id="dashboard"></section>
+    <!-- KONSOla -->
+    <div id="console"></div>
 
-    <!-- MAPA / BRAMY -->
-    <section id="mapa-grid" class="gates-grid"></section>
-
-    <!-- STRUKTURA -->
-    <aside id="structure-tree"></aside>
-
-    <!-- EDYCJA ELEMENTU -->
-    <section id="editor">
-      <input id="element-title" type="text" placeholder="Tytuł elementu" />
-      <textarea id="element-content" placeholder="Treść elementu"></textarea>
-    </section>
-
-    <!-- STATUS -->
-    <footer id="status-bar">Gotowy</footer>
+    <!-- INPUT -->
+    <div id="inputRow">
+      <input id="cmd" placeholder="Wpisz komendę i ENTER (np. generate, dalle)" />
+      <button id="run">▶</button>
+    </div>
 
   </div>
 
-  <!-- MODAL -->
-  <div id="modalBackdrop" aria-modal="true" role="dialog">
-    <div class="modal" tabindex="-1">
-      <h2 id="modalTitle">Edycja księgi</h2>
-      <div id="modalContent"></div>
-      <div class="modal-actions">
-        <button id="modalSave">Zapisz</button>
-        <button id="modalDelete">Usuń</button>
-        <button id="modalClose">Zamknij</button>
-      </div>
-    </div>
-  </div>
+<script>
+/* =========================
+   BELLA MINI ENGINE
+========================= */
 
-  <!-- TOAST -->
-  <div id="toastContainer" aria-live="polite"></div>
+const consoleEl = document.getElementById('console');
+const cmdInput = document.getElementById('cmd');
+const runBtn = document.getElementById('run');
 
-  <!-- OKŁADKA -->
-  <div id="coverPreview" aria-modal="true" role="dialog">
-    <div class="cover-container">
-      <img id="coverImg" src="" alt="Okładka księgi" loading="lazy" />
-      <button id="coverClose">Zamknij</button>
-    </div>
-  </div>
+function log(msg, cls='log-info') {
+  const div = document.createElement('div');
+  div.className = cls;
+  div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  consoleEl.appendChild(div);
+  consoleEl.scrollTop = consoleEl.scrollHeight;
+}
 
-  <!-- SCRIPTS – KOLEJNOŚĆ KRYTYCZNA -->
-  <script src="js/data.js"></script>
-  <script src="js/render.js"></script>
-  <script src="js/script.js"></script>
-  <script src="js/bella-console.js"></script>
+const bella = {
+  help() {
+    log('Dostępne komendy:', 'log-ok');
+    log('help');
+    log('status');
+    log('generate');
+    log('dalle');
+    log('clear');
+  },
 
-  <!-- LOADING OFF -->
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const l = document.getElementById('loadingScreen');
-      if (l) l.style.display = 'none';
-    });
-  </script>
+  status() {
+    log('BELLA: ONLINE', 'log-ok');
+    log('Tryb: LOCAL');
+  },
+
+  generateText() {
+    log('Generuję tekst...', 'log-warn');
+    log('„W ciszy zapadła decyzja, która zmieniła wszystko.”', 'log-ok');
+  },
+
+  generateImage() {
+    log('DALL·E: trigger image generation', 'log-warn');
+    log('➡ Tu podłączasz DALL·E API / image_gen', 'log-info');
+  },
+
+  clear() {
+    consoleEl.innerHTML = '';
+    log('Konsola wyczyszczona', 'log-ok');
+  },
+
+  exec(cmd) {
+    switch(cmd) {
+      case 'help': return this.help();
+      case 'status': return this.status();
+      case 'generate': return this.generateText();
+      case 'dalle': return this.generateImage();
+      case 'clear': return this.clear();
+      default:
+        log('Nieznana komenda: ' + cmd, 'log-warn');
+    }
+  }
+};
+
+/* INPUT */
+runBtn.onclick = () => {
+  const v = cmdInput.value.trim().toLowerCase();
+  if (!v) return;
+  log('> ' + v);
+  bella.exec(v);
+  cmdInput.value = '';
+};
+
+cmdInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') runBtn.click();
+});
+
+/* START */
+log('BELLA MASTER GOTOWA', 'log-ok');
+log('Klikaj guziki albo pisz komendy', 'log-info');
+</script>
 
 </body>
 </html>
