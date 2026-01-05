@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "version": "1.3"
+  },
+  "gates": [
+    {
+      "id": 1,
+      "name": "BRAMA I — INTERSEEKER",
+      "sub": "Psychika · Cień · Trauma · Mechanizmy przetrwania",
+      "tag": "CORE/PSYCHE",
+      "books": [
+        {
+          "title": "INTERSEEKER: Geneza",
+          "status": "published",
+          "desc": "Podstawa psyche",
+          "cover": "",
+          "content": "",
+          "audio": []
+        }
+      ]
+    },
+    // Dodaj pozostałe 9 bram z podobną strukturą
+  ]
+}{
   "MAPA_ETERNIVERSE": { 
     "titles": [
       { "id": 1, "title": "InterSeeker – Atlas Wewnętrzny", "hook": "Wejdź tam, gdzie nawet twoje myśli boją się wejść.", "pitch": "Podróż w głąb psyche, która rozbiera cię do kości i zmusza, byś zobaczył, kim naprawdę jesteś." },
