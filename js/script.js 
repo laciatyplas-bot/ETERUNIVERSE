@@ -1,123 +1,24 @@
-// script.js — Eterniverse Master PRO
-// KANON / STABLE
-// ZGODNY Z DataMaster v14.4 + render.js v2.0
-// WKLEJ 1:1
-
-'use strict';
-
-class EterniverseMasterPRO {
-  constructor() {
-    this.currentElement = null;
-    this.currentProfile = 'wattpad';
-    this.isDictating = false;
-
-    this.init();
-  }
-
-  /* =========================
-     INIT
-  ========================= */
-  init() {
-    this.bindEvents();
-    this.renderAll();
-    this.initSpeechRecognition();
-    this.status('Eterniverse Master — system gotowy', 5000);
-  }
-
-  bindEvents() {
-    const qs = id => document.getElementById(id);
-
-    const profileSelect = qs('profile-select');
-    if (profileSelect) {
-      profileSelect.value = this.currentProfile;
-      profileSelect.addEventListener('change', e => {
-        this.currentProfile = e.target.value;
-        this.status(`Profil: ${this.currentProfile.toUpperCase()}`);
-      });
+class EterSeeker {
+    constructor() {
+        this.bella = new BellaMasterPROv2();
+        this.initTabs();
+        this.quantumEffects();
     }
-
-    qs('bella-analyze')?.addEventListener('click', () => this.bellaAnalyze());
-    qs('start-dictate')?.addEventListener('click', () => this.startDictation());
-    qs('stop-dictate')?.addEventListener('click', () => this.stopDictation());
-  }
-
-  /* =========================
-     RENDER
-  ========================= */
-  renderAll() {
-    this.renderMapa();
-    this.renderSuggestions([]);
-  }
-
-  renderMapa() {
-    const container = document.getElementById('mapa-grid');
-    if (!container) return;
-
-    // DataMaster v14.4 → jedno źródło prawdy
-    const data = dataMaster.exportForRender();
-
-    renderGates(
-      { gates: data.gates },
-      container,
-      { status: 'all' }
-    );
-  }
-
-  /* =========================
-     BELLA (LOCAL)
-  ========================= */
-  bellaAnalyze() {
-    const textarea = document.getElementById('element-content');
-    if (!textarea || !textarea.value.trim()) {
-      this.status('Brak treści do analizy');
-      return;
+    
+    initTabs() {
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelector('.tab-btn.active').classList.remove('active');
+                document.querySelector('.tab-content.active').classList.remove('active');
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            };
+        });
     }
-
-    this.renderSuggestions([
-      '✅ Tekst spójny.',
-      '✅ Brak sprzeczności logicznych.',
-      'ℹ️ Możliwa kompresja treści w 2–3 miejscach.'
-    ]);
-  }
-
-  renderSuggestions(list) {
-    const el = document.getElementById('suggestions');
-    if (!el) return;
-    el.innerHTML = list.map(s => `<div>${s}</div>`).join('');
-  }
-
-  /* =========================
-     STATUS
-  ========================= */
-  status(msg, t = 4000) {
-    const el = document.getElementById('status-bar');
-    if (!el) return;
-
-    el.textContent = msg;
-    if (t > 0) {
-      setTimeout(() => {
-        if (el.textContent === msg) el.textContent = 'Gotowy';
-      }, t);
+    
+    quantumEffects() {
+        // Particles, spin, glow – z CSS
     }
-  }
-
-  /* =========================
-     DYKTOWANIE (STUBY)
-  ========================= */
-  initSpeechRecognition() {}
-  startDictation() {}
-  stopDictation() {}
 }
 
-/* =========================
-   BOOT
-========================= */
-document.addEventListener('DOMContentLoaded', () => {
-  if (!window.dataMaster) {
-    console.error('❌ DataMaster nie załadowany');
-    return;
-  }
-
-  window.master = new EterniverseMasterPRO();
-  console.log('🌌 Eterniverse Master PRO — READY');
-});
+new EterSeeker();
