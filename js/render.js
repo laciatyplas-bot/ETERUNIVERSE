@@ -1,220 +1,132 @@
-// render.js — ETERNIVERSE ENGINE v2.0
-// FIXED / CLEAN / 1:1 / ZGODNY Z app.js v2.0
-// Dashboard + Bramy + Księgi + Światy
-
 'use strict';
 
-/* =========================
-   DASHBOARD
-========================= */
+/*
+  =========================================
+  ETERNIVERSE TABLE RENDER
+  - Obsługa interakcji tabeli
+  - Klik → szczegóły księgi
+  - ZERO zależności
+  =========================================
+*/
 
-function renderDashboard(data, container) {
-  if (!container || !data || !Array.isArray(data.worlds) || !Array.isArray(data.gates)) {
-    console.warn('[renderDashboard] Brak danych lub kontenera');
-    return;
+class EterniverseRenderer {
+  constructor(app) {
+    if (!app || !app.data) {
+      console.error('❌ Renderer: brak app lub danych');
+      return;
+    }
+
+    this.app = app;
+    this.data = app.data;
+    this.table = document.querySelector('table');
+    this.detailsPanel = null;
+
+    if (!this.table) {
+      console.error('❌ Renderer: brak tabeli');
+      return;
+    }
+
+    this.init();
   }
 
-  const totalBooks = data.gates.reduce(
-    (sum, gate) => sum + (Array.isArray(gate.books) ? gate.books.length : 0),
-    0
-  );
-
-  const countByStatus = status =>
-    data.gates.reduce(
-      (sum, gate) =>
-        sum + (gate.books?.filter(b => b.status === status).length || 0),
-      0
-    );
-
-  const publishedCount = countByStatus('published');
-  const readyCount = countByStatus('ready');
-  const writingCount = countByStatus('writing');
-
-  container.innerHTML = `
-    <div class="dashboard-header">
-      <h1>ETERNIVERSE PRO MASTER</h1>
-      <div class="dashboard-subtitle">
-        Architektura uniwersum • 10 Bram • ${data.worlds.length} Światy
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-item">
-          <span class="stat-value">${data.worlds.length}</span>
-          <span class="stat-label">Światy</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value">${totalBooks}</span>
-          <span class="stat-label">Księgi</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value st-published">${publishedCount}</span>
-          <span class="stat-label">Published</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value st-ready">${readyCount}</span>
-          <span class="stat-label">Ready</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value st-writing">${writingCount}</span>
-          <span class="stat-label">Writing</span>
-        </div>
-      </div>
-
-      <div class="worlds-list">
-        ${data.worlds
-          .map(
-            world => `
-          <div class="world-card">
-            <div class="world-name">${escapeHtml(world.name)}</div>
-            <div class="world-desc">${escapeHtml(world.desc || '')}</div>
-            <div class="world-books-count">
-              ${(world.gates?.length || 0)} Bram
-            </div>
-          </div>
-        `
-          )
-          .join('')}
-      </div>
-    </div>
-  `;
-}
-
-/* =========================
-   BRAMY + KSIĘGI
-========================= */
-
-function renderGates(data, container, filters = {}) {
-  if (!container || !Array.isArray(data.gates)) {
-    console.warn('[renderGates] Brak danych lub kontenera');
-    return;
+  init() {
+    this.injectDetailsPanel();
+    this.bindTableEvents();
+    console.log('✅ Renderer: aktywny');
   }
 
-  const { search = '', gateId = null, status = null } = filters;
-  container.innerHTML = '';
+  /* =========================
+     PANEL SZCZEGÓŁÓW
+  ========================= */
 
-  data.gates.forEach(brama => {
-    if (!brama || typeof brama !== 'object') return;
-    if (gateId !== null && brama.id !== gateId) return;
+  injectDetailsPanel() {
+    const panel = document.createElement('div');
+    panel.id = 'book-details';
+    panel.style.marginTop = '24px';
+    panel.style.padding = '16px';
+    panel.style.border = '1px solid var(--border, #333)';
+    panel.style.borderRadius = '12px';
+    panel.style.display = 'none';
 
-    const card = document.createElement('article');
-    card.className = 'brama-card';
-    card.dataset.gateId = brama.id;
-
-    card.innerHTML = `
-      <div class="brama-header">
-        <div>
-          <div class="brama-title">${escapeHtml(brama.name)}</div>
-          <div class="brama-sub">${escapeHtml(brama.sub || '')}</div>
-        </div>
-        ${
-          brama.tag
-            ? `<span class="badge">${escapeHtml(brama.tag)}</span>`
-            : ''
-        }
-      </div>
-      <div class="books"></div>
+    panel.innerHTML = `
+      <h2 id="details-title"></h2>
+      <p id="details-gate" style="opacity:.7;"></p>
+      <p id="details-desc"></p>
+      <p><strong>Status:</strong> <span id="details-status"></span></p>
     `;
 
-    const booksWrap = card.querySelector('.books');
-    let books = Array.isArray(brama.books) ? [...brama.books] : [];
+    this.table.parentNode.appendChild(panel);
+    this.detailsPanel = panel;
+  }
 
-    if (status && status !== 'all') {
-      books = books.filter(b => b.status === status);
-    }
+  /* =========================
+     EVENTY
+  ========================= */
 
-    if (search) {
-      const q = search.toLowerCase();
-      books = books.filter(
-        b =>
-          (b.title || '').toLowerCase().includes(q) ||
-          (b.desc || '').toLowerCase().includes(q)
-      );
-    }
+  bindTableEvents() {
+    const rows = this.table.querySelectorAll('tbody tr');
 
-    if (books.length === 0) {
-      booksWrap.innerHTML = `<div class="no-books">Brak pozycji w tej Bramie</div>`;
-    }
+    rows.forEach(row => {
+      row.addEventListener('click', () => {
+        this.clearSelection();
+        row.classList.add('active');
 
-    books.forEach((book, bookIndex) => {
-      if (!book) return;
-
-      const hasCover = Boolean(book.cover && book.cover.trim());
-      const bookEl = document.createElement('div');
-      bookEl.className = 'book';
-      bookEl.dataset.gateId = brama.id;
-      bookEl.dataset.bookIndex = bookIndex;
-
-      bookEl.innerHTML = `
-        <div class="book-cover-thumb" ${
-          hasCover
-            ? `style="background-image:url('${escapeHtml(book.cover)}')"`
-            : ''
-        }>
-          ${hasCover ? '' : 'okładka'}
-        </div>
-
-        <div class="book-main">
-          <div class="book-title">${escapeHtml(
-            book.title || 'Bez tytułu'
-          )}</div>
-          <div class="book-desc">${escapeHtml(book.desc || '')}</div>
-          <div class="book-meta">
-            <span class="status ${getStatusClass(book.status)}">
-              ${(book.status || 'idea').toUpperCase()}
-            </span>
-          </div>
-        </div>
-
-        <button class="book-edit-btn" title="Edytuj">✏️</button>
-      `;
-
-      const editHandler = e => {
-        e.stopPropagation();
-        if (typeof openEditModal === 'function') {
-          openEditModal(brama.id, bookIndex);
-        }
-      };
-
-      bookEl.querySelector('.book-title').addEventListener('click', editHandler);
-      bookEl
-        .querySelector('.book-edit-btn')
-        .addEventListener('click', editHandler);
-
-      if (hasCover) {
-        bookEl.querySelector('.book-cover-thumb').addEventListener('click', e => {
-          e.stopPropagation();
-          if (window.coverImg && window.coverPreview) {
-            coverImg.src = book.cover;
-            coverPreview.classList.add('show');
-          }
-        });
-      }
-
-      booksWrap.appendChild(bookEl);
+        const bookTitle = row.children[1]?.textContent.trim();
+        this.showBookDetails(bookTitle);
+      });
     });
+  }
 
-    container.appendChild(card);
-  });
+  clearSelection() {
+    this.table
+      .querySelectorAll('tbody tr.active')
+      .forEach(r => r.classList.remove('active'));
+  }
+
+  /* =========================
+     LOGIKA
+  ========================= */
+
+  showBookDetails(title) {
+    const found = this.findBookByTitle(title);
+
+    if (!found) {
+      console.warn('⚠️ Nie znaleziono księgi:', title);
+      return;
+    }
+
+    const { gate, book } = found;
+
+    this.detailsPanel.style.display = 'block';
+    document.getElementById('details-title').textContent = book.title;
+    document.getElementById('details-gate').textContent = gate.name;
+    document.getElementById('details-desc').textContent = book.desc || '';
+    document.getElementById('details-status').textContent = book.status;
+  }
+
+  findBookByTitle(title) {
+    for (const gate of this.data.gates) {
+      if (!gate.books) continue;
+
+      for (const book of gate.books) {
+        if (book.title === title) {
+          return { gate, book };
+        }
+      }
+    }
+    return null;
+  }
 }
 
 /* =========================
-   HELPERS
+   BOOT
 ========================= */
 
-function escapeHtml(text) {
-  if (!text) return '';
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
+document.addEventListener('DOMContentLoaded', () => {
+  if (!window.app) {
+    console.error('❌ Renderer: window.app nie istnieje');
+    return;
+  }
 
-function getStatusClass(status) {
-  const map = {
-    published: 'st-published',
-    ready: 'st-ready',
-    writing: 'st-writing',
-    draft: 'st-draft',
-    idea: 'st-idea'
-  };
-  return map[status] || 'st-idea';
-}
+  window.renderer = new EterniverseRenderer(window.app);
+});
