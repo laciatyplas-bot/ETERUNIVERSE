@@ -1,6 +1,21 @@
-# Ignoruj tymczasowe
+# Systemowe śmieci
 .DS_Store
 Thumbs.db
 
-# Ignoruj node_modules jeśli kiedyś dodasz
+# Node / npm (jeśli kiedykolwiek dojdzie)
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build / cache (na przyszłość)
+dist/
+build/
+.cache/
+
+# Edytory
+.vscode/
+.idea/
+
+# Logi
+*.log
