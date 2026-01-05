@@ -1,16 +1,21 @@
+/* =====================================================
+   ETERNIVERSE PRO MASTER — STYLE MASTER
+   KANON / TABLE READY / SAFE
+===================================================== */
+
 :root {
   --bg: #050814;
-  --bg-soft: #0a1423;
-  --card: #0f2138;
-  --border: #20324a;
-  --text: #e9f4ff;
-  --muted: #9bb0d4;
+  --card: #0A1727;
+  --card-soft: #0F2138;
+  --border: #20324A;
+  --text: #E9F4FF;
+  --muted: #9BB0D4;
 
-  --gold: #d9a441;
-  --teal: #28d3c6;
-  --green: #12c65b;
-  --orange: #ffb14b;
-  --purple: #9b6bff;
+  --gold: #D9A441;
+  --teal: #28D3C6;
+  --green: #12C65B;
+  --orange: #FFB14B;
+  --purple: #9B6BFF;
 }
 
 * {
@@ -20,169 +25,180 @@
 html, body {
   margin: 0;
   padding: 0;
+  height: 100%;
   background: radial-gradient(
-    circle at 30% 20%,
-    #1a254b 0%,
-    #0a1423 35%,
-    #050814 70%,
-    #01030a 100%
+    circle at 25% 15%,
+    #1A254B 0%,
+    #0A1423 30%,
+    #050814 60%,
+    #01030A 100%
   );
   color: var(--text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 body {
-  padding: 32px;
+  overflow-x: hidden;
 }
 
-/* =========================
+/* =====================================================
    HEADER
-========================= */
+===================================================== */
 
-h1 {
-  margin: 0 0 8px;
-  font-size: 26px;
+header {
+  padding: 24px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  background: rgba(5,8,20,0.85);
+  backdrop-filter: blur(10px);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 20px;
   letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--gold);
 }
 
-p {
-  margin: 0 0 24px;
-  color: var(--muted);
-  font-size: 13px;
+/* =====================================================
+   LAYOUT
+===================================================== */
+
+main {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 16px;
+  padding: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-/* =========================
-   TABLE CORE
-========================= */
+section {
+  background: linear-gradient(145deg, var(--card), var(--card-soft));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.6);
+}
+
+/* =====================================================
+   TABLE
+===================================================== */
 
 table {
   width: 100%;
   border-collapse: collapse;
-  background: linear-gradient(145deg, var(--card), var(--bg-soft));
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-}
-
-thead {
-  background: rgba(15, 33, 56, 0.95);
+  font-size: 13px;
 }
 
 thead th {
-  padding: 14px 12px;
-  font-size: 12px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--teal);
+  text-align: left;
+  font-weight: 600;
+  color: var(--muted);
   border-bottom: 1px solid var(--border);
+  padding: 10px 8px;
+  letter-spacing: .5px;
 }
 
 tbody tr {
-  transition: background 0.2s ease;
+  cursor: pointer;
+  transition: background .15s ease, box-shadow .15s ease;
 }
 
 tbody tr:hover {
-  background: rgba(217, 164, 65, 0.08);
+  background: rgba(217,164,65,.06);
+}
+
+tbody tr.active {
+  background: rgba(40,211,198,.18);
+  box-shadow: inset 3px 0 0 var(--teal);
 }
 
 td {
-  padding: 14px 12px;
-  font-size: 13px;
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
+  padding: 10px 8px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
 }
 
-/* =========================
-   COLUMNS — WZMOCNIENIE SEMANTYKI
-========================= */
+/* =====================================================
+   STATUS TAGS
+===================================================== */
 
-td:nth-child(1) {
-  font-weight: 700;
-  color: var(--gold);
-  background: rgba(217, 164, 65, 0.06);
-}
-
-td:nth-child(2) {
-  font-weight: 600;
-  color: var(--teal);
-}
-
-td:nth-child(3) {
-  font-weight: 500;
-}
-
-td:nth-child(4) {
-  text-transform: uppercase;
+.status {
   font-size: 11px;
-  letter-spacing: 1px;
-  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: .5px;
 }
 
-/* =========================
-   STATUSY
-========================= */
-
-td:nth-child(4):contains("published"),
-td:nth-child(4)[data-status="published"] {
+.published {
   color: var(--green);
+  border-color: var(--green);
 }
 
-td:nth-child(4):contains("ready") {
+.ready {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.writing {
+  color: var(--orange);
+  border-color: var(--orange);
+}
+
+.idea {
+  color: var(--purple);
+  border-color: var(--purple);
+}
+
+/* =====================================================
+   DETAILS PANEL
+===================================================== */
+
+#details h2 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
   color: var(--gold);
 }
 
-td:nth-child(4):contains("writing") {
-  color: var(--orange);
+#details p {
+  margin: 6px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  opacity: .95;
 }
 
-/* fallback – JS później podmieni na klasy */
-td:nth-child(4) {
+#details .muted {
   color: var(--muted);
+  font-size: 12px;
 }
 
-/* =========================
+/* =====================================================
+   SCROLLBAR
+===================================================== */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #020617;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 6px;
+}
+
+/* =====================================================
    RESPONSIVE
-========================= */
+===================================================== */
 
 @media (max-width: 900px) {
-  body {
-    padding: 16px;
-  }
-
-  table {
-    font-size: 12px;
-  }
-
-  thead {
-    display: none;
-  }
-
-  tbody tr {
-    display: block;
-    margin-bottom: 16px;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-
-  td {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  td::before {
-    content: attr(data-label);
-    color: var(--muted);
-    font-size: 11px;
-    margin-right: 12px;
-  }
-
-  td:last-child {
-    border-bottom: none;
+  main {
+    grid-template-columns: 1fr;
   }
 }
