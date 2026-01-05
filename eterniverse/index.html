@@ -1,105 +1,110 @@
-<!-- TABELA ETERNIVERSE -->
-<style>
-  .et-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 40px 0;
-    background: #0b1220;
-    font-size: 14px;
-  }
-
-  .et-table th,
-  .et-table td {
-    border: 1px solid #2d3748;
-    padding: 12px 14px;
-    text-align: left;
-  }
-
-  .et-table th {
-    background: #111827;
-    color: #93c5fd;
-    font-weight: 800;
-    letter-spacing: 1px;
-  }
-
-  .et-table tr:nth-child(even) {
-    background: #0f172a;
-  }
-
-  .et-table tr:hover {
-    background: #1e293b;
-  }
-
-  .status {
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-weight: 700;
-    font-size: 12px;
-    display: inline-block;
-  }
-
-  .published { background:#14532d; color:#86efac; }
-  .writing   { background:#78350f; color:#fde68a; }
-  .idea      { background:#1e3a8a; color:#bfdbfe; }
-</style>
-
-<script>
-  function renderTable() {
-    if (!DATA || !DATA.worlds) return;
-
-    const container = document.getElementById('contentArea');
-    container.innerHTML = '<h2>TABELA ETERNIVERSE</h2>';
-
-    const table = document.createElement('table');
-    table.className = 'et-table';
-
-    table.innerHTML = `
-      <thead>
-        <tr>
-          <th>ŚWIAT</th>
-          <th>BRAMA</th>
-          <th>KSIĘGA</th>
-          <th>STATUS</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    `;
-
-    const tbody = table.querySelector('tbody');
-
-    DATA.worlds.forEach(world => {
-      world.gates.forEach(gate => {
-        if (!gate.books.length) {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${world.name}</td>
-            <td>${gate.name}</td>
-            <td>—</td>
-            <td>—</td>
-          `;
-          tbody.appendChild(tr);
-        }
-
-        gate.books.forEach(book => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${world.name}</td>
-            <td>${gate.name}</td>
-            <td>${book.title}</td>
-            <td>
-              <span class="status ${book.status || 'idea'}">
-                ${book.status || 'idea'}
-              </span>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      });
-    });
-
-    container.appendChild(table);
-  }
-
-  // WYWOŁANIE
-  renderTable();
-</script>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 EterSeeker - Kronika Woli 🔥😈</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="quantum-field"></div>
+    
+    <header>
+        <h1>ETERSEEKER</h1>
+        <h2>Kronika Woli • Świat 2 • Bella 7.00 PRO</h2>
+        <div class="power-status">
+            ⚡ MOC: <span id="power-level">100</span> | Księgi: <span id="book-count">54</span> | Światy: <span id="world-count">2</span>
+        </div>
+    </header>
+    
+    <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="bella">😈 BELLA</button>
+        <button class="tab-btn" data-tab="editor">✍️ PISARZ</button>
+        <button class="tab-btn" data-tab="bramy">🚪 BRAMY</button>
+        <button class="tab-btn" data-tab="ksiegi">📚 KSIĘGI</button>
+    </nav>
+    
+    <main class="main">
+        <!-- BELLA CHAT -->
+        <section id="bella" class="tab-content active">
+            <div class="chat-container">
+                <div id="chat-output" class="chat-output">
+                    <div class="message bella">
+                        😈 Witaj, Architekcie. EterSeeker gotowy. Wola płynie.<br>
+                        Klikaj zakładki. Rozkazuj. Tworzymy Świat 2. 🔥
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="user-input" placeholder="Co manifestujemy dziś? 😈" autofocus>
+                    <button id="send-btn">EXECUTE 🔥</button>
+                </div>
+            </div>
+            
+            <!-- Ulubione księgi - mini panel -->
+            <div class="books-panel">
+                <div class="book-item" data-book="0">
+                    <div class="book-cover" style="background-image: url('https://via.placeholder.com/200x280/D9A441/000?text=ObfitoSeeker')"></div>
+                    <div>ObfitoSeeker</div>
+                </div>
+                <div class="book-item" data-book="1">
+                    <div class="book-cover" style="background-image: url('https://via.placeholder.com/200x280/28D3C6/000?text=InterSeeker')"></div>
+                    <div>InterSeeker</div>
+                </div>
+                <div class="book-item" data-book="2">
+                    <div class="book-cover" style="background-image: url('https://via.placeholder.com/200x280/FFB14B/000?text=Polaris')"></div>
+                    <div>Polaris</div>
+                </div>
+                <div class="book-item" data-book="3">
+                    <div class="book-cover" style="background-image: url('https://via.placeholder.com/200x280/9B6BFF/000?text=EterSeeker')"></div>
+                    <div>EterSeeker</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- EDYTOR -->
+        <section id="editor" class="tab-content">
+            <div class="editor-container">
+                <textarea class="editor" id="story-editor" placeholder="Tutaj rodzi się Kronika Woli... Pisarz, manifestuj..."></textarea>
+                <div class="editor-buttons">
+                    <button id="save-chapter">💾 Zapisz Rozdział</button>
+                    <button id="new-chapter">📄 Nowy Rozdział</button>
+                    <button id="export-md">📤 Export MD</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- BRAMY -->
+        <section id="bramy" class="tab-content">
+            <div class="bramy-container">
+                <div class="world-item active" data-world="polaris">
+                    <h3>🌌 Polaris</h3>
+                    <p>Echo pod Lodem • Rozdział 12</p>
+                </div>
+                <div class="world-item" data-world="obfito">
+                    <h3>💰 ObfitoSeeker</h3>
+                    <p>Kod Obfitości • Core Engine</p>
+                </div>
+                <div class="world-item" data-world="inter">
+                    <h3>🧭 InterSeeker</h3>
+                    <p>Atlas Wewnętrzny • Mapa Eteru</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- KSIĘGI -->
+        <section id="ksiegi" class="tab-content">
+            <div class="books-grid">
+                <div class="book-card">
+                    <div class="book-cover-large" style="background-image: url('https://via.placeholder.com/300x450/D9A441/000?text=ObfitoSeeker')"></div>
+                    <h3>ObfitoSeeker</h3>
+                    <p>PUBLISHED • 2025</p>
+                </div>
+                <!-- więcej ksiąg... -->
+            </div>
+        </section>
+    </main>
+    
+    <script src="script.js"></script>
+</body>
+</html>
