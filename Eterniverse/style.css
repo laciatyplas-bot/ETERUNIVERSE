@@ -1,0 +1,65 @@
+/* =========================
+   ETERNIVERSE — CORE STYLE
+   ========================= */
+
+:root{
+  --bg:#050814;
+  --panel:#0A1727;
+  --panel-soft:#0D1C30;
+  --text:#E9F4FF;
+  --muted:#9BA9C8;
+  --border:#20324A;
+
+  --gold:#D9A441;
+  --teal:#28D3C6;
+  --green:#12C65B;
+  --orange:#FFB14B;
+  --red:#FF6B6B;
+  --violet:#9B6BFF;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  background:
+    radial-gradient(circle at top, #15223A 0%, #050814 55%, #01030A 100%);
+  color:var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  min-height:100vh;
+}
+
+/* ===== LAYOUT ===== */
+
+.app{
+  display:grid;
+  grid-template-columns: 300px 1fr;
+  min-height:100vh;
+}
+
+.sidebar{
+  background:linear-gradient(180deg,#071626,#050814);
+  border-right:1px solid var(--border);
+  padding:20px;
+}
+
+.main{
+  padding:32px;
+}
+
+/* ===== SIDEBAR ===== */
+
+.sidebar h1{
+  color:var(--gold);
+  font-size:18px;
+  letter-spacing:3px;
+  margin-bottom:20px;
+  text-transform:uppercase;
+}
+
+.world-btn{
+  width:100%;
+  padding:14px;
