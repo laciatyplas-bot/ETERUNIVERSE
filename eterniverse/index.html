@@ -1,621 +1,105 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ETERNIVERSE – Mapa Światów | Master Edition</title>
-  <style>
-    /* Master CSS – Ultimate Professional Cosmic Interface (2026 Edition) */
+<!-- TABELA ETERNIVERSE -->
+<style>
+  .et-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 40px 0;
+    background: #0b1220;
+    font-size: 14px;
+  }
 
-    * { box-sizing:border-box; margin:0; padding:0; font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+  .et-table th,
+  .et-table td {
+    border: 1px solid #2d3748;
+    padding: 12px 14px;
+    text-align: left;
+  }
 
-    body { background:#05070a; color:#e6e6e6; min-height:100vh; display:flex; flex-direction:column; }
+  .et-table th {
+    background: #111827;
+    color: #93c5fd;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
 
-    header { background:rgba(17,24,39,0.94); padding:24px; border-bottom:1px solid #2d3748; backdrop-filter:blur(20px); box-shadow:0 12px 40px rgba(0,0,0,0.6); display:flex; flex-direction:column; gap:24px; align-items:center; }
+  .et-table tr:nth-child(even) {
+    background: #0f172a;
+  }
 
-    header h1 { font-size:32px; font-weight:800; color:#93c5fd; letter-spacing:2px; text-align:center; text-shadow:0 8px 32px rgba(147,197,253,0.4); }
+  .et-table tr:hover {
+    background: #1e293b;
+  }
 
-    .controls { display:flex; flex-wrap:wrap; gap:16px; justify-content:center; width:100%; max-width:1200px; }
+  .status {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 12px;
+    display: inline-block;
+  }
 
-    .controls input, .controls select, .controls button { padding:14px 20px; border-radius:16px; border:none; background:#1e293b; color:#e6e6e6; font-size:16px; transition:all 0.4s ease; box-shadow:0 4px 16px rgba(0,0,0,0.3); }
+  .published { background:#14532d; color:#86efac; }
+  .writing   { background:#78350f; color:#fde68a; }
+  .idea      { background:#1e3a8a; color:#bfdbfe; }
+</style>
 
-    .controls input:focus, .controls select:focus { outline:none; box-shadow:0 0 0 4px rgba(96,165,250,0.4); }
+<script>
+  function renderTable() {
+    if (!DATA || !DATA.worlds) return;
 
-    .controls button { background:#1e40af; cursor:pointer; font-weight:700; }
+    const container = document.getElementById('contentArea');
+    container.innerHTML = '<h2>TABELA ETERNIVERSE</h2>';
 
-    .controls button:hover { background:#2563eb; transform:translateY(-4px); box-shadow:0 12px 32px rgba(37,99,235,0.4); }
+    const table = document.createElement('table');
+    table.className = 'et-table';
 
-    main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>ŚWIAT</th>
+          <th>BRAMA</th>
+          <th>KSIĘGA</th>
+          <th>STATUS</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `;
 
-    .panel { background:#111827; padding:24px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:#4a5568 #111827; border-bottom:1px solid #2d3748; }
+    const tbody = table.querySelector('tbody');
 
-    .panel:last-child { border-bottom:none; }
-
-    .panel::-webkit-scrollbar { width:10px; }
-    .panel::-webkit-scrollbar-track { background:#111827; }
-    .panel::-webkit-scrollbar-thumb { background:#4a5568; border-radius:5px; }
-
-    #worldList { max-height:40vh; }
-
-    #worldList button { display:block; width:100%; padding:24px; margin-bottom:20px; background:linear-gradient(135deg,#0f2138,#071626); border:none; border-radius:24px; color:#E6F6F5; font-size:22px; font-weight:700; cursor:pointer; box-shadow:0 16px 60px rgba(0,0,0,0.7); transition:all 0.6s ease; text-align:left; position:relative; }
-
-    #worldList button:hover { transform:translateY(-12px) scale(1.03); box-shadow:0 24px 80px rgba(0,0,0,0.9); }
-
-    #contentArea { flex:1; padding:40px; }
-
-    #contentArea h2 { font-size:42px; color:#D9A441; text-align:center; margin-bottom:40px; text-shadow:0 12px 40px rgba(217,164,65,0.5); }
-
-    .gate { margin:64px 0; padding:56px; background:linear-gradient(145deg,#08121c,#0f2138); border-radius:32px; box-shadow:0 32px 100px rgba(0,0,0,0.9); position:relative; overflow:hidden; transition:all 0.7s ease; }
-
-    .gate::before { content:''; position:absolute; top:0; left:0; width:100%; height:16px; background:var(--gate-color, #28D3C6); border-radius:32px 32px 0 0; }
-
-    .gate h3 { font-size:36px; color:var(--gate-color, #28D3C6); margin-bottom:24px; text-align:center; text-shadow:0 0 50px var(--gate-color, #28D3C6)50; }
-
-    .gate .sub { opacity:0.9; font-size:20px; margin-bottom:40px; text-align:center; line-height:1.7; }
-
-    .gate .tag { display:block; text-align:center; margin-bottom:48px; font-size:20px; padding:16px 48px; background:linear-gradient(135deg,rgba(217,164,65,0.35),rgba(40,211,198,0.35)); color:#D9A441; border-radius:80px; letter-spacing:3px; font-weight:800; box-shadow:0 20px 60px rgba(217,164,65,0.5); }
-
-    .books-header { display:flex; justify-content:space-between; align-items:center; margin:48px 0 24px; flex-wrap:wrap; gap:20px; }
-
-    .books-header strong { font-size:24px; color:#E6F6F5; }
-
-    .add-book-btn { padding:16px 36px; background:#1e40af; border:none; border-radius:20px; color:#fff; cursor:pointer; font-weight:700; font-size:18px; transition:all 0.4s ease; }
-
-    .add-book-btn:hover { background:#2563eb; transform:translateY(-6px); box-shadow:0 16px 40px rgba(37,99,235,0.5); }
-
-    .book { padding:32px; margin:32px 0; background:rgba(15,33,56,0.7); border-radius:28px; border:1px solid rgba(255,255,255,0.15); position:relative; transition:all 0.6s ease; }
-
-    .book:hover { transform:translateX(24px) scale(1.04); box-shadow:0 32px 100px rgba(0,0,0,0.7); }
-
-    .book strong { display:block; font-size:26px; color:#E6F6F5; margin-bottom:16px; }
-
-    .book .status { display:inline-block; padding:12px 28px; background:rgba(217,164,65,0.5); color:#D9A441; border-radius:40px; font-size:16px; font-weight:800; }
-
-    .book p { margin:24px 0 0; line-height:1.8; opacity:0.95; font-size:18px; }
-
-    .book-actions { position:absolute; top:32px; right:32px; display:flex; gap:16px; opacity:0; transition:opacity 0.5s ease; flex-wrap:wrap; }
-
-    .book:hover .book-actions { opacity:1; }
-
-    .book-actions button { padding:12px 24px; border:none; border-radius:16px; color:#fff; cursor:pointer; font-size:15px; font-weight:700; }
-
-    .edit-btn { background:#2563eb; }
-    .delete-btn { background:#dc2626; }
-
-    #log { background:#05070a; padding:24px; font-family:monospace; font-size:14px; line-height:1.6; white-space:pre-wrap; min-height:160px; border-top:1px solid #2d3748; }
-
-    /* Responsywność – Master Edition */
-    @media (min-width:1280px) {
-      main { display:grid; grid-template-columns:340px 1fr 440px; }
-      header { flex-direction:row; justify-content:space-between; align-items:center; }
-      .controls { width:auto; gap:20px; }
-      #worldList { max-height:none; }
-    }
-
-    @media (max-width:1279px) and (min-width:1024px) {
-      main { grid-template-columns:300px 1fr 400px; }
-    }
-
-    @media (max-width:1023px) and (min-width:768px) {
-      main { grid-template-columns:260px 1fr 340px; }
-      header h1 { font-size:30px; }
-    }
-
-    @media (max-width:767px) {
-      header { padding:20px; gap:24px; }
-      header h1 { font-size:26px; }
-      .controls { flex-direction:column; }
-      .controls input, .controls select, .controls button { width:100%; }
-      #contentArea { padding:24px; }
-      #contentArea h2 { font-size:34px; }
-      .gate { padding:40px; margin:48px 0; }
-      .gate h3 { font-size:30px; }
-      .book-actions { opacity:1; position:static; margin-top:32px; justify-content:center; }
-      .book-actions button { width:100%; margin:12px 0; }
-    }
-
-    @media (max-width:480px) {
-      header h1 { font-size:24px; }
-      #contentArea h2 { font-size:30px; }
-      .gate { padding:32px; margin:40px 0; }
-      .gate h3 { font-size:28px; }
-      .book { padding:24px; }
-      .book strong { font-size:22px; }
-      .add-book-btn { width:100%; }
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>ETERNIVERSE – Mapa Światów | Master Edition</h1>
-    <div class="controls">
-      <input type="text" id="searchInput" placeholder="Szukaj bram / ksiąg...">
-      <select id="filterSelect">
-        <option value="all">Wszystkie statusy</option>
-        <option value="aktywna">Aktywne</option>
-        <option value="planowana">Planowane</option>
-        <option value="w przygotowaniu">W przygotowaniu</option>
-        <option value="idea">Idea</option>
-      </select>
-      <select id="sortSelect">
-        <option value="id">Sortuj po ID</option>
-        <option value="books">Sortuj po liczbie ksiąg</option>
-        <option value="name">Sortuj po nazwie</option>
-      </select>
-      <button id="themeToggle">🌙 Tryb ciemny</button>
-    </div>
-  </header>
-  <main>
-    <div class="panel" id="worldList"><!-- Lista światów --></div>
-    <div class="panel" id="contentArea"><!-- Treść --></div>
-    <div class="panel" id="log"><!-- Log --></div>
-  </main>
-
-  <script>
-    // ETERNIVERSE – Master Edition JS (pełny, kompletny kod z obsługą wielu światów)
-
-    const selectors = {
-      worldList: '#worldList',
-      contentArea: '#contentArea',
-      log: '#log'
-    };
-
-    const elements = {
-      worldList: document.querySelector(selectors.worldList),
-      contentArea: document.querySelector(selectors.contentArea),
-      log: document.querySelector(selectors.log)
-    };
-
-    const DB_NAME = 'EterniverseDB';
-    const DB_VERSION = 1;
-    const STORE_NAME = 'eterniverse_data';
-    let db = null;
-    let DATA = null;
-
-    let currentWorld = null;
-
-    // Otwarcie IndexedDB
-    async function openDB() {
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => {
-          db = request.result;
-          resolve(db);
-        };
-        request.onupgradeneeded = (e) => {
-          db = e.target.result;
-          if (!db.objectStoreNames.contains(STORE_NAME)) {
-            db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-          }
-        };
-      });
-    }
-
-    // Ładowanie danych
-    async function loadData() {
-      if (!db) await openDB();
-
-      // 1. map.json
-      try {
-        const res = await fetch('map.json?' + Date.now());
-        if (res.ok) {
-          DATA = await res.json();
-          saveToIndexedDB();
-          logMessage('Dane załadowane z map.json');
-          renderWorlds();
-          return;
+    DATA.worlds.forEach(world => {
+      world.gates.forEach(gate => {
+        if (!gate.books.length) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${world.name}</td>
+            <td>${gate.name}</td>
+            <td>—</td>
+            <td>—</td>
+          `;
+          tbody.appendChild(tr);
         }
-      } catch (err) {
-        logMessage('map.json niedostępny – ładowanie z IndexedDB');
-      }
 
-      // 2. IndexedDB
-      const saved = await getFromIndexedDB();
-      if (saved) {
-        DATA = saved;
-        logMessage('Dane załadowane z IndexedDB');
-      } else {
-        DATA = getDefaultData();
-        logMessage('Załadowno domyślne dane z przykładowymi księgami');
-      }
-
-      saveToIndexedDB();
-      renderWorlds();
-    }
-
-    // Pobieranie z IndexedDB
-    function getFromIndexedDB() {
-      return new Promise((resolve) => {
-        const tx = db.transaction(STORE_NAME, 'readonly');
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.get('core_data');
-        request.onsuccess = () => resolve(request.result ? request.result.data : null);
-      });
-    }
-
-    // Zapisywanie do IndexedDB
-    function saveToIndexedDB() {
-      if (!db) return;
-      const tx = db.transaction(STORE_NAME, 'readwrite');
-      const store = tx.objectStore(STORE_NAME);
-      store.put({ id: 'core_data', data: DATA });
-    }
-
-    // Domyślne dane – dwa światy z przykładowymi księgami
-    function getDefaultData() {
-      return {
-        "system": "ETERNIVERSE",
-        "version": "Multi-World Master 2026",
-        "architect": "Maciej Maciuszek",
-        "worlds": [
-          {
-            "id": "core",
-            "name": "ETERUNIVERSE – Rdzeń",
-            "description": "Centralny system nawigacji świadomości. Mapa przejścia ból → świadomość → wola → obfitość → integracja.",
-            "gates": [
-              {
-                "id": "1",
-                "name": "BRAMA I — INTERSEEKER",
-                "color": "#28D3C6",
-                "sub": "Psychika · Cień · Trauma",
-                "tag": "CORE/PSYCHE",
-                "books": [
-                  { "id": "b1", "title": "INTERSEEKER: Geneza", "status": "opublikowana", "content": "Surowa autobiograficzna historia spod pieca – dzieciństwo, trauma, ogień jako symbol odrodzenia." },
-                  { "id": "b2", "title": "InterSeeker – Atlas Wewnętrzny", "status": "opublikowana", "content": "Podręcznik konfrontacji z Cieniem i mechanizmami przetrwania." },
-                  { "id": "b3", "title": "INTERSEEKER: Efekt Cienia", "status": "opublikowana", "content": "Tom 2 serii – test na nowe życie." }
-                ]
-              },
-              {
-                "id": "3",
-                "name": "BRAMA III — ETERSEEKER",
-                "color": "#12C65B",
-                "sub": "Wola · Pole · Architektura rzeczywistości",
-                "tag": "CORE/FIELD",
-                "books": [
-                  { "id": "b4", "title": "EterSeeker: Kronika Woli", "status": "opublikowana", "content": "Protokół reprogramowania woli za pomocą oddechu, częstotliwości i spójności pola." }
-                ]
-              },
-              // Pozostałe bramy puste
-              { "id": "2", "name": "BRAMA II — CUSTOS / GENEZA", "color": "#D9A441", "sub": "Strażnik · Początek", "tag": "CORE/ORIGIN", "books": [] },
-              { "id": "4", "name": "BRAMA IV — ARCHETYPY / WOLA", "color": "#9B6BFF", "sub": "Role · Przeznaczenie", "tag": "CORE/WILL", "books": [] },
-              { "id": "5", "name": "BRAMA V — OBFITOSEEKER", "color": "#FFB14B", "sub": "Obfitość · Przepływ", "tag": "EMBODIED/FLOW", "books": [] },
-              { "id": "6", "name": "BRAMA VI — BIOSEEKER", "color": "#FF6B6B", "sub": "Ciało · Biologia", "tag": "EMBODIED/BIO", "books": [] },
-              { "id": "7", "name": "BRAMA VII — SPLĄTANIE / AI", "color": "#9B6BFF", "sub": "Obserwator · Technologia", "tag": "META/TECH", "books": [] },
-              { "id": "8", "name": "BRAMA VIII — TRAJEKTORIE", "color": "#28D3C6", "sub": "Czas · Linie życia", "tag": "META/PHYSICS", "books": [] },
-              { "id": "9", "name": "BRAMA IX — ETERNIONY / KOLEKTYW", "color": "#D9A441", "sub": "Wspólnota · Węzły", "tag": "COLLECTIVE", "books": [] },
-              { "id": "10", "name": "BRAMA X — ETERUNIVERSE", "color": "#12C65B", "sub": "Integracja · Absolut", "tag": "INTEGRATION", "books": [] }
-            ]
-          },
-          {
-            "id": "polaris",
-            "name": "POLARIS – Drugi Świat",
-            "description": "Świat przejścia, testu i bram. 10 Kręgów inicjacji – droga do Lemurii i Krasnali.",
-            "gates": [
-              { "id": "p1", "name": "KRĄG I — PRZEBUDZENIE", "color": "#FFD700", "sub": "Chaos · Echa starego świata", "tag": "INITIATION", "books": [] },
-              { "id": "p2", "name": "KRĄG II — CIAŁO I STRACH", "color": "#FF4500", "sub": "Ból · Przetrwanie · Pierwotność", "tag": "BODY", "books": [] },
-              { "id": "p3", "name": "KRĄG III — WIĘŹ", "color": "#00CED1", "sub": "Relacje · Zaufanie · Zdrada", "tag": "BOND", "books": [] },
-              { "id": "p4", "name": "KRĄG IV — TOŻSAMOŚĆ", "color": "#9370DB", "sub": "Maski · Role · Imię", "tag": "IDENTITY", "books": [] },
-              { "id": "p5", "name": "KRĄG V — WOLA", "color": "#FF1493", "sub": "Decyzje · Cena · Mit", "tag": "WILL", "books": [] },
-              { "id": "p6", "name": "KRĄG VI — BOGOWIE", "color": "#4169E1", "sub": "Olimp · Asgard · Systemy", "tag": "GODS", "books": [] },
-              { "id": "p7", "name": "KRĄG VII — GŁĘBIA", "color": "#20B2AA", "sub": "Nieświadomość · Syreny · Emocje", "tag": "DEPTH", "books": [] },
-              { "id": "p8", "name": "KRĄG VIII — HISTORIA", "color": "#8B4513", "sub": "Anak · Atlantis · Błędy", "tag": "HISTORY", "books": [] },
-              { "id": "p9", "name": "KRĄG IX — LEMURIA", "color": "#00FF7F", "sub": "Technologia · Pokój · Kryształy", "tag": "LEMURIA", "books": [] },
-              { "id": "p10", "name": "KRĄG X — POWRÓT", "color": "#FFD700", "sub": "Odpowiedzialność · Portal · Krasnale", "tag": "RETURN", "books": [] }
-            ]
-          }
-        ]
-      };
-    }
-
-    // Renderowanie listy światów z edycją
-    function renderWorlds() {
-      elements.worldList.innerHTML = `
-        <button style="display:block;width:100%;padding:20px;margin:20px 0;border:none;border-radius:20px;background:#1e40af;color:#fff;font-size:20px;font-weight:700;cursor:pointer;box-shadow:0 12px 40px rgba(0,0,0,0.6);" onclick="addWorld()">+ Dodaj nowy Świat</button>
-      `;
-
-      DATA.worlds.forEach(world => {
-        const button = document.createElement('button');
-        button.textContent = `\( {world.name} ( \){world.gates.length} bram)`;
-        button.style.cssText = 'display:block;width:100%;padding:20px;margin:16px 0;border:none;border-radius:20px;background:linear-gradient(135deg,#0f2138,#071626);color:#E6F6F5;font-size:22px;font-weight:700;cursor:pointer;box-shadow:0 12px 40px rgba(0,0,0,0.6);transition:all 0.5s ease;position:relative;';
-        button.addEventListener('mouseover', () => button.style.transform = 'translateY(-8px) scale(1.03)');
-        button.addEventListener('mouseout', () => button.style.transform = 'translateY(0) scale(1)');
-        button.addEventListener('click', () => openWorld(world));
-
-        const actions = document.createElement('div');
-        actions.style.cssText = 'position:absolute;top:16px;right:16px;display:flex;gap:8px;opacity:0;transition:opacity 0.3s;';
-        actions.innerHTML = `
-          <button style="padding:8px 16px;background:#2563eb;border:none;border-radius:8px;color:#fff;cursor:pointer;font-size:13px;" onclick="editWorld(event, '${world.id}')">Edytuj</button>
-          <button style="padding:8px 16px;background:#dc2626;border:none;border-radius:8px;color:#fff;cursor:pointer;font-size:13px;" onclick="deleteWorld(event, '${world.id}')">Usuń</button>
-        `;
-        button.appendChild(actions);
-        button.addEventListener('mouseover', () => actions.style.opacity = '1');
-        button.addEventListener('mouseout', () => actions.style.opacity = '0');
-
-        elements.worldList.appendChild(button);
-      });
-    }
-
-    // Dodawanie nowego świata
-    function addWorld() {
-      const name = prompt('Nazwa nowego świata:');
-      if (!name) return;
-      const description = prompt('Opis świata:', 'Nowy świat w ETERNIVERSE');
-
-      const newWorld = {
-        id: Date.now().toString(),
-        name,
-        description,
-        gates: []
-      };
-
-      DATA.worlds.push(newWorld);
-      saveToIndexedDB();
-      renderWorlds();
-      logMessage(`Dodano nowy świat: ${name}`);
-    }
-
-    // Edycja świata
-    function editWorld(e, worldId) {
-      e.stopPropagation();
-      const world = DATA.worlds.find(w => w.id === worldId);
-      if (!world) return;
-
-      const newName = prompt('Nowa nazwa:', world.name);
-      if (newName) world.name = newName;
-      const newDesc = prompt('Nowy opis:', world.description);
-      if (newDesc !== null) world.description = newDesc;
-
-      saveToIndexedDB();
-      renderWorlds();
-      logMessage(`Edytowano świat: ${world.name}`);
-    }
-
-    // Usuwanie świata
-    function deleteWorld(e, worldId) {
-      e.stopPropagation();
-      if (!confirm('Usunąć cały świat wraz z bramami i księgami?')) return;
-
-      DATA.worlds = DATA.worlds.filter(w => w.id !== worldId);
-      saveToIndexedDB();
-      renderWorlds();
-      logMessage(`Usunięto świat ID ${worldId}`);
-    }
-
-    // Otwieranie świata
-    function openWorld(world) {
-      currentWorld = world;
-      elements.contentArea.innerHTML = `
-        <h2 style="color:#D9A441;margin:0 0 32px;font-size:36px;text-align:center;text-shadow:0 8px 32px rgba(217,164,65,0.4);">${escapeHtml(world.name)}</h2>
-        <p style="opacity:0.9;font-size:18px;line-height:1.8;margin-bottom:40px;text-align:center;max-width:900px;">${escapeHtml(world.description)}</p>
-        <button style="margin-bottom:40px;padding:16px 32px;background:#1e40af;border:none;border-radius:12px;color:#fff;cursor:pointer;font-weight:600;" onclick="addGate()">+ Dodaj nową Bramę</button>
-      `;
-
-      world.gates.forEach(gate => renderGate(gate));
-      logMessage(`Otworzono świat: ${world.name}`);
-    }
-
-    // Renderowanie bramy
-    function renderGate(gate) {
-      const gateDiv = document.createElement('div');
-      gateDiv.style.cssText = 'margin:48px 0;padding:32px;background:linear-gradient(145deg,#08121c,#0f2138);border-radius:24px;box-shadow:0 16px 60px rgba(0,0,0,0.8);border-left:8px solid ' + gate.color + ';position:relative;';
-
-      const h3 = document.createElement('h3');
-      h3.textContent = escapeHtml(gate.name);
-      h3.style.cssText = 'color:' + gate.color + ';margin:0 0 16px;font-size:28px;text-shadow:0 0 30px ' + gate.color + '40;';
-      gateDiv.appendChild(h3);
-
-      if (gate.sub) {
-        const sub = document.createElement('p');
-        sub.textContent = gate.sub;
-        sub.style.cssText = 'margin:0 0 24px;opacity:0.85;font-size:16px;text-align:center;';
-        gateDiv.appendChild(sub);
-      }
-
-      if (gate.tag) {
-        const tag = document.createElement('span');
-        tag.textContent = gate.tag;
-        tag.style.cssText = 'display:block;text-align:center;margin-bottom:24px;font-size:16px;padding:12px 32px;background:linear-gradient(135deg,rgba(217,164,65,0.25),rgba(40,211,198,0.25));color:#D9A441;border-radius:60px;letter-spacing:2px;font-weight:800;box-shadow:0 12px 32px rgba(217,164,65,0.4);';
-        gateDiv.appendChild(tag);
-      }
-
-      const booksHeader = document.createElement('div');
-      booksHeader.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin:32px 0 16px;';
-      booksHeader.innerHTML = `<strong style="font-size:20px;color:#E6F6F5;">Księgi (${gate.books.length})</strong>`;
-      
-      const addBtn = document.createElement('button');
-      addBtn.textContent = '+ Dodaj księgę';
-      addBtn.style.cssText = 'padding:10px 20px;background:#1e40af;border:none;border-radius:12px;color:#fff;cursor:pointer;font-weight:600;';
-      addBtn.onclick = () => addBook(gate);
-      booksHeader.appendChild(addBtn);
-      gateDiv.appendChild(booksHeader);
-
-      if (gate.books.length > 0) {
         gate.books.forEach(book => {
-          const bookDiv = document.createElement('div');
-          bookDiv.style.cssText = 'padding:24px;margin:20px 0;background:rgba(15,33,56,0.5);border-radius:20px;border:1px solid rgba(255,255,255,0.1);position:relative;transition:all 0.4s ease;';
-          bookDiv.addEventListener('mouseover', () => bookDiv.style.transform = 'translateX(16px) scale(1.02)');
-          bookDiv.addEventListener('mouseout', () => bookDiv.style.transform = 'translateX(0) scale(1)');
-
-          bookDiv.innerHTML = `
-            <strong style="display:block;font-size:22px;color:#E6F6F5;margin-bottom:12px;">📘 ${escapeHtml(book.title)}</strong>
-            <span style="display:inline-block;padding:8px 20px;background:rgba(217,164,65,0.3);color:#D9A441;border-radius:30px;font-size:14px;font-weight:800;">${escapeHtml(book.status || 'w przygotowaniu')}</span>
-            <p style="margin:16px 0 0;line-height:1.6;opacity:0.9;">${escapeHtml(book.content || 'Brak treści')}</p>
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${world.name}</td>
+            <td>${gate.name}</td>
+            <td>${book.title}</td>
+            <td>
+              <span class="status ${book.status || 'idea'}">
+                ${book.status || 'idea'}
+              </span>
+            </td>
           `;
-
-          const actions = document.createElement('div');
-          actions.style.cssText = 'position:absolute;top:20px;right:20px;display:flex;gap:8px;opacity:0;transition:opacity 0.3s;';
-          actions.innerHTML = `
-            <button style="padding:8px 16px;background:#2563eb;border:none;border-radius:8px;color:#fff;cursor:pointer;font-size:13px;" onclick="editBook(event, '\( {gate.id}', ' \){book.id}')">Edytuj</button>
-            <button style="padding:8px 16px;background:#dc2626;border:none;border-radius:8px;color:#fff;cursor:pointer;font-size:13px;" onclick="deleteBook(event, '\( {gate.id}', ' \){book.id}')">Usuń</button>
-          `;
-          bookDiv.appendChild(actions);
-          bookDiv.addEventListener('mouseover', () => actions.style.opacity = '1');
-          bookDiv.addEventListener('mouseout', () => actions.style.opacity = '0');
-
-          bookDiv.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'BUTTON') openBook(gate, book);
-          });
-
-          gateDiv.appendChild(bookDiv);
+          tbody.appendChild(tr);
         });
-      } else {
-        const empty = document.createElement('p');
-        empty.textContent = 'Brak opublikowanych ksiąg – kliknij + Dodaj księgę';
-        empty.style.cssText = 'opacity:0.6;text-align:center;font-style:italic;font-size:18px;';
-        gateDiv.appendChild(empty);
-      }
-
-      // Akcje bramy
-      const gateActions = document.createElement('div');
-      gateActions.style.cssText = 'position:absolute;top:24px;right:24px;display:flex;gap:12px;';
-      gateActions.innerHTML = `
-        <button style="padding:10px 20px;background:#2563eb;border:none;border-radius:12px;color:#fff;cursor:pointer;font-weight:600;" onclick="editGate(event, '${gate.id}')">Edytuj Bramę</button>
-        <button style="padding:10px 20px;background:#dc2626;border:none;border-radius:12px;color:#fff;cursor:pointer;font-weight:600;" onclick="deleteGate(event, '${gate.id}')">Usuń Bramę</button>
-      `;
-      gateDiv.appendChild(gateActions);
-
-      elements.contentArea.appendChild(gateDiv);
-    }
-
-    // Dodawanie bramy
-    function addGate() {
-      const name = prompt('Nazwa bramy:');
-      if (!name) return;
-      const color = prompt('Kolor HEX:', '#28D3C6');
-      const sub = prompt('Podtytuł:', 'Nowa brama');
-      const tag = prompt('Tag:', 'NEW');
-
-      const newGate = {
-        id: Date.now().toString(),
-        name,
-        color,
-        sub,
-        tag,
-        books: []
-      };
-
-      currentWorld.gates.push(newGate);
-      saveToIndexedDB();
-      openWorld(currentWorld);
-      logMessage(`Dodano bramę: ${name}`);
-    }
-
-    // Edycja bramy
-    function editGate(e, gateId) {
-      e.stopPropagation();
-      const gate = currentWorld.gates.find(g => g.id === gateId);
-      if (!gate) return;
-
-      const newName = prompt('Nowa nazwa:', gate.name);
-      if (newName) gate.name = newName;
-      const newColor = prompt('Nowy kolor HEX:', gate.color);
-      if (newColor) gate.color = newColor;
-      const newSub = prompt('Nowy podtytuł:', gate.sub);
-      if (newSub !== null) gate.sub = newSub;
-      const newTag = prompt('Nowy tag:', gate.tag);
-      if (newTag !== null) gate.tag = newTag;
-
-      saveToIndexedDB();
-      openWorld(currentWorld);
-      logMessage(`Edytowano bramę: ${gate.name}`);
-    }
-
-    // Usuwanie bramy
-    function deleteGate(e, gateId) {
-      e.stopPropagation();
-      if (!confirm('Usunąć bramę i wszystkie księgi?')) return;
-
-      currentWorld.gates = currentWorld.gates.filter(g => g.id !== gateId);
-      saveToIndexedDB();
-      openWorld(currentWorld);
-      logMessage(`Usunięto bramę ID ${gateId}`);
-    }
-
-    // Dodawanie księgi
-    function addBook(gate) {
-      const title = prompt('Tytuł księgi:');
-      if (!title) return;
-      const content = prompt('Treść:', 'Nowa treść...');
-      const status = prompt('Status:', 'w przygotowaniu');
-
-      const newBook = {
-        id: Date.now().toString(),
-        title,
-        status,
-        content
-      };
-
-      gate.books.push(newBook);
-      saveToIndexedDB();
-      openWorld(currentWorld);
-      logMessage(`Dodano księgę: ${title}`);
-    }
-
-    // Edycja księgi
-    function editBook(e, gateId, bookId) {
-      e.stopPropagation();
-      const gate = currentWorld.gates.find(g => g.id === gateId);
-      const book = gate.books.find(b => b.id === bookId);
-      if (!book) return;
-
-      const newTitle = prompt('Nowy tytuł:', book.title);
-      if (newTitle) book.title = newTitle;
-      const newContent = prompt('Nowa treść:', book.content);
-      if (newContent !== null) book.content = newContent;
-      const newStatus = prompt('Nowy status:', book.status);
-      if (newStatus) book.status = newStatus;
-
-      saveToIndexedDB();
-      openWorld(currentWorld);
-      logMessage(`Edytowano księgę: ${book.title}`);
-    }
-
-    // Usuwanie księgi
-    function deleteBook(e, gateId, bookId) {
-      e.stopPropagation();
-      if (!confirm('Usunąć księgę?')) return;
-
-      const gate = currentWorld.gates.find(g => g.id === gateId);
-      gate.books = gate.books.filter(b => b.id !== bookId);
-
-      saveToIndexedDB();
-      openWorld(currentWorld);
-      logMessage(`Usunięto księgę ID ${bookId}`);
-    }
-
-    // Otwieranie księgi
-    function openBook(gate, book) {
-      elements.contentArea.innerHTML = `
-        <button onclick="openWorld(currentWorld)" style="margin-bottom:32px;padding:16px 32px;background:#1e40af;border:none;border-radius:12px;color:#fff;cursor:pointer;font-weight:600;">← Powrót</button>
-        <h2 style="color:${gate.color};margin:0 0 32px;font-size:40px;text-shadow:0 0 40px \( {gate.color}60;"> \){escapeHtml(book.title)}</h2>
-        <p style="opacity:0.7;margin-bottom:32px;font-size:18px;">${escapeHtml(gate.name)}</p>
-        <div style="line-height:1.8;font-size:18px;opacity:0.95;">${escapeHtml(book.content || 'Brak treści')}</div>
-      `;
-      logMessage(`Otworzono księgę: ${book.title}`);
-    }
-
-    // Log
-    function logMessage(message) {
-      if (!elements.log) return;
-      const timestamp = new Date().toLocaleTimeString();
-      elements.log.textContent += `[${timestamp}] ${message}\n`;
-      elements.log.scrollTop = elements.log.scrollHeight;
-    }
-
-    // Bezpieczeństwo
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text || '';
-      return div.innerHTML;
-    }
-
-    // Inicjalizacja
-    document.addEventListener('DOMContentLoaded', async () => {
-      await openDB();
-      await loadData();
-      logMessage(`System ETERNIVERSE Multi-World – Załadowany (${DATA.worlds.length} światów aktywnych)`);
+      });
     });
-  </script>
-</body>
-</html>
+
+    container.appendChild(table);
+  }
+
+  // WYWOŁANIE
+  renderTable();
+</script>
