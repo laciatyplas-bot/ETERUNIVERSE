@@ -2,189 +2,88 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ETERNIVERSE PRO MASTER — Tabela</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ETERNIVERSE PRO MASTER – Multi-World System · 10 Bram · DataMaster v14.3" />
+  <title>ETERNIVERSE PRO MASTER</title>
 
-  <style>
-    :root {
-      --bg: #050814;
-      --card: #0A1727;
-      --border: #20324A;
-      --text: #E9F4FF;
-      --muted: #9BB0D4;
-      --gold: #D9A441;
-      --teal: #28D3C6;
-    }
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,
+  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+    <text y='.9em' font-size='90'>🌌</text>
+  </svg>">
 
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css" />
 
-    header {
-      padding: 24px;
-      text-align: center;
-      border-bottom: 1px solid var(--border);
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 20px;
-      letter-spacing: 3px;
-      color: var(--gold);
-    }
-
-    main {
-      display: grid;
-      grid-template-columns: 1fr 360px;
-      gap: 16px;
-      padding: 16px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    section {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-    }
-
-    /* ===== TABELA ===== */
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    thead th {
-      text-align: left;
-      font-weight: 600;
-      color: var(--muted);
-      border-bottom: 1px solid var(--border);
-      padding: 8px;
-    }
-
-    tbody tr {
-      cursor: pointer;
-      transition: background .15s, box-shadow .15s;
-    }
-
-    tbody tr:hover {
-      background: rgba(217,164,65,.05);
-    }
-
-    tbody tr.active {
-      background: rgba(40,211,198,.15);
-      box-shadow: inset 3px 0 0 var(--teal);
-    }
-
-    td {
-      padding: 8px;
-      border-bottom: 1px solid rgba(255,255,255,.04);
-    }
-
-    .status {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      display: inline-block;
-    }
-
-    .published { color: #12C65B; border-color: #12C65B; }
-    .ready { color: var(--gold); border-color: var(--gold); }
-    .writing { color: #FFB14B; border-color: #FFB14B; }
-    .idea { color: #9B6BFF; border-color: #9B6BFF; }
-
-    /* ===== DETAILS ===== */
-
-    #details h2 {
-      margin: 0 0 8px 0;
-      font-size: 18px;
-      color: var(--gold);
-    }
-
-    #details p {
-      margin: 6px 0;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    @media (max-width: 900px) {
-      main {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
 </head>
 <body>
 
-<header>
-  <h1>ETERNIVERSE PRO MASTER</h1>
-</header>
+  <!-- APP ROOT -->
+  <div id="app">
 
-<main>
-  <!-- ===== TABELA ===== -->
-  <section>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Tytuł</th>
-          <th>Status</th>
-          <th>Brama</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- WIERSZE WSTAWIA app.js -->
-      </tbody>
-    </table>
-  </section>
+    <!-- LOADING -->
+    <div class="loading-screen" id="loadingScreen">
+      <div class="spinner"></div>
+      <div>Ładowanie ETERNIVERSE PRO MASTER…</div>
+    </div>
 
-  <!-- ===== DETAILS ===== -->
-  <section id="details">
-    <p style="opacity:.6;">Kliknij pozycję w tabeli</p>
-  </section>
-</main>
+    <!-- DASHBOARD -->
+    <section id="dashboard"></section>
 
-<!-- ===== SCRIPTS ===== -->
-<script src="app.js"></script>
-<script src="render.js"></script>
+    <!-- MAPA / BRAMY -->
+    <section id="mapa-grid" class="gates-grid"></section>
 
-<script>
-  /*
-    DEMO: app.js MUSI ustawić window.app.data
-    Tu TYLKO przykładowe renderowanie tabeli
-  */
+    <!-- STRUKTURA -->
+    <aside id="structure-tree"></aside>
 
-  document.addEventListener('DOMContentLoaded', () => {
-    if (!window.app || !window.app.data) return;
+    <!-- EDYCJA ELEMENTU -->
+    <section id="editor">
+      <input id="element-title" type="text" placeholder="Tytuł elementu" />
+      <textarea id="element-content" placeholder="Treść elementu"></textarea>
+    </section>
 
-    const tbody = document.querySelector('tbody');
-    let index = 0;
+    <!-- STATUS -->
+    <footer id="status-bar">Gotowy</footer>
 
-    window.app.data.gates.forEach(gate => {
-      gate.books.forEach(book => {
-        const tr = document.createElement('tr');
-        tr.dataset.index = index++;
+  </div>
 
-        tr.innerHTML = `
-          <td>${index}</td>
-          <td>${book.title}</td>
-          <td><span class="status ${book.status}">${book.status}</span></td>
-          <td>${gate.name}</td>
-        `;
+  <!-- MODAL -->
+  <div id="modalBackdrop" aria-modal="true" role="dialog">
+    <div class="modal" tabindex="-1">
+      <h2 id="modalTitle">Edycja księgi</h2>
+      <div id="modalContent"></div>
+      <div class="modal-actions">
+        <button id="modalSave">Zapisz</button>
+        <button id="modalDelete">Usuń</button>
+        <button id="modalClose">Zamknij</button>
+      </div>
+    </div>
+  </div>
 
-        tbody.appendChild(tr);
-      });
+  <!-- TOAST -->
+  <div id="toastContainer" aria-live="polite"></div>
+
+  <!-- OKŁADKA -->
+  <div id="coverPreview" aria-modal="true" role="dialog">
+    <div class="cover-container">
+      <img id="coverImg" src="" alt="Okładka księgi" loading="lazy" />
+      <button id="coverClose">Zamknij</button>
+    </div>
+  </div>
+
+  <!-- SCRIPTS – KOLEJNOŚĆ KRYTYCZNA -->
+  <script src="js/data.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/bella-console.js"></script>
+
+  <!-- LOADING OFF -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const l = document.getElementById('loadingScreen');
+      if (l) l.style.display = 'none';
     });
-  });
-</script>
+  </script>
 
 </body>
 </html>
