@@ -3,114 +3,329 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧠 EterSeeker - Kronika Woli 🔥😈</title>
-    <meta name="theme-color" content="#ff6600">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <title>Eterniverse - Mobile Reading App</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div class="quantum-field"></div>
-    
-    <header>
-        <h1>ETERSEEKER</h1>
-        <h2>Kronika Woli • Świat 2 • Bella 7.00 PRO</h2>
-        <div class="power-status">
-            ⚡ MOC: <span id="power-level">100</span> | Księgi: <span id="book-count">54</span> | Światy: <span id="world-count">2</span>
-        </div>
-    </header>
-    
-    <nav class="tab-nav">
-        <button class="tab-btn active" data-tab="bella">😈 BELLA</button>
-        <button class="tab-btn" data-tab="editor">✍️ PISARZ</button>
-        <button class="tab-btn" data-tab="bramy">🚪 BRAMY</button>
-        <button class="tab-btn" data-tab="ksiegi">📚 KSIĘGI</button>
-    </nav>
-    
-    <main class="main">
-        <!-- BELLA -->
-        <section id="bella" class="tab-content active">
-            <div class="chat-container">
-                <div id="chat-output" class="chat-output">
-                    <div class="message bella">
-                        😈 Witaj, Architekcie. EterSeeker gotowy. Wola płynie.<br>
-                        Klikaj zakładki. Rozkazuj. Tworzymy Świat 2. 🔥
+    <div class="app-container">
+        <!-- Phone Frame -->
+        <div class="phone-frame">
+            <!-- Phone Container -->
+            <div class="phone-container">
+                <!-- Notch -->
+                <div class="notch"></div>
+
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <div class="status-icons">
+                        <div class="signal-icon"></div>
+                        <div class="wifi-icon"></div>
+                        <div class="battery-icon">
+                            <div class="battery-fill"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="chat-input">
-                    <input type="text" id="user-input" placeholder="Co manifestujemy dziś? 😈" autofocus>
-                    <button id="send-btn">EXECUTE 🔥</button>
-                </div>
-            </div>
-            
-            <div class="books-panel">
-                <div class="book-item" data-book="0">
-                    <div class="book-cover" style="background-image: url('https://via.placeholder.com/200x280/D9A441/000?text=ObfitoSeeker')"></div>
-                    <div>ObfitoSeeker</div>
-                </div>
-                <div class="book-item" data-book="1">
-                    <div class="book-cover" style="background-image: url('https://via.placeholder.com/200x280/28D3C6/000?text=InterSeeker')"></div>
-                    <div>InterSeeker</div>
-                </div>
-                <div class="book-item" data-book="2">
-                    <div class="book-cover" style="background-image: url('https://via.placeholder.com/200x280/FFB14B/000?text=Polaris')"></div>
-                    <div>Polaris</div>
-                </div>
-                <div class="book-item" data-book="3">
-                    <div class="book-cover" style="background-image: url('https://via.placeholder.com/200x280/9B6BFF/000?text=EterSeeker')"></div>
-                    <div>EterSeeker</div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- PISARZ -->
-        <section id="editor" class="tab-content">
-            <div class="editor-container">
-                <textarea class="editor" id="story-editor" placeholder="Tutaj rodzi się Kronika Woli... Pisarz, manifestuj..."></textarea>
-                <div class="editor-buttons">
-                    <button id="save-chapter">💾 Zapisz Offline</button>
-                    <button id="new-chapter">📄 Nowy Rozdział</button>
-                    <button id="export-md">📤 Export MD</button>
-                </div>
-            </div>
-        </section>
-        
-        <!-- BRAMY -->
-        <section id="bramy" class="tab-content">
-            <div class="bramy-container">
-                <div class="world-item active" data-world="polaris">
-                    <h3>🌌 Polaris</h3>
-                    <p>Echo pod Lodem • Rozdział 12</p>
-                </div>
-                <div class="world-item" data-world="obfito">
-                    <h3>💰 ObfitoSeeker</h3>
-                    <p>Kod Obfitości • Core Engine</p>
-                </div>
-                <div class="world-item" data-world="inter">
-                    <h3>🧭 InterSeeker</h3>
-                    <p>Atlas Wewnętrzny • Mapa Eteru</p>
-                </div>
-            </div>
-        </section>
-        
-        <!-- KSIĘGI -->
-        <section id="ksiegi" class="tab-content">
-            <div class="books-grid">
-                <div class="book-card">
-                    <div class="book-cover-large" style="background-image: url('https://via.placeholder.com/300x450/D9A441/000?text=ObfitoSeeker')"></div>
-                    <h3>ObfitoSeeker</h3>
-                    <p>PUBLISHED • 2025</p>
-                </div>
-            </div>
-        </section>
-    </main>
 
-    <script src="script.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js');
-        }
-    </script>
+                <!-- Main Content -->
+                <div class="main-content">
+                    
+                    <!-- Home Screen -->
+                    <div id="home-screen" class="screen active">
+                        <div class="screen-content">
+                            <!-- Header -->
+                            <div class="header">
+                                <div>
+                                    <h1 class="app-title">ETERNIVERSE</h1>
+                                    <p class="welcome-text">Witaj ponownie! 👋</p>
+                                </div>
+                                <button class="notification-btn">
+                                    🔔
+                                    <span class="notification-badge"></span>
+                                </button>
+                            </div>
+
+                            <!-- Continue Reading -->
+                            <div class="section">
+                                <h2 class="section-title">Continue Reading</h2>
+                                <div class="continue-card" onclick="navigateTo('reading')">
+                                    <div class="continue-header">
+                                        <div class="book-icon">📘</div>
+                                        <div class="book-info">
+                                            <h3>INTERSEEKER: Geneza</h3>
+                                            <p class="book-meta">Chapter 2 • 67% complete</p>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 67%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="btn-primary">Continue Reading</button>
+                                </div>
+                            </div>
+
+                            <!-- Trending Now -->
+                            <div class="section">
+                                <div class="section-header">
+                                    <h2 class="section-title">
+                                        <span class="trending-icon">📈</span>
+                                        Trending Now
+                                    </h2>
+                                    <button class="see-all-btn">See All</button>
+                                </div>
+                                <div class="horizontal-scroll" id="trending-books">
+                                    <!-- Books will be added by JavaScript -->
+                                </div>
+                            </div>
+
+                            <!-- Worlds -->
+                            <div class="section">
+                                <h2 class="section-title">Explore Worlds</h2>
+                                <div class="worlds-list">
+                                    <div class="world-item" style="border-color: rgba(59, 130, 246, 0.25)">
+                                        <div class="world-icon">🌌</div>
+                                        <div class="world-info">
+                                            <h3>ETERNIVERSE CORE</h3>
+                                            <p>25 books</p>
+                                        </div>
+                                        <span class="chevron">›</span>
+                                    </div>
+                                    <div class="world-item" style="border-color: rgba(139, 92, 246, 0.25)">
+                                        <div class="world-icon">⭐</div>
+                                        <div class="world-info">
+                                            <h3>POLARIS</h3>
+                                            <p>18 books</p>
+                                        </div>
+                                        <span class="chevron">›</span>
+                                    </div>
+                                    <div class="world-item" style="border-color: rgba(16, 185, 129, 0.25)">
+                                        <div class="world-icon">🚀</div>
+                                        <div class="world-info">
+                                            <h3>COSMOS EXPLORERS</h3>
+                                            <p>22 books</p>
+                                        </div>
+                                        <span class="chevron">›</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Library Screen -->
+                    <div id="library-screen" class="screen">
+                        <div class="screen-content">
+                            <h1 class="page-title">My Library</h1>
+                            
+                            <!-- Tabs -->
+                            <div class="tabs">
+                                <button class="tab active">All Books</button>
+                                <button class="tab">Reading</button>
+                                <button class="tab">Finished</button>
+                            </div>
+
+                            <div id="library-grid" class="library-grid">
+                                <!-- Books will be added by JavaScript -->
+                            </div>
+
+                            <div id="empty-library" class="empty-state" style="display: none;">
+                                <div class="empty-icon">📚</div>
+                                <p class="empty-title">Your library is empty</p>
+                                <p class="empty-subtitle">Add books from Home or Discover</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reading Screen -->
+                    <div id="reading-screen" class="screen">
+                        <div class="reading-container">
+                            <!-- Reading Header -->
+                            <div class="reading-header">
+                                <button onclick="navigateTo('home')" class="icon-btn">‹</button>
+                                <div class="reading-title-section">
+                                    <p class="reading-meta">Chapter 2 of 12</p>
+                                    <p class="reading-chapter">Anatomia Kompasu</p>
+                                </div>
+                                <button onclick="navigateTo('audio')" class="icon-btn">▶</button>
+                            </div>
+
+                            <!-- Reading Content -->
+                            <div class="reading-content">
+                                <h1 class="chapter-title">Anatomia Wewnętrznego Kompasu</h1>
+                                <div class="chapter-text">
+                                    <p>W głębi ludzkiej psychiki istnieje coś, co można nazwać wewnętrznym kompasem - niezawodny system nawigacyjny, który prowadzi nas przez labirynty życia.</p>
+                                    <p>Nie jest to abstrakcyjny koncept, lecz żywa, dynamiczna struktura świadomości. Kiedy po raz pierwszy dotknąłem tego kompasu podczas medytacji, poczułem, jak coś w moim wnętrzu drgnęło.</p>
+                                    <p>To było jak odkrycie ukrytej komory w sercu - miejsca, które zawsze tam było, ale którego nigdy wcześniej nie zauważyłem. Ten kompas nie wskazuje geograficznych kierunków. Wskazuje prawdę.</p>
+                                </div>
+                            </div>
+
+                            <!-- Reading Controls -->
+                            <div class="reading-controls">
+                                <div class="controls-buttons">
+                                    <button class="control-btn">‹</button>
+                                    <div class="social-buttons">
+                                        <button class="social-btn">❤️</button>
+                                        <button class="social-btn">💬</button>
+                                        <button class="social-btn">🔗</button>
+                                    </div>
+                                    <button class="control-btn">›</button>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 67%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Audio Player Screen -->
+                    <div id="audio-screen" class="screen">
+                        <div class="audio-container">
+                            <div class="audio-header">
+                                <button onclick="navigateTo('reading')" class="icon-btn">‹</button>
+                                <p class="audio-title">Audiobook</p>
+                                <button class="icon-btn">⚙️</button>
+                            </div>
+
+                            <div class="audio-content">
+                                <!-- Cover -->
+                                <div class="audio-cover">📘</div>
+
+                                <!-- Info -->
+                                <h2 class="audio-book-title">INTERSEEKER: Geneza</h2>
+                                <p class="audio-chapter">Chapter 2 • Anatomia Kompasu</p>
+
+                                <!-- Progress -->
+                                <div class="audio-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 33%"></div>
+                                    </div>
+                                    <div class="time-labels">
+                                        <span>4:23</span>
+                                        <span>12:45</span>
+                                    </div>
+                                </div>
+
+                                <!-- Controls -->
+                                <div class="audio-controls">
+                                    <button class="audio-control-btn">⏮</button>
+                                    <button class="play-btn" id="play-btn" onclick="togglePlay()">▶️</button>
+                                    <button class="audio-control-btn">⏭</button>
+                                </div>
+
+                                <!-- Volume -->
+                                <div class="volume-control">
+                                    <span class="volume-icon">🔊</span>
+                                    <div class="volume-bar">
+                                        <div class="volume-fill"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Screen -->
+                    <div id="profile-screen" class="screen">
+                        <div class="screen-content">
+                            <!-- Profile Header -->
+                            <div class="profile-header">
+                                <div class="profile-avatar">👤</div>
+                                <h2 class="profile-name">Maciej Maciuszek</h2>
+                                <p class="profile-username">@architect_of_will</p>
+                                <div class="profile-stats">
+                                    <div class="stat">
+                                        <p class="stat-number" id="books-count">4</p>
+                                        <p class="stat-label">Books Read</p>
+                                    </div>
+                                    <div class="stat">
+                                        <p class="stat-number">3.2K</p>
+                                        <p class="stat-label">Followers</p>
+                                    </div>
+                                    <div class="stat">
+                                        <p class="stat-number">892</p>
+                                        <p class="stat-label">Following</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stats Cards -->
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-icon">📖</div>
+                                    <p class="stat-card-number">127</p>
+                                    <p class="stat-card-label">Hours Read</p>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon">❤️</div>
+                                    <p class="stat-card-number">234</p>
+                                    <p class="stat-card-label">Books Liked</p>
+                                </div>
+                            </div>
+
+                            <!-- Menu -->
+                            <div class="menu-list">
+                                <button class="menu-item">
+                                    <div class="menu-item-left">
+                                        <span class="menu-icon">⚙️</span>
+                                        <span class="menu-label">Settings</span>
+                                    </div>
+                                    <span class="chevron">›</span>
+                                </button>
+                                <button class="menu-item">
+                                    <div class="menu-item-left">
+                                        <span class="menu-icon">👑</span>
+                                        <span class="menu-label">Subscription</span>
+                                    </div>
+                                    <span class="chevron">›</span>
+                                </button>
+                                <button class="menu-item">
+                                    <div class="menu-item-left">
+                                        <span class="menu-icon">🔔</span>
+                                        <span class="menu-label">Notifications</span>
+                                    </div>
+                                    <span class="chevron">›</span>
+                                </button>
+                                <button class="menu-item">
+                                    <div class="menu-item-left">
+                                        <span class="menu-icon">💬</span>
+                                        <span class="menu-label">Help & Support</span>
+                                    </div>
+                                    <span class="chevron">›</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Bottom Navigation -->
+                <div class="bottom-nav">
+                    <button class="nav-item active" data-screen="home" onclick="navigateTo('home')">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-label">Home</span>
+                    </button>
+                    <button class="nav-item" data-screen="discover" onclick="navigateTo('discover')">
+                        <span class="nav-icon">🔍</span>
+                        <span class="nav-label">Discover</span>
+                    </button>
+                    <button class="nav-item" data-screen="library" onclick="navigateTo('library')">
+                        <span class="nav-icon">📚</span>
+                        <span class="nav-label">Library</span>
+                    </button>
+                    <button class="nav-item" data-screen="profile" onclick="navigateTo('profile')">
+                        <span class="nav-icon">👤</span>
+                        <span class="nav-label">Profile</span>
+                    </button>
+                </div>
+
+                <!-- Home Indicator -->
+                <div class="home-indicator"></div>
+            </div>
+
+            <!-- Screen Label -->
+            <div class="screen-label">
+                Current: <span id="current-screen-label">Home</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
 </body>
 </html>
