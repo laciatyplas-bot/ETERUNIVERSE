@@ -1,69 +1,100 @@
 :root {
   --bg: #050814;
-  --card: #0A1727;
-  --border: #1E324B;
   --text: #E9F4FF;
   --muted: #9BA9C8;
-  --highlight: #28D3C6;
-  --gold: #D9A441;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+  --card: #0A1727;
+  --border: #1E324B;
+  --radius: 10px;
 }
 
 body {
-  background: radial-gradient(circle at top, #15223A 0%, #050814 55%, #01030A 100%);
+  background: radial-gradient(circle at top, #101828 0%, #050814 60%, #01030A 100%);
   color: var(--text);
   font-family: 'Segoe UI', sans-serif;
-  padding: 20px;
+  margin: 0;
+  padding: 0;
   min-height: 100vh;
 }
 
-h1 {
+header {
   text-align: center;
-  color: var(--gold);
-  font-size: 2rem;
+  padding: 20px;
+  background: rgba(255,255,255,0.05);
+  border-bottom: 1px solid var(--border);
+}
+
+h1 {
+  margin: 0;
+  color: #D9A441;
   letter-spacing: 2px;
-  margin-bottom: 10px;
 }
 
-h2 {
-  color: var(--highlight);
-  margin-bottom: 8px;
+p {
+  color: var(--muted);
 }
 
-.wrap {
+main {
   max-width: 900px;
-  margin: 0 auto;
+  margin: 30px auto;
+  padding: 0 20px;
 }
 
 .gate {
   background: var(--card);
   border: 1px solid var(--border);
-  border-left: 5px solid var(--highlight);
+  border-left: 8px solid;
   padding: 16px;
-  border-radius: 8px;
-  margin: 20px 0;
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+}
+
+.gate h2 {
+  margin-top: 0;
 }
 
 .book {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 8px;
-  border-radius: 6px;
-  margin: 6px 0;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  padding: 10px;
+  margin: 8px 0;
   cursor: pointer;
   transition: 0.2s;
 }
 
 .book:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateX(2px);
+  background: rgba(255,255,255,0.1);
 }
 
-.book p {
-  color: var(--muted);
+.book img {
+  width: 60px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-right: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.book-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+.book-info {
+  flex: 1;
+}
+
+.audio-player {
+  margin-top: 10px;
+  background: #08101C;
+  border-radius: 6px;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
   font-size: 0.9em;
+  color: #777;
+  border-top: 1px solid rgba(255,255,255,0.1);
 }
