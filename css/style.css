@@ -1,100 +1,49 @@
-:root {
-  --bg: #050814;
-  --text: #E9F4FF;
-  --muted: #9BA9C8;
-  --card: #0A1727;
-  --border: #1E324B;
-  --radius: 10px;
-}
-
-body {
-  background: radial-gradient(circle at top, #101828 0%, #050814 60%, #01030A 100%);
-  color: var(--text);
-  font-family: 'Segoe UI', sans-serif;
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-}
-
-header {
-  text-align: center;
-  padding: 20px;
-  background: rgba(255,255,255,0.05);
-  border-bottom: 1px solid var(--border);
-}
-
-h1 {
-  margin: 0;
-  color: #D9A441;
-  letter-spacing: 2px;
-}
-
-p {
-  color: var(--muted);
-}
-
-main {
-  max-width: 900px;
-  margin: 30px auto;
-  padding: 0 20px;
-}
-
-.gate {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-left: 8px solid;
-  padding: 16px;
-  border-radius: var(--radius);
-  margin-bottom: 20px;
-}
-
-.gate h2 {
-  margin-top: 0;
-}
-
 .book {
-  background: rgba(255,255,255,0.05);
-  border-radius: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
   padding: 10px;
-  margin: 8px 0;
-  cursor: pointer;
-  transition: 0.2s;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  margin: 10px 0;
+  transition: 0.3s;
 }
 
 .book:hover {
-  background: rgba(255,255,255,0.1);
+  transform: scale(1.02);
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(217,164,65,0.4);
 }
 
 .book img {
-  width: 60px;
-  height: 90px;
+  width: 80px;
+  height: 110px;
+  border-radius: 8px;
   object-fit: cover;
-  border-radius: 6px;
-  margin-right: 10px;
-  border: 1px solid rgba(255,255,255,0.1);
+  flex-shrink: 0;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
 }
 
-.book-row {
-  display: flex;
-  align-items: flex-start;
+.book-info strong {
+  color: var(--text);
+  font-size: 1.05em;
 }
 
-.book-info {
-  flex: 1;
+.book-info p {
+  color: var(--muted);
+  font-size: 0.9em;
 }
 
 .audio-player {
-  margin-top: 10px;
+  margin-top: 8px;
   background: #08101C;
+  padding: 6px;
   border-radius: 6px;
-  padding: 8px;
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
-footer {
-  text-align: center;
-  padding: 20px;
-  font-size: 0.9em;
-  color: #777;
-  border-top: 1px solid rgba(255,255,255,0.1);
+audio {
+  width: 100%;
+  height: 26px;
 }
