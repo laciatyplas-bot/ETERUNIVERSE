@@ -39,6 +39,14 @@ export const WORLD_PSYCHE = {
               audio: "media/audio/shadowseeker_ch1.mp3"
             }
           ]
+        },
+        {
+          id: "book_1_3",
+          title: "MemorySeeker — Archeologia Wspomnień",
+          cover: "media/covers/memoryseeker.jpg",
+          description:
+            "Rozkodowanie pamięci i traum. Odkrywanie przeszłości jako kodu Woli.",
+          chapters: []
         }
       ]
     },
@@ -47,13 +55,6 @@ export const WORLD_PSYCHE = {
       name: "BRAMA II — MEMORY SEEKER",
       color: "#1FB5A5",
       theme: "Pamięć · Archeologia Wspomnień",
-      books: []
-    },
-    {
-      id: "gate_3",
-      name: "BRAMA III — SELF SPLIT",
-      color: "#1AA8A8",
-      theme: "Jaźń · Rozszczepienie · Integracja",
       books: []
     }
   ]
