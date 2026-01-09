@@ -1,17 +1,12 @@
 // ==========================================================
 //  ETERNIVERSE CORE ENGINE
 // ==========================================================
-//  Autor: Architekt Dominik (laciatyplas-bot)
-//  Wersja: 1.0.0 (pełny system modułowy)
+//  Autor: Architekt Dominik
+//  Wersja: 1.0.0
 // ==========================================================
-//
-//  Ten plik jest głównym kontrolerem całego systemu ETERNIVERSE.
-//  Odpowiada za:
-//   ✅ inicjalizację wszystkich modułów
-//   ✅ ładowanie danych z localStorage
-//   ✅ synchronizację UI z logiką
-//   ✅ globalne zapisywanie danych
-//   ✅ integrację z silnikami (books, chapters, audio)
+//  Ten plik jest sercem projektu ETERNIVERSE.
+//  Łączy wszystkie silniki (bookEngine, chapterEngine, uiEngine, dataEngine, audioEngine)
+//  i zarządza przepływem danych oraz logiką całej aplikacji.
 // ==========================================================
 
 import { loadData, saveData, debugDump } from './dataEngine.js';
@@ -21,7 +16,7 @@ import { setupChapterEngine, addChapter, editChapter, deleteChapter } from './ch
 import { setupAudioEngine } from './audioEngine.js';
 
 // ==========================================================
-// 🌍 GLOBALNE DANE
+// 🌍 GLOBALNE DANE SYSTEMU
 // ==========================================================
 export let BOOKS = [];
 
@@ -31,14 +26,14 @@ export let BOOKS = [];
 document.addEventListener('DOMContentLoaded', () => {
   console.log('%c[CORE] Inicjalizacja systemu ETERNIVERSE...', 'color:#FFD700;font-weight:bold;');
 
-  // 1️⃣ Wczytaj dane
+  // 1️⃣ Wczytaj dane z localStorage
   BOOKS = loadData();
 
-  // 2️⃣ Uruchom UI (interfejs użytkownika)
+  // 2️⃣ Renderuj UI (interfejs użytkownika)
   renderUI(BOOKS);
   setupUI(addBook, addChapter, editBook, deleteBook, editChapter, deleteChapter);
 
-  // 3️⃣ Aktywuj silniki logiki
+  // 3️⃣ Uruchom silniki logiki
   setupBookEngine();
   setupChapterEngine();
   setupAudioEngine();
@@ -51,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================================
 export function saveAll() {
   saveData(BOOKS);
-  console.log('%c[CORE] Dane zapisane.', 'color:#28D3C6;');
+  console.log('%c[CORE] Dane zapisane do localStorage.', 'color:#28D3C6;');
 }
 
 // ==========================================================
@@ -59,9 +54,7 @@ export function saveAll() {
 // ==========================================================
 
 /**
- * 📜 Wypisz wszystkie książki i rozdziały w konsoli.
- * Użyj w konsoli przeglądarki:
- *   → debugBooks();
+ * 📜 Wypisz wszystkie książki i rozdziały w konsoli
  */
 export function debugBooks() {
   console.log('%c=== AKTUALNA BAZA KSIĄŻEK ===', 'color:#D9A441;font-weight:bold;');
@@ -78,31 +71,31 @@ export function debugBooks() {
 }
 
 /**
- * 🧹 Czyści localStorage i restartuje dane domyślne.
- * Po uruchomieniu w konsoli:
- *   → resetUniverse();
+ * 🧹 Resetuje dane do domyślnego stanu
  */
 export function resetUniverse() {
   localStorage.removeItem('eterniverseBooksData_v1');
   BOOKS = loadData();
   renderUI(BOOKS);
-  console.warn('%c[CORE] Reset danych — załadowano ponownie dane domyślne.', 'color:#FF6B6B;');
+  console.warn('%c[CORE] Dane zresetowane. Załadowano domyślną bazę.', 'color:#FF6B6B;');
 }
 
 /**
- * 🔍 Eksport danych (kopiuj JSON do schowka)
+ * 📤 Eksport danych — kopiuje JSON do schowka
  */
 export function exportData() {
   const json = JSON.stringify(BOOKS, null, 2);
-  navigator.clipboard.writeText(json);
-  alert('📋 Dane ETERNIVERSE skopiowane do schowka!');
+  navigator.clipboard.writeText(json)
+    .then(() => alert('📋 Dane ETERNIVERSE zostały skopiowane do schowka!'))
+    .catch(err => console.error('Błąd eksportu:', err));
 }
 
 /**
- * 📥 Import danych (wklej JSON do systemu)
+ * 📥 Import danych — wklej JSON z kopii
  */
 export function importData() {
   const json = prompt('Wklej dane JSON:');
+  if (!json) return;
   try {
     const parsed = JSON.parse(json);
     BOOKS = parsed;
@@ -110,11 +103,32 @@ export function importData() {
     renderUI(BOOKS);
     alert('✅ Dane zaimportowane pomyślnie!');
   } catch (err) {
-    alert('❌ Błąd importu: niepoprawny JSON.');
+    alert('❌ Błąd: niepoprawny JSON.');
   }
 }
 
+/**
+ * 🧩 Wypisz dane debugowe w konsoli
+ */
+export function dumpData() {
+  debugDump(BOOKS);
+}
+
 // ==========================================================
-// 🔧 DEV LOG
+// 🛡️ TRYB DEVELOPERA (opcjonalny log debugowy)
+// ==========================================================
+const DEV_MODE = true; // ustaw false, aby wyciszyć logi w produkcji
+
+if (DEV_MODE) {
+  console.log('%c[CORE] Developer Mode: aktywny', 'color:#9BA9C8;');
+  window.debugBooks = debugBooks;
+  window.resetUniverse = resetUniverse;
+  window.exportData = exportData;
+  window.importData = importData;
+  window.dumpData = dumpData;
+}
+
+// ==========================================================
+// 🔧 STATUS
 // ==========================================================
 console.log('%c[CORE] Plik core.js załadowany poprawnie.', 'color:#9BA9C8;');
