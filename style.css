@@ -1,10 +1,3 @@
-/* ==========================================================
-   ETERNIVERSE STYLE SHEET
-   Wersja: 1.0.0
-   Autor: Architekt Dominik
-   Styl: Futurystyczny interfejs biblioteki wszechświata
-   ========================================================== */
-
 :root {
   --bg-dark: #050814;
   --bg-panel: #0A1727;
@@ -16,65 +9,38 @@
   --accent-green: #12C65B;
   --accent-orange: #FFB14B;
   --accent-red: #FF6B6B;
-  --accent-gray: #8B8FA0;
   --border: #20324A;
-  --shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   background: radial-gradient(circle at top, #15223A 0%, var(--bg-dark) 55%, #01030A 100%);
   color: var(--text-main);
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
   min-height: 100vh;
   padding: 24px 18px;
 }
 
-/* HEADER */
 h1 {
   font-size: 32px;
-  letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--accent-gold);
   margin-bottom: 6px;
-  text-shadow: 0 0 10px rgba(217, 164, 65, 0.3);
+  text-shadow: 0 0 10px rgba(217,164,65,0.3);
 }
+
 .subtitle {
   color: var(--text-muted);
   font-size: 14px;
   margin-bottom: 20px;
 }
 
-/* TOOLBAR */
 .toolbar {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  align-items: center;
   margin-bottom: 22px;
-}
-
-.toolbar input,
-.toolbar select {
-  background: #050B16;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text-main);
-  padding: 8px 10px;
-  font-size: 13px;
-  transition: border-color 0.2s, background 0.2s;
-}
-
-.toolbar input:focus,
-.toolbar select:focus {
-  border-color: var(--accent-gold);
-  outline: none;
-  background: #0D1C30;
 }
 
 .toolbar button {
@@ -84,18 +50,14 @@ h1 {
   border: none;
   border-radius: 10px;
   padding: 9px 14px;
-  font-size: 13px;
   cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: transform 0.1s, filter 0.2s;
+  transition: transform 0.15s;
 }
 
 .toolbar button:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.1);
+  transform: translateY(-2px);
 }
 
-/* BOOK GRID */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -111,8 +73,7 @@ h1 {
   flex-direction: column;
   gap: 6px;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  transition: 0.2s;
 }
 
 .book:hover {
@@ -128,28 +89,18 @@ h1 {
   border-radius: 10px;
   background-size: cover;
   background-position: center;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.book-title {
-  font-size: 15px;
-  font-weight: 600;
-  margin-top: 4px;
-}
+.book-title { font-size: 15px; font-weight: 600; margin-top: 4px; }
+.status { font-size: 11px; text-transform: uppercase; color: var(--text-muted); }
 
-.status {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-}
-
-/* MODAL (okno rozdziałów) */
 .modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
   display: none;
   align-items: center;
   justify-content: center;
@@ -165,7 +116,6 @@ h1 {
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
 }
 
 .modal h2 {
@@ -173,62 +123,20 @@ h1 {
   font-size: 18px;
   margin-bottom: 12px;
   text-align: center;
-  letter-spacing: 1px;
-}
-
-.modal button {
-  background: var(--accent-teal);
-  color: #000;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  padding: 7px 14px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.modal button:hover {
-  filter: brightness(1.15);
-}
-
-.modal #closeModal {
-  background: var(--accent-gold);
-  color: #02030A;
-}
-
-/* CHAPTERS (rozdziały) */
-#chapterList {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 
 .chapter {
   background: var(--bg-soft);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255,255,255,0.06);
   border-radius: 10px;
   padding: 10px;
   font-size: 13px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-.chapter b {
-  color: var(--accent-teal);
-  font-size: 14px;
-}
+.chapter b { color: var(--accent-teal); font-size: 14px; }
+.chapter small { display: block; color: var(--text-muted); margin-bottom: 4px; }
+.chapter audio { width: 100%; margin-top: 6px; }
 
-.chapter small {
-  display: block;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-}
-
-.chapter audio {
-  width: 100%;
-  margin-top: 6px;
-}
-
-/* ACTION BUTTONS */
 button.action {
   background: var(--accent-teal);
   color: #000;
@@ -241,19 +149,4 @@ button.action {
   transition: transform 0.15s;
 }
 
-button.action:hover {
-  transform: translateY(-2px);
-}
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .toolbar button,
-  .toolbar input,
-  .toolbar select {
-    width: 100%;
-  }
-}
+button.action:hover { transform: translateY(-2px); }
