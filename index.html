@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MAPA ETERNIVERSE — Centrum Ksiąg</title>
   <meta name="description" content="Centralny interfejs Architekta Woli. Wszystkie Bramy i Księgi w jednym, czytelnym widoku.">
-  <link rel="stylesheet" href="style.css">
+  
+  <!-- Ikona strony (favicon) -->
+  <link rel="icon" href="data:," />
+
+  <!-- GŁÓWNY STYL STRONY -->
+  <link rel="stylesheet" href="style.css" />
+
 </head>
 
 <body>
@@ -64,7 +70,7 @@
       </div>
       <div class="modal-row">
         <label>URL okładki</label>
-        <input id="modalCover" placeholder="https://…">
+        <input id="modalCover" placeholder="https://adres-okladki.jpg">
       </div>
       <div class="modal-actions">
         <button id="modalCancel">Anuluj</button>
@@ -79,6 +85,7 @@
     <img id="coverImg" src="" alt="Okładka księgi">
   </div>
 
+  <!-- GŁÓWNY SKRYPT -->
   <script src="script.js"></script>
 </body>
 </html>
