@@ -28,22 +28,20 @@ function renderWorld(world) {
         bookDiv.className = 'book';
 
         bookDiv.innerHTML = `
-          <div class="book-row">
-            <img src="${book.cover}" alt="${book.title}">
-            <div class="book-info">
-              <strong>${book.title}</strong>
-              <p>${book.description}</p>
-            </div>
+          <img src="${book.cover}" alt="${book.title}">
+          <div class="book-info">
+            <strong>${book.title}</strong>
+            <p>${book.description}</p>
           </div>
         `;
 
-        // Dodaj audio rozdziały
+        // Dodaj rozdziały z audio
         book.chapters.forEach(ch => {
           const audioBox = document.createElement('div');
           audioBox.className = 'audio-player';
           audioBox.innerHTML = `
             <p><strong>${ch.title}</strong></p>
-            <audio controls preload="none" src="${ch.audio}" style="width:100%"></audio>
+            <audio controls preload="none" src="${ch.audio}"></audio>
           `;
           bookDiv.appendChild(audioBox);
         });
