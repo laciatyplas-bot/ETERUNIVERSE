@@ -1,5 +1,5 @@
 // ========================================================
-//  MAPA ETERNIVERSE — Pełna wersja z danymi i zapisami
+//  MAPA ETERNIVERSE — WERSJA 2.0 z AUDIOBOOKAMI
 // ========================================================
 
 // Wczytaj dane z localStorage (jeśli istnieją)
@@ -10,9 +10,23 @@ let DATA = JSON.parse(localStorage.getItem("eterniverseData")) || [
     sub: "Psychika · Cień · Trauma · Archetyp",
     tag: "CORE / PSYCHE",
     books: [
-      { title: "InterSeeker – Atlas Wewnętrzny", status: "published", cover: "https://i.imgur.com/3UDr5kk.jpeg" },
-      { title: "ShadowSeeker – Anatomia Cienia", status: "ready", cover: "https://i.imgur.com/PR9xzMx.jpeg" },
-      { title: "MemorySeeker – Archeologia Wspomnień", status: "draft", cover: "https://i.imgur.com/K5zEmZs.jpeg" }
+      {
+        title: "InterSeeker – Atlas Wewnętrzny",
+        status: "published",
+        cover: "https://i.imgur.com/3UDr5kk.jpeg",
+        audio: "https://cdn.pixabay.com/download/audio/2022/10/25/audio_5b46f1b123.mp3?filename=calm-mind-ambient-122893.mp3"
+      },
+      {
+        title: "ShadowSeeker – Anatomia Cienia",
+        status: "ready",
+        cover: "https://i.imgur.com/PR9xzMx.jpeg",
+        audio: "https://cdn.pixabay.com/download/audio/2023/03/06/audio_ae5985f344.mp3?filename=dark-mystery-soundscape-141085.mp3"
+      },
+      {
+        title: "MemorySeeker – Archeologia Wspomnień",
+        status: "draft",
+        cover: "https://i.imgur.com/K5zEmZs.jpeg"
+      }
     ]
   },
   {
@@ -21,7 +35,12 @@ let DATA = JSON.parse(localStorage.getItem("eterniverseData")) || [
     sub: "Strażnik · Rdzeń · Początek",
     tag: "CORE / ORIGIN",
     books: [
-      { title: "Geneza", status: "ready", cover: "https://i.imgur.com/DuBvlOB.jpeg" },
+      {
+        title: "Geneza",
+        status: "ready",
+        cover: "https://i.imgur.com/DuBvlOB.jpeg",
+        audio: "https://cdn.pixabay.com/download/audio/2022/03/10/audio_358b5f2efb.mp3?filename=epic-cinematic-ambient-11089.mp3"
+      },
       { title: "Custos: Kodeks Głębi", status: "idea", cover: "https://i.imgur.com/t1Ilvwz.jpeg" }
     ]
   },
@@ -51,7 +70,12 @@ let DATA = JSON.parse(localStorage.getItem("eterniverseData")) || [
     sub: "Materia · Przepływ · Manifestacja",
     tag: "EMBODIED / FLOW",
     books: [
-      { title: "ObfitoSeeker – Kod Obfitości", status: "published", cover: "https://i.imgur.com/ctYMX2e.jpeg" },
+      {
+        title: "ObfitoSeeker – Kod Obfitości",
+        status: "published",
+        cover: "https://i.imgur.com/ctYMX2e.jpeg",
+        audio: "https://cdn.pixabay.com/download/audio/2022/10/25/audio_8a8b9d6ed5.mp3?filename=inspiring-meditation-ambient-122890.mp3"
+      },
       { title: "MateriaSeeker – Przewodnik Ciała i Przepływu", status: "draft", cover: "https://i.imgur.com/HJ4zddT.jpeg" }
     ]
   },
@@ -80,7 +104,12 @@ let DATA = JSON.parse(localStorage.getItem("eterniverseData")) || [
     sub: "Kod Życia · Linie Czasu · Fizyka Duszy",
     tag: "META / PHYSICS",
     books: [
-      { title: "TrajektoriaSeeker – Mapa Linii Życia", status: "ready", cover: "https://i.imgur.com/hiA0JHi.jpeg" },
+      {
+        title: "TrajektoriaSeeker – Mapa Linii Życia",
+        status: "ready",
+        cover: "https://i.imgur.com/hiA0JHi.jpeg",
+        audio: "https://cdn.pixabay.com/download/audio/2023/03/13/audio_017aef38c3.mp3?filename=ethereal-ambient-141711.mp3"
+      },
       { title: "QuantumSeeker – Fizyka Duszy", status: "idea", cover: "https://i.imgur.com/vYUZH2U.jpeg" }
     ]
   },
@@ -100,20 +129,23 @@ let DATA = JSON.parse(localStorage.getItem("eterniverseData")) || [
     sub: "Integracja · Jedność · Architekt",
     tag: "INTEGRATION",
     books: [
-      { title: "Architekt Eteru — Manifest Twórcy", status: "writing", cover: "https://i.imgur.com/YrK1Jb3.jpeg" },
+      {
+        title: "Architekt Eteru — Manifest Twórcy",
+        status: "writing",
+        cover: "https://i.imgur.com/YrK1Jb3.jpeg",
+        audio: "https://cdn.pixabay.com/download/audio/2023/03/10/audio_cfa5570c31.mp3?filename=space-soundscape-141470.mp3"
+      },
       { title: "Mapa Uniwersum Eteru", status: "idea", cover: "https://i.imgur.com/FAdTuO5.jpeg" }
     ]
   }
 ];
 
-// ========================================================
-//  FUNKCJE GŁÓWNE
-// ========================================================
-
+// Zapis do localStorage
 function saveData() {
   localStorage.setItem("eterniverseData", JSON.stringify(DATA));
 }
 
+// Elementy DOM
 const gatesGrid = document.getElementById("gatesGrid");
 const gateFilter = document.getElementById("gateFilter");
 const statusFilter = document.getElementById("statusFilter");
@@ -126,7 +158,7 @@ const modalCover = document.getElementById("modalCover");
 const coverPreview = document.getElementById("coverPreview");
 const coverImg = document.getElementById("coverImg");
 
-// Fill selects
+// Uzupełnij selecty bram
 DATA.forEach((b) => {
   const opt = document.createElement("option");
   opt.value = b.id;
@@ -141,19 +173,15 @@ DATA.forEach((b) => {
 
 function statusClass(st) {
   switch (st) {
-    case "published":
-      return "st-published";
-    case "ready":
-      return "st-ready";
-    case "writing":
-      return "st-writing";
-    case "draft":
-      return "st-draft";
-    default:
-      return "st-idea";
+    case "published": return "st-published";
+    case "ready": return "st-ready";
+    case "writing": return "st-writing";
+    case "draft": return "st-draft";
+    default: return "st-idea";
   }
 }
 
+// Główne renderowanie
 function render() {
   const q = searchInput.value.toLowerCase().trim();
   const gate = gateFilter.value;
@@ -203,6 +231,11 @@ function render() {
               <span>${book.status}</span>
               <span class="status ${statusClass(book.status)}">${book.status.toUpperCase()}</span>
             </div>
+            ${
+              book.audio
+                ? `<audio controls preload="none" style="width:100%;margin-top:6px;"><source src="${book.audio}" type="audio/mpeg">Twoja przeglądarka nie obsługuje audio.</audio>`
+                : ""
+            }
           </div>
         `;
         const thumb = el.querySelector(".book-cover-thumb");
@@ -222,13 +255,13 @@ function render() {
   });
 }
 
-// Eventy filtrów
+// Filtry
 [searchInput, gateFilter, statusFilter].forEach((el) => {
   el.addEventListener("input", render);
   el.addEventListener("change", render);
 });
 
-// Modal dodawania
+// Modal dodawania książki
 document.getElementById("addBookBtn").onclick = () => {
   modalTitle.value = "";
   modalCover.value = "";
