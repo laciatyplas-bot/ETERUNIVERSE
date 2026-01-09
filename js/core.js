@@ -2,48 +2,57 @@ import { WORLD_PSYCHE } from './world_psyche.js';
 
 const app = document.getElementById('app');
 
-// Renderowanie całego świata
 function renderWorld(world) {
   app.innerHTML = `
     <h1>${world.name}</h1>
-    <p style="text-align:center;color:#9BA9C8;margin-bottom:20px;">
-      ${world.description}
-    </p>
+    <p>${world.description}</p>
   `;
 
   world.gates.forEach(gate => {
-    const gateBox = document.createElement('div');
-    gateBox.className = 'gate';
-    gateBox.innerHTML = `
+    const gateDiv = document.createElement('div');
+    gateDiv.className = 'gate';
+    gateDiv.style.borderLeftColor = gate.color;
+
+    gateDiv.innerHTML = `
       <h2>${gate.name}</h2>
       <p>${gate.theme}</p>
-      <div class="books"></div>
     `;
-
-    const booksDiv = gateBox.querySelector('.books');
 
     if (gate.books.length === 0) {
       const empty = document.createElement('p');
       empty.textContent = 'Brak książek w tej bramie.';
-      empty.style.color = '#777';
-      empty.style.fontSize = '0.9em';
-      booksDiv.appendChild(empty);
+      gateDiv.appendChild(empty);
     } else {
       gate.books.forEach(book => {
-        const bookEl = document.createElement('div');
-        bookEl.className = 'book';
-        bookEl.innerHTML = `
-          <strong>${book.title}</strong>
-          <p>${book.description}</p>
+        const bookDiv = document.createElement('div');
+        bookDiv.className = 'book';
+
+        bookDiv.innerHTML = `
+          <div class="book-row">
+            <img src="${book.cover}" alt="${book.title}">
+            <div class="book-info">
+              <strong>${book.title}</strong>
+              <p>${book.description}</p>
+            </div>
+          </div>
         `;
-        bookEl.addEventListener('click', () => {
-          alert(`📘 ${book.title}\n\n${book.description}`);
+
+        // Dodaj audio rozdziały
+        book.chapters.forEach(ch => {
+          const audioBox = document.createElement('div');
+          audioBox.className = 'audio-player';
+          audioBox.innerHTML = `
+            <p><strong>${ch.title}</strong></p>
+            <audio controls preload="none" src="${ch.audio}" style="width:100%"></audio>
+          `;
+          bookDiv.appendChild(audioBox);
         });
-        booksDiv.appendChild(bookEl);
+
+        gateDiv.appendChild(bookDiv);
       });
     }
 
-    app.appendChild(gateBox);
+    app.appendChild(gateDiv);
   });
 }
 
