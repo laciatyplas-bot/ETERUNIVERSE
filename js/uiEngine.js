@@ -1,188 +1,303 @@
 // ==========================================================
-//  ETERNIVERSE UI ENGINE (z rozdziałami PRO)
+//  ETERNIVERSE UI ENGINE
+// ==========================================================
+//  Tworzy i zarządza całym interfejsem użytkownika (UI):
+//   ✅ Lista książek
+//   ✅ Modal z rozdziałami
+//   ✅ Przyciski dodawania / edycji / usuwania
+//   ✅ Obsługa audio
 // ==========================================================
 
-import { playAudio } from './audioEngine.js';
-import { addBook, updateBook, deleteBook } from './bookEngine.js';
-import { addChapter, updateChapter, deleteChapter } from './chapterEngine.js';
-import { ETERNIVERSE_DATA } from './core.js';
+import { BOOKS, saveAll } from './core.js';
+import { addBook, editBook, deleteBook } from './bookEngine.js';
+import { addChapter, editChapter, deleteChapter, playChapterAudio } from './chapterEngine.js';
 
-// === Elementy interfejsu ===
-const gatesGrid = document.getElementById('gatesGrid');
-const addModal = document.getElementById('addModal');
-const modalGate = document.getElementById('modalGate');
-const modalTitle = document.getElementById('modalTitle');
-const modalStatus = document.getElementById('modalStatus');
-const modalCover = document.getElementById('modalCover');
-
-// === RENDEROWANIE WIDOKU ===
+// ==========================================================
+// 🧩 Renderuj główny interfejs
+// ==========================================================
 export function renderUI(data) {
-  gatesGrid.innerHTML = '';
+  const app = document.getElementById('app');
+  if (!app) {
+    console.error('[UI ENGINE] Nie znaleziono elementu #app w index.html');
+    return;
+  }
 
-  // Uzupełnij listę bram w select
-  modalGate.innerHTML = '';
-  data.forEach(gate => {
-    const opt = document.createElement('option');
-    opt.value = gate.id;
-    opt.textContent = gate.name;
-    modalGate.appendChild(opt);
+  app.innerHTML = ''; // wyczyść
+
+  // 🔹 Pasek narzędzi
+  const toolbar = document.createElement('div');
+  toolbar.className = 'toolbar';
+
+  const addBtn = document.createElement('button');
+  addBtn.textContent = '+ Dodaj książkę';
+  addBtn.onclick = () => openBookForm();
+
+  const exportBtn = document.createElement('button');
+  exportBtn.textContent = '📤 Eksport';
+  exportBtn.onclick = exportData;
+
+  const importBtn = document.createElement('button');
+  importBtn.textContent = '📥 Import';
+  importBtn.onclick = importData;
+
+  toolbar.appendChild(addBtn);
+  toolbar.appendChild(exportBtn);
+  toolbar.appendChild(importBtn);
+
+  app.appendChild(toolbar);
+
+  // 🔹 Lista książek
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+
+  data.forEach((book, i) => {
+    const bookEl = document.createElement('div');
+    bookEl.className = 'book';
+    bookEl.onclick = () => openBookModal(i);
+
+    const cover = document.createElement('div');
+    cover.className = 'book-cover';
+    cover.style.backgroundImage = book.cover ? `url(${book.cover})` : 'none';
+    if (!book.cover) cover.textContent = 'Brak okładki';
+
+    const title = document.createElement('div');
+    title.className = 'book-title';
+    title.textContent = book.title;
+
+    const status = document.createElement('div');
+    status.className = 'status';
+    status.textContent = book.status?.toUpperCase() || 'UNKNOWN';
+
+    bookEl.appendChild(cover);
+    bookEl.appendChild(title);
+    bookEl.appendChild(status);
+    grid.appendChild(bookEl);
   });
 
-  // Render każdej bramy
-  data.forEach((gate) => {
-    const gateEl = document.createElement('article');
-    gateEl.className = 'brama-card';
-    gateEl.innerHTML = `
-      <div class="brama-header">
-        <div>
-          <div class="brama-title">${gate.name}</div>
-          <div class="brama-sub">${gate.sub}</div>
-        </div>
-        <span class="badge">${gate.tag}</span>
-      </div>
-    `;
-
-    const booksWrap = document.createElement('div');
-    booksWrap.className = 'books';
-
-    // Render książek
-    gate.books.forEach((book, bookIndex) => {
-      const el = document.createElement('div');
-      el.className = 'book';
-      el.innerHTML = `
-        <div class="book-cover-thumb" style="${book.cover ? `background-image:url('${book.cover}')` : ''}"></div>
-        <div class="book-main">
-          <div class="book-title">${book.title}</div>
-          <div class="book-meta"><span>${book.status}</span></div>
-          ${book.audio ? `<audio controls src="${book.audio}"></audio>` : ''}
-        </div>
-      `;
-
-      // Klik = otwórz panel książki
-      el.addEventListener('click', () => openBookEditor(gate.id, bookIndex));
-      booksWrap.appendChild(el);
-    });
-
-    gateEl.appendChild(booksWrap);
-    gatesGrid.appendChild(gateEl);
-  });
+  app.appendChild(grid);
 }
 
-// === OBSŁUGA INTERAKCJI ===
-export function setupUIEvents() {
-  document.getElementById('addBookBtn').onclick = () => {
-    modalTitle.value = '';
-    modalCover.value = '';
-    modalStatus.value = 'idea';
-    addModal.style.display = 'flex';
-  };
-
-  document.getElementById('modalCancel').onclick = () => (addModal.style.display = 'none');
-
-  document.getElementById('modalSave').onclick = () => {
-    const gateId = Number(modalGate.value);
-    const title = modalTitle.value.trim();
-    const status = modalStatus.value;
-    const cover = modalCover.value.trim();
-    if (!title) return;
-    addBook(gateId, { title, status, cover, chapters: [] });
-    addModal.style.display = 'none';
-  };
-}
-
-// === PANEL EDYCJI KSIĄŻKI I ROZDZIAŁÓW ===
-export function openBookEditor(gateId, bookIndex) {
-  const gate = ETERNIVERSE_DATA.find(g => g.id === gateId);
-  const book = gate.books[bookIndex];
-  if (!book.chapters) book.chapters = [];
+// ==========================================================
+// 📘 Otwórz modal z książką i jej rozdziałami
+// ==========================================================
+function openBookModal(index) {
+  const book = BOOKS[index];
+  if (!book) return;
 
   const modal = document.createElement('div');
   modal.className = 'modal-backdrop';
-  modal.style.cssText = 'display:flex;align-items:center;justify-content:center;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;';
   modal.innerHTML = `
-    <div class="modal" style="background:#050B16;border:1px solid #20324A;border-radius:18px;padding:16px;max-width:650px;width:100%;max-height:90vh;overflow:auto;">
+    <div class="modal">
       <h2>${book.title}</h2>
-      <label>Okładka</label><input id="editCover" value="${book.cover || ''}" style="width:100%;margin-bottom:8px;">
-      <label>Audio główne</label><input id="editAudio" value="${book.audio || ''}" style="width:100%;margin-bottom:8px;">
-      <h3 style="margin-top:12px;">Rozdziały</h3>
       <div id="chapterList"></div>
-      <button id="addChapter" style="margin-top:10px;background:#28D3C6;color:#000;border:none;padding:6px 10px;border-radius:6px;">+ Dodaj rozdział</button>
-      <div style="margin-top:16px;text-align:right;">
-        <button id="editDelete" style="background:#FF6B6B;color:#fff;border:none;padding:6px 12px;border-radius:6px;">Usuń książkę</button>
-        <button id="editClose">Zamknij</button>
-        <button id="editSave" style="background:#28D3C6;color:#000;border:none;padding:6px 12px;border-radius:6px;">Zapisz</button>
-      </div>
+      <button id="addChapterBtn">+ Dodaj rozdział</button>
+      <hr style="margin:10px 0;opacity:0.2;">
+      <button id="editBookBtn">✏️ Edytuj książkę</button>
+      <button id="deleteBookBtn">🗑️ Usuń książkę</button>
+      <button id="closeModal">Zamknij</button>
     </div>
   `;
   document.body.appendChild(modal);
 
-  const renderChapters = () => {
-    const container = modal.querySelector('#chapterList');
-    container.innerHTML = '';
-    book.chapters.forEach((ch, idx) => {
-      const el = document.createElement('div');
-      el.style.cssText = 'background:#0D1C30;padding:8px;margin-top:6px;border-radius:8px;';
-      el.innerHTML = `
-        <b>${ch.title}</b><br>
-        <small>${ch.desc || ''}</small><br>
-        ${ch.audio ? `<audio controls src="${ch.audio}" style="width:100%;margin-top:4px;"></audio>` : ''}
-        <div style="margin-top:6px;text-align:right;">
-          <button data-idx="${idx}" class="editCh" style="margin-right:6px;">✏️</button>
-          <button data-idx="${idx}" class="delCh">🗑️</button>
-        </div>
-      `;
-      container.appendChild(el);
-    });
+  const chapterList = modal.querySelector('#chapterList');
+  renderChapters(chapterList, book, index);
 
-    container.querySelectorAll('.editCh').forEach(btn => {
-      btn.onclick = () => {
-        const i = btn.dataset.idx;
-        const ch = book.chapters[i];
-        const newTitle = prompt('Tytuł rozdziału:', ch.title);
-        const newDesc = prompt('Opis:', ch.desc || '');
-        const newAudio = prompt('URL audio:', ch.audio || '');
-        updateChapter(gateId, bookIndex, i, { title: newTitle, desc: newDesc, audio: newAudio });
-        modal.remove();
-      };
-    });
+  modal.style.display = 'flex';
 
-    container.querySelectorAll('.delCh').forEach(btn => {
-      btn.onclick = () => {
-        const i = btn.dataset.idx;
-        if (confirm('Usunąć rozdział?')) {
-          deleteChapter(gateId, bookIndex, i);
-          modal.remove();
-        }
-      };
-    });
-  };
-
-  renderChapters();
-
-  modal.querySelector('#addChapter').onclick = () => {
-    const title = prompt('Tytuł nowego rozdziału:');
-    const desc = prompt('Opis:');
-    const audio = prompt('URL audio (opcjonalnie):');
-    if (title) {
-      addChapter(gateId, bookIndex, { title, desc, audio });
+  modal.querySelector('#closeModal').onclick = () => modal.remove();
+  modal.querySelector('#addChapterBtn').onclick = () => openChapterForm(index, modal);
+  modal.querySelector('#editBookBtn').onclick = () => openBookForm(book, index, modal);
+  modal.querySelector('#deleteBookBtn').onclick = () => {
+    if (confirm(`Na pewno usunąć książkę "${book.title}"?`)) {
+      deleteBook(index);
       modal.remove();
     }
   };
+}
 
-  modal.querySelector('#editSave').onclick = () => {
-    updateBook(gateId, bookIndex, {
-      cover: modal.querySelector('#editCover').value.trim(),
-      audio: modal.querySelector('#editAudio').value.trim()
-    });
-    modal.remove();
-  };
+// ==========================================================
+// 🧩 Renderuj listę rozdziałów w modalu
+// ==========================================================
+function renderChapters(container, book, bookIndex) {
+  container.innerHTML = '';
 
-  modal.querySelector('#editClose').onclick = () => modal.remove();
+  if (!book.chapters || book.chapters.length === 0) {
+    const empty = document.createElement('div');
+    empty.textContent = 'Brak rozdziałów.';
+    empty.style.color = '#9BA9C8';
+    empty.style.fontSize = '13px';
+    container.appendChild(empty);
+    return;
+  }
 
-  modal.querySelector('#editDelete').onclick = () => {
-    if (confirm('Na pewno usunąć tę książkę?')) {
-      deleteBook(gateId, bookIndex);
-      modal.remove();
+  book.chapters.forEach((ch, i) => {
+    const div = document.createElement('div');
+    div.className = 'chapter';
+
+    div.innerHTML = `
+      <b>${ch.title}</b>
+      <small>${ch.desc || ''}</small>
+      ${ch.audio ? `<audio controls src="${ch.audio}"></audio>` : ''}
+      <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="action" id="playAudio_${i}">▶️ Odtwórz</button>
+        <button class="action" id="editChapter_${i}">✏️ Edytuj</button>
+        <button class="action" id="deleteChapter_${i}">🗑️ Usuń</button>
+      </div>
+    `;
+
+    container.appendChild(div);
+
+    const playBtn = div.querySelector(`#playAudio_${i}`);
+    const editBtn = div.querySelector(`#editChapter_${i}`);
+    const delBtn = div.querySelector(`#deleteChapter_${i}`);
+
+    playBtn.onclick = () => playChapterAudio(bookIndex, i);
+    editBtn.onclick = () => openChapterForm(bookIndex, null, book.chapters[i], i);
+    delBtn.onclick = () => {
+      if (confirm(`Usunąć rozdział "${ch.title}"?`)) {
+        deleteChapter(bookIndex, i);
+        renderChapters(container, BOOKS[bookIndex], bookIndex);
+      }
+    };
+  });
+}
+
+// ==========================================================
+// ➕ Formularz dodawania / edycji książki
+// ==========================================================
+function openBookForm(book = null, index = null, modalToClose = null) {
+  const form = document.createElement('div');
+  form.className = 'modal-backdrop';
+  form.innerHTML = `
+    <div class="modal">
+      <h2>${book ? 'Edytuj książkę' : 'Nowa książka'}</h2>
+      <label>Tytuł:</label>
+      <input type="text" id="bookTitle" value="${book?.title || ''}" placeholder="Tytuł książki">
+      <label>URL okładki:</label>
+      <input type="text" id="bookCover" value="${book?.cover || ''}" placeholder="https://example.com/cover.jpg">
+      <label>Status:</label>
+      <select id="bookStatus">
+        <option value="idea">Idea</option>
+        <option value="draft">Szkic</option>
+        <option value="writing">W trakcie pisania</option>
+        <option value="ready">Gotowe</option>
+        <option value="published">Opublikowane</option>
+      </select>
+      <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end;">
+        <button id="saveBookBtn">${book ? 'Zapisz' : 'Dodaj'}</button>
+        <button id="cancelBookBtn">Anuluj</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(form);
+
+  form.querySelector('#bookStatus').value = book?.status || 'idea';
+  form.style.display = 'flex';
+
+  const save = form.querySelector('#saveBookBtn');
+  const cancel = form.querySelector('#cancelBookBtn');
+
+  cancel.onclick = () => form.remove();
+
+  save.onclick = () => {
+    const newBook = {
+      title: form.querySelector('#bookTitle').value.trim(),
+      cover: form.querySelector('#bookCover').value.trim(),
+      status: form.querySelector('#bookStatus').value,
+      chapters: book?.chapters || [],
+    };
+
+    if (!newBook.title) {
+      alert('Podaj tytuł książki.');
+      return;
     }
+
+    if (book) {
+      editBook(index, newBook);
+    } else {
+      addBook(newBook);
+    }
+
+    form.remove();
+    if (modalToClose) modalToClose.remove();
   };
+}
+
+// ==========================================================
+// ➕ Formularz dodawania / edycji rozdziału
+// ==========================================================
+function openChapterForm(bookIndex, modal = null, chapter = null, chapterIndex = null) {
+  const form = document.createElement('div');
+  form.className = 'modal-backdrop';
+  form.innerHTML = `
+    <div class="modal">
+      <h2>${chapter ? 'Edytuj rozdział' : 'Nowy rozdział'}</h2>
+      <label>Tytuł rozdziału:</label>
+      <input type="text" id="chTitle" value="${chapter?.title || ''}" placeholder="np. Rozdział I — Początek">
+      <label>Opis:</label>
+      <input type="text" id="chDesc" value="${chapter?.desc || ''}" placeholder="Krótki opis">
+      <label>URL pliku audio (opcjonalnie):</label>
+      <input type="text" id="chAudio" value="${chapter?.audio || ''}" placeholder="https://example.com/audio.mp3">
+      <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end;">
+        <button id="saveChapterBtn">${chapter ? 'Zapisz' : 'Dodaj'}</button>
+        <button id="cancelChapterBtn">Anuluj</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(form);
+  form.style.display = 'flex';
+
+  form.querySelector('#cancelChapterBtn').onclick = () => form.remove();
+
+  form.querySelector('#saveChapterBtn').onclick = () => {
+    const newCh = {
+      title: form.querySelector('#chTitle').value.trim(),
+      desc: form.querySelector('#chDesc').value.trim(),
+      audio: form.querySelector('#chAudio').value.trim(),
+    };
+
+    if (!newCh.title) {
+      alert('Podaj tytuł rozdziału.');
+      return;
+    }
+
+    if (chapter) {
+      editChapter(bookIndex, chapterIndex, newCh);
+    } else {
+      addChapter(bookIndex, newCh);
+    }
+
+    form.remove();
+    if (modal) modal.remove();
+  };
+}
+
+// ==========================================================
+// 📤 Eksport / 📥 Import danych (UI)
+// ==========================================================
+function exportData() {
+  const json = JSON.stringify(BOOKS, null, 2);
+  navigator.clipboard.writeText(json);
+  alert('📋 Dane zostały skopiowane do schowka!');
+}
+
+function importData() {
+  const json = prompt('Wklej dane JSON:');
+  if (!json) return;
+  try {
+    const parsed = JSON.parse(json);
+    BOOKS.splice(0, BOOKS.length, ...parsed);
+    saveAll();
+    renderUI(BOOKS);
+    alert('✅ Dane zaimportowane pomyślnie!');
+  } catch (err) {
+    alert('❌ Błąd importu danych.');
+  }
+}
+
+// ==========================================================
+// 🧩 Inicjalizacja UI
+// ==========================================================
+export function setupUI() {
+  console.log('%c[UI ENGINE] Aktywny i gotowy.', 'color:#FFD700;font-weight:bold;');
 }
