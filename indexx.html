@@ -1,0 +1,953 @@
+
+<!DOCTYPE html>
+<!-- saved from url=(0049)file:///C:/Users/DOMINIKK/Desktop/manamanqnq.html -->
+<html lang="pl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MAPA ETERNIVERSE — Centrum Ksiąg</title>
+  <meta name="description" content="Centralny interfejs Architekta. Wszystkie Bram i księgi w jednym, czytelnym widoku.">
+
+  <!-- (opcjonalnie) Firebase – jeśli chcesz sync w chmurze -->
+  <!--
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  -->
+
+  <style>
+    :root{
+      --bg:#050814;
+      --card:#0A1727;
+      --card-soft:#0D1C30;
+      --text:#E9F4FF;
+      --muted:#9BA9C8;
+      --border:#20324A;
+      --gold:#D9A441;
+      --teal:#28D3C6;
+      --green:#12C65B;
+      --orange:#FFB14B;
+      --red:#FF6B6B;
+      --gray:#8B8FA0;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      background: radial-gradient(circle at top, #15223A 0%, #050814 55%, #01030A 100%);
+      color:var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height:100vh;
+    }
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:32px 16px 40px;
+    }
+    header{
+      margin-bottom:24px;
+    }
+    h1{
+      font-size:32px;
+      letter-spacing:3px;
+      text-transform:uppercase;
+      color:var(--gold);
+    }
+    .subtitle{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:18px;
+      align-items:center;
+    }
+    .search{
+      flex:1 1 220px;
+      position:relative;
+    }
+    .search input{
+      width:100%;
+      padding:9px 12px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#050B16;
+      color:var(--text);
+      font-size:13px;
+    }
+    .toolbar select,
+    .toolbar button{
+      border-radius:10px;
+      border:1px solid var(--border);
+      padding:9px 12px;
+      font-size:13px;
+      background:#050B16;
+      color:var(--text);
+      cursor:pointer;
+    }
+    .toolbar button.main{
+      background:var(--gold);
+      color:#02030A;
+      font-weight:700;
+      border:none;
+    }
+    .toolbar button.main:hover{
+      filter:brightness(1.03);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:14px;
+      margin-top:20px;
+    }
+    .brama-card{
+      background:var(--card);
+      border-radius:14px;
+      border:1px solid var(--border);
+      padding:14px 14px 10px;
+      display:flex;
+      flex-direction:column;
+      min-height:200px;
+    }
+    .brama-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:10px;
+    }
+    .brama-title{
+      font-size:14px;
+      font-weight:700;
+    }
+    .brama-sub{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:0.06em;
+      color:var(--muted);
+      margin-top:4px;
+    }
+    .badge{
+      font-size:10px;
+      padding:3px 8px;
+      border-radius:999px;
+      background:rgba(217,164,65,0.15);
+      color:var(--gold);
+      text-transform:uppercase;
+      letter-spacing:0.06em;
+      white-space:nowrap;
+    }
+    .books{
+      margin-top:6px;
+      border-top:1px solid rgba(255,255,255,0.06);
+      padding-top:8px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      flex:1;
+      overflow:hidden;
+    }
+    .book{
+      background:var(--card-soft);
+      border-radius:10px;
+      padding:7px 8px;
+      border:1px solid rgba(255,255,255,0.04);
+      display:flex;
+      gap:8px;
+      align-items:flex-start;
+      cursor:pointer;
+      transition:background 0.15s,border-color 0.15s,transform 0.1s;
+      position:relative;
+    }
+    .book:hover{
+      background:#0F2138;
+      border-color:rgba(217,164,65,0.35);
+      transform:translateY(-1px);
+    }
+    .book-cover-thumb{
+      width:28px;
+      height:40px;
+      border-radius:4px;
+      flex-shrink:0;
+      background:#101624;
+      background-size:cover;
+      background-position:center;
+      border:1px solid rgba(255,255,255,0.08);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:9px;
+      color:var(--gray);
+    }
+    .book-main{
+      flex:1;
+      min-width:0;
+    }
+    .book-title{
+      font-size:12px;
+      font-weight:600;
+      margin-bottom:2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .book-meta{
+      font-size:10px;
+      color:var(--muted);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .status{
+      font-size:9px;
+      padding:2px 6px;
+      border-radius:999px;
+      text-transform:uppercase;
+      letter-spacing:0.06em;
+      font-weight:700;
+    }
+    .st-published{background:rgba(18,198,91,0.2);color:var(--green);}
+    .st-ready{background:rgba(217,164,65,0.2);color:var(--gold);}
+    .st-writing{background:rgba(40,211,198,0.2);color:var(--teal);}
+    .st-draft{background:rgba(255,177,75,0.2);color:var(--orange);}
+    .st-idea{background:rgba(139,143,160,0.25);color:var(--gray);}
+
+    .no-books{
+      font-size:11px;
+      color:var(--muted);
+      padding:6px 4px 2px;
+    }
+
+    /* Panel dodawania księgi */
+    .modal-backdrop{
+      position:fixed;inset:0;background:rgba(0,0,0,0.65);
+      display:none;align-items:center;justify-content:center;z-index:2000;
+    }
+    .modal{
+      background:#050B16;
+      border-radius:18px;
+      border:1px solid var(--border);
+      padding:18px 18px 16px;
+      max-width:420px;
+      width:100%;
+      box-shadow:0 24px 80px rgba(0,0,0,0.9);
+      font-size:13px;
+    }
+    .modal h2{
+      font-size:15px;
+      margin-bottom:10px;
+    }
+    .modal-row{
+      margin-bottom:8px;
+    }
+    .modal label{
+      display:block;
+      font-size:11px;
+      color:var(--muted);
+      margin-bottom:3px;
+    }
+    .modal input,
+    .modal select{
+      width:100%;
+      padding:7px 9px;
+      border-radius:9px;
+      border:1px solid var(--border);
+      background:#050B16;
+      color:var(--text);
+      font-size:12px;
+    }
+    .modal-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+      margin-top:6px;
+    }
+    .modal button{
+      border-radius:999px;
+      padding:6px 12px;
+      border:1px solid var(--border);
+      font-size:12px;
+      cursor:pointer;
+      background:#050B16;
+      color:var(--text);
+    }
+    .modal button.primary{
+      background:var(--teal);
+      color:#020308;
+      border:none;
+      font-weight:600;
+    }
+
+    /* Podgląd okładki na cały ekran */
+    .cover-preview{
+      position:fixed;inset:0;
+      background:rgba(0,0,0,0.85);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:2100;
+    }
+    .cover-preview img{
+      max-width:90vw;
+      max-height:90vh;
+      border-radius:10px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.9);
+    }
+    .cover-preview-close{
+      position:fixed;
+      top:14px;right:18px;
+      font-size:24px;
+      cursor:pointer;
+      color:#eee;
+    }
+
+    @media (max-width:768px){
+      header{padding-top:18px;}
+      .toolbar{flex-direction:column;align-items:stretch;}
+      .toolbar button, .toolbar select{width:100%;}
+    }
+  </style>
+<style type="text/css" id="operaUserStyle"></style></head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>MAPA ETERNIVERSE</h1>
+    <div class="subtitle">
+      Centralny interfejs Architekta Woli (Maciej Maciuszek). Szukaj, filtruj, zarządzaj stanem ksiąg.
+      Każdy tytuł może mieć swoją okładkę i status wydawniczy.
+    </div>
+
+    <div class="toolbar">
+      <div class="search">
+        <input type="text" id="searchInput" placeholder="Szukaj tytułu, tagu, opisu...">
+      </div>
+      <select id="gateFilter">
+        <option value="all">Wszystkie bramy</option>
+      <option value="1">BRAMA I — INTERSEEKER</option><option value="2">BRAMA II — CUSTOS / GENEZA</option><option value="3">BRAMA III — ETERSEEKER</option><option value="4">BRAMA IV — ARCHETYPY / WOLA</option><option value="5">BRAMA V — OBFITOSEEKER</option><option value="6">BRAMA VI — BIOSEEKER</option><option value="7">BRAMA VII — SPLĄTANIE / AI</option><option value="8">BRAMA VIII — TRAJEKTORIE</option><option value="9">BRAMA IX — ETERNIONY / KOLEKTYW</option><option value="10">BRAMA X — ETERUNIVERSE</option></select>
+      <select id="statusFilter">
+        <option value="all">Wszystkie statusy</option>
+        <option value="published">Opublikowane</option>
+        <option value="ready">Gotowe</option>
+        <option value="writing">W trakcie pisania</option>
+        <option value="draft">Szkic</option>
+        <option value="idea">Idea</option>
+      </select>
+      <button class="main" id="addBookBtn">+ Dodaj księgę</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="grid" id="gatesGrid"><article class="brama-card">
+        <div class="brama-header">
+          <div>
+            <div class="brama-title">BRAMA I — INTERSEEKER</div>
+            <div class="brama-sub">Psychika · Cień · Trauma · Archetyp</div>
+          </div>
+          <span class="badge">CORE / PSYCHE</span>
+        </div>
+      <div class="books"><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">InterSeeker – Atlas Wewnętrzny</div>
+              <div class="book-meta">
+                <span>published</span>
+                <span class="status st-published">PUBLISHED</span>
+              </div>
+            </div>
+          </div><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">ShadowSeeker – Anatomia Cienia</div>
+              <div class="book-meta">
+                <span>ready</span>
+                <span class="status st-ready">READY</span>
+              </div>
+            </div>
+          </div><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">MemorySeeker – Archeologia Wspomnień</div>
+              <div class="book-meta">
+                <span>draft</span>
+                <span class="status st-draft">DRAFT</span>
+              </div>
+            </div>
+          </div></div></article><article class="brama-card">
+        <div class="brama-header">
+          <div>
+            <div class="brama-title">BRAMA II — CUSTOS / GENEZA</div>
+            <div class="brama-sub">Strażnik · Rdzeń · Początek</div>
+          </div>
+          <span class="badge">CORE / ORIGIN</span>
+        </div>
+      <div class="books"><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">Geneza</div>
+              <div class="book-meta">
+                <span>ready</span>
+                <span class="status st-ready">READY</span>
+              </div>
+            </div>
+          </div><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">Custos: Kodeks Głębi</div>
+              <div class="book-meta">
+                <span>idea</span>
+                <span class="status st-idea">IDEA</span>
+              </div>
+            </div>
+          </div></div></article><article class="brama-card">
+        <div class="brama-header">
+          <div>
+            <div class="brama-title">BRAMA III — ETERSEEKER</div>
+            <div class="brama-sub">Wola · Pole · Architektura</div>
+          </div>
+          <span class="badge">CORE / FIELD</span>
+        </div>
+      <div class="books"><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">EterSeeker – Księga Zakazana (Tom Zero)</div>
+              <div class="book-meta">
+                <span>writing</span>
+                <span class="status st-writing">WRITING</span>
+              </div>
+            </div>
+          </div><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">EterSeeker – Architektura Woli</div>
+              <div class="book-meta">
+                <span>idea</span>
+                <span class="status st-idea">IDEA</span>
+              </div>
+            </div>
+          </div></div></article><article class="brama-card">
+        <div class="brama-header">
+          <div>
+            <div class="brama-title">BRAMA IV — ARCHETYPY / WOLA</div>
+            <div class="brama-sub">Konstrukcja · Role · Przeznaczenie</div>
+          </div>
+          <span class="badge">CORE / WILL</span>
+        </div>
+      <div class="books"><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">ArchetypSeeker – System Archetypów Eteru</div>
+              <div class="book-meta">
+                <span>idea</span>
+                <span class="status st-idea">IDEA</span>
+              </div>
+            </div>
+          </div><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">Kronika Woli</div>
+              <div class="book-meta">
+                <span>idea</span>
+                <span class="status st-idea">IDEA</span>
+              </div>
+            </div>
+          </div></div></article><article class="brama-card">
+        <div class="brama-header">
+          <div>
+            <div class="brama-title">BRAMA V — OBFITOSEEKER</div>
+            <div class="brama-sub">Materia · Przepływ · Manifestacja</div>
+          </div>
+          <span class="badge">EMBODIED / FLOW</span>
+        </div>
+      <div class="books"><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">ObfitoSeeker – Kod Obfitości</div>
+              <div class="book-meta">
+                <span>published</span>
+                <span class="status st-published">PUBLISHED</span>
+              </div>
+            </div>
+          </div><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">MateriaSeeker – Przewodnik Ciała i Przepływu</div>
+              <div class="book-meta">
+                <span>draft</span>
+                <span class="status st-draft">DRAFT</span>
+              </div>
+            </div>
+          </div></div></article><article class="brama-card">
+        <div class="brama-header">
+          <div>
+            <div class="brama-title">BRAMA VI — BIOSEEKER</div>
+            <div class="brama-sub">Ciało · Biologia · Regulacja</div>
+          </div>
+          <span class="badge">EMBODIED / BIO</span>
+        </div>
+      <div class="books"><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">BioSeeker – Sekret Biologii Pola</div>
+              <div class="book-meta">
+                <span>idea</span>
+                <span class="status st-idea">IDEA</span>
+              </div>
+            </div>
+          </div></div></article><article class="brama-card">
+        <div class="brama-header">
+          <div>
+            <div class="brama-title">BRAMA VII — SPLĄTANIE / AI</div>
+            <div class="brama-sub">Obserwator · Meta-tożsamość · Technologia</div>
+          </div>
+          <span class="badge">META / TECH</span>
+        </div>
+      <div class="books"><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">SplatanieSeeker – Protokół Obserwatora</div>
+              <div class="book-meta">
+                <span>idea</span>
+                <span class="status st-idea">IDEA</span>
+              </div>
+            </div>
+          </div><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">InterfejsSeeker – Interfejs Świadomości</div>
+              <div class="book-meta">
+                <span>idea</span>
+                <span class="status st-idea">IDEA</span>
+              </div>
+            </div>
+          </div></div></article><article class="brama-card">
+        <div class="brama-header">
+          <div>
+            <div class="brama-title">BRAMA VIII — TRAJEKTORIE</div>
+            <div class="brama-sub">Kod Życia · Linie Czasu · Fizyka Duszy</div>
+          </div>
+          <span class="badge">META / PHYSICS</span>
+        </div>
+      <div class="books"><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">TrajektoriaSeeker – Mapa Linii Życia</div>
+              <div class="book-meta">
+                <span>ready</span>
+                <span class="status st-ready">READY</span>
+              </div>
+            </div>
+          </div><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">QuantumSeeker – Fizyka Duszy</div>
+              <div class="book-meta">
+                <span>idea</span>
+                <span class="status st-idea">IDEA</span>
+              </div>
+            </div>
+          </div></div></article><article class="brama-card">
+        <div class="brama-header">
+          <div>
+            <div class="brama-title">BRAMA IX — ETERNIONY / KOLEKTYW</div>
+            <div class="brama-sub">Węzły Pola · Wspólnota · Misja</div>
+          </div>
+          <span class="badge">COLLECTIVE</span>
+        </div>
+      <div class="books"><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">Eteriony – Tom I</div>
+              <div class="book-meta">
+                <span>idea</span>
+                <span class="status st-idea">IDEA</span>
+              </div>
+            </div>
+          </div><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">Eteriony – Tom II</div>
+              <div class="book-meta">
+                <span>idea</span>
+                <span class="status st-idea">IDEA</span>
+              </div>
+            </div>
+          </div></div></article><article class="brama-card">
+        <div class="brama-header">
+          <div>
+            <div class="brama-title">BRAMA X — ETERUNIVERSE</div>
+            <div class="brama-sub">Integracja · Jedność · Architekt</div>
+          </div>
+          <span class="badge">INTEGRATION</span>
+        </div>
+      <div class="books"><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">Architekt Eteru — Manifest Twórcy</div>
+              <div class="book-meta">
+                <span>writing</span>
+                <span class="status st-writing">WRITING</span>
+              </div>
+            </div>
+          </div><div class="book">
+            <div class="book-cover-thumb" style="">
+              okładka
+            </div>
+            <div class="book-main">
+              <div class="book-title">Mapa Uniwersum Eteru</div>
+              <div class="book-meta">
+                <span>idea</span>
+                <span class="status st-idea">IDEA</span>
+              </div>
+            </div>
+          </div></div></article></section>
+  </main>
+</div>
+
+<!-- Modal dodawania księgi -->
+<div class="modal-backdrop" id="addModal">
+  <div class="modal">
+    <h2>Nowa księga</h2>
+    <div class="modal-row">
+      <label>Brama</label>
+      <select id="modalGate"><option value="1">BRAMA I — INTERSEEKER</option><option value="2">BRAMA II — CUSTOS / GENEZA</option><option value="3">BRAMA III — ETERSEEKER</option><option value="4">BRAMA IV — ARCHETYPY / WOLA</option><option value="5">BRAMA V — OBFITOSEEKER</option><option value="6">BRAMA VI — BIOSEEKER</option><option value="7">BRAMA VII — SPLĄTANIE / AI</option><option value="8">BRAMA VIII — TRAJEKTORIE</option><option value="9">BRAMA IX — ETERNIONY / KOLEKTYW</option><option value="10">BRAMA X — ETERUNIVERSE</option></select>
+    </div>
+    <div class="modal-row">
+      <label>Tytuł</label>
+      <input id="modalTitle" placeholder="np. InterSeeker – Atlas Wewnętrzny">
+    </div>
+    <div class="modal-row">
+      <label>Status</label>
+      <select id="modalStatus">
+        <option value="idea">Idea</option>
+        <option value="draft">Szkic</option>
+        <option value="writing">W trakcie pisania</option>
+        <option value="ready">Gotowe</option>
+        <option value="published">Opublikowane</option>
+      </select>
+    </div>
+    <div class="modal-row">
+      <label>URL okładki (Wattpad / Canva / gdziekolwiek)</label>
+      <input id="modalCover" placeholder="https://…">
+    </div>
+    <div class="modal-actions">
+      <button id="modalCancel">Anuluj</button>
+      <button class="primary" id="modalSave">Zapisz</button>
+    </div>
+  </div>
+</div>
+
+<!-- Podgląd okładki -->
+<div class="cover-preview" id="coverPreview">
+  <span class="cover-preview-close" id="coverClose">×</span>
+  <img id="coverImg" src="file:///C:/Users/DOMINIKK/Desktop/manamanqnq.html" alt="Okładka księgi">
+</div>
+
+<script>
+  // ===== Dane Bram i Ksiąg (na start można trzymać tylko tutaj) =====
+  const DATA = [
+    {
+      id:1,
+      name:"BRAMA I — INTERSEEKER",
+      sub:"Psychika · Cień · Trauma · Archetyp",
+      tag:"CORE / PSYCHE",
+      color:"#28D3C6",
+      books:[
+        {title:"InterSeeker – Atlas Wewnętrzny",status:"published",cover:""},
+        {title:"ShadowSeeker – Anatomia Cienia",status:"ready",cover:""},
+        {title:"MemorySeeker – Archeologia Wspomnień",status:"draft",cover:""}
+      ]
+    },
+    {
+      id:2,
+      name:"BRAMA II — CUSTOS / GENEZA",
+      sub:"Strażnik · Rdzeń · Początek",
+      tag:"CORE / ORIGIN",
+      color:"#FF6B6B",
+      books:[
+        {title:"Geneza",status:"ready",cover:""},
+        {title:"Custos: Kodeks Głębi",status:"idea",cover:""}
+      ]
+    },
+    {
+      id:3,
+      name:"BRAMA III — ETERSEEKER",
+      sub:"Wola · Pole · Architektura",
+      tag:"CORE / FIELD",
+      color:"#D9A441",
+      books:[
+        {title:"EterSeeker – Księga Zakazana (Tom Zero)",status:"writing",cover:""},
+        {title:"EterSeeker – Architektura Woli",status:"idea",cover:""}
+      ]
+    },
+    {
+      id:4,
+      name:"BRAMA IV — ARCHETYPY / WOLA",
+      sub:"Konstrukcja · Role · Przeznaczenie",
+      tag:"CORE / WILL",
+      color:"#9B6BFF",
+      books:[
+        {title:"ArchetypSeeker – System Archetypów Eteru",status:"idea",cover:""},
+        {title:"Kronika Woli",status:"idea",cover:""}
+      ]
+    },
+    {
+      id:5,
+      name:"BRAMA V — OBFITOSEEKER",
+      sub:"Materia · Przepływ · Manifestacja",
+      tag:"EMBODIED / FLOW",
+      color:"#12C65B",
+      books:[
+        {title:"ObfitoSeeker – Kod Obfitości",status:"published",cover:""},
+        {title:"MateriaSeeker – Przewodnik Ciała i Przepływu",status:"draft",cover:""}
+      ]
+    },
+    {
+      id:6,
+      name:"BRAMA VI — BIOSEEKER",
+      sub:"Ciało · Biologia · Regulacja",
+      tag:"EMBODIED / BIO",
+      color:"#FFB14B",
+      books:[
+        {title:"BioSeeker – Sekret Biologii Pola",status:"idea",cover:""}
+      ]
+    },
+    {
+      id:7,
+      name:"BRAMA VII — SPLĄTANIE / AI",
+      sub:"Obserwator · Meta-tożsamość · Technologia",
+      tag:"META / TECH",
+      color:"#5DADE2",
+      books:[
+        {title:"SplatanieSeeker – Protokół Obserwatora",status:"idea",cover:""},
+        {title:"InterfejsSeeker – Interfejs Świadomości",status:"idea",cover:""}
+      ]
+    },
+    {
+      id:8,
+      name:"BRAMA VIII — TRAJEKTORIE",
+      sub:"Kod Życia · Linie Czasu · Fizyka Duszy",
+      tag:"META / PHYSICS",
+      color:"#FF9FF3",
+      books:[
+        {title:"TrajektoriaSeeker – Mapa Linii Życia",status:"ready",cover:""},
+        {title:"QuantumSeeker – Fizyka Duszy",status:"idea",cover:""}
+      ]
+    },
+    {
+      id:9,
+      name:"BRAMA IX — ETERNIONY / KOLEKTYW",
+      sub:"Węzły Pola · Wspólnota · Misja",
+      tag:"COLLECTIVE",
+      color:"#667eea",
+      books:[
+        {title:"Eteriony – Tom I",status:"idea",cover:""},
+        {title:"Eteriony – Tom II",status:"idea",cover:""}
+      ]
+    },
+    {
+      id:10,
+      name:"BRAMA X — ETERUNIVERSE",
+      sub:"Integracja · Jedność · Architekt",
+      tag:"INTEGRATION",
+      color:"#D9A441",
+      books:[
+        {title:"Architekt Eteru — Manifest Twórcy",status:"writing",cover:""},
+        {title:"Mapa Uniwersum Eteru",status:"idea",cover:""}
+      ]
+    }
+  ];
+
+  const gatesGrid   = document.getElementById('gatesGrid');
+  const gateFilter  = document.getElementById('gateFilter');
+  const statusFilter= document.getElementById('statusFilter');
+  const searchInput = document.getElementById('searchInput');
+
+  const addModal    = document.getElementById('addModal');
+  const modalGate   = document.getElementById('modalGate');
+  const modalTitle  = document.getElementById('modalTitle');
+  const modalStatus = document.getElementById('modalStatus');
+  const modalCover  = document.getElementById('modalCover');
+
+  const coverPreview= document.getElementById('coverPreview');
+  const coverImg    = document.getElementById('coverImg');
+
+  // wypełnij selecty bram
+  DATA.forEach(b => {
+    const opt1 = document.createElement('option');
+    opt1.value = b.id;
+    opt1.textContent = b.name;
+    gateFilter.appendChild(opt1);
+
+    const opt2 = document.createElement('option');
+    opt2.value = b.id;
+    opt2.textContent = b.name;
+    modalGate.appendChild(opt2);
+  });
+
+  function statusClass(st){
+    switch(st){
+      case 'published': return 'st-published';
+      case 'ready':     return 'st-ready';
+      case 'writing':   return 'st-writing';
+      case 'draft':     return 'st-draft';
+      default:          return 'st-idea';
+    }
+  }
+
+  function render(){
+    const q = searchInput.value.toLowerCase().trim();
+    const gate = gateFilter.value;
+    const st   = statusFilter.value;
+
+    gatesGrid.innerHTML = '';
+
+    DATA.forEach(brama => {
+      if(gate !== 'all' && String(brama.id) !== gate) return;
+
+      const card = document.createElement('article');
+      card.className = 'brama-card';
+
+      card.innerHTML = `
+        <div class="brama-header">
+          <div>
+            <div class="brama-title">${brama.name}</div>
+            <div class="brama-sub">${brama.sub}</div>
+          </div>
+          <span class="badge">${brama.tag}</span>
+        </div>
+      `;
+
+      const booksWrap = document.createElement('div');
+      booksWrap.className = 'books';
+
+      const filteredBooks = brama.books.filter(book => {
+        if(st !== 'all' && book.status !== st) return false;
+        if(!q) return true;
+        return (book.title || '').toLowerCase().includes(q);
+      });
+
+      if(!filteredBooks.length){
+        const info = document.createElement('div');
+        info.className = 'no-books';
+        info.textContent = 'Brak tytułów w tym filtrze.';
+        booksWrap.appendChild(info);
+      }else{
+        filteredBooks.forEach(book => {
+          const el = document.createElement('div');
+          el.className = 'book';
+          el.innerHTML = `
+            <div class="book-cover-thumb" style="${book.cover ? `background-image:url('${book.cover}')` : ''}">
+              ${book.cover ? '' : 'okładka'}
+            </div>
+            <div class="book-main">
+              <div class="book-title">${book.title}</div>
+              <div class="book-meta">
+                <span>${book.status || 'idea'}</span>
+                <span class="status ${statusClass(book.status)}">${(book.status || 'idea').toUpperCase()}</span>
+              </div>
+            </div>
+          `;
+          // klik w miniaturę → pełna okładka
+          const thumb = el.querySelector('.book-cover-thumb');
+          if(book.cover){
+            thumb.addEventListener('click', (ev) => {
+              ev.stopPropagation();
+              coverImg.src = book.cover;
+              coverPreview.style.display = 'flex';
+            });
+          }
+          booksWrap.appendChild(el);
+        });
+      }
+
+      card.appendChild(booksWrap);
+      gatesGrid.appendChild(card);
+    });
+  }
+
+  // filter events
+  [searchInput, gateFilter, statusFilter].forEach(el => {
+    el.addEventListener('input', render);
+    el.addEventListener('change', render);
+  });
+
+  // modal add book
+  document.getElementById('addBookBtn').onclick = () => {
+    modalTitle.value = '';
+    modalCover.value = '';
+    modalStatus.value = 'idea';
+    addModal.style.display = 'flex';
+  };
+  document.getElementById('modalCancel').onclick = () => {
+    addModal.style.display = 'none';
+  };
+  document.getElementById('modalSave').onclick = () => {
+    const gateId = Number(modalGate.value);
+    const title  = modalTitle.value.trim();
+    if(!title) return;
+    const status = modalStatus.value;
+    const cover  = modalCover.value.trim();
+
+    const brama = DATA.find(b => b.id === gateId);
+    if(!brama) return;
+
+    brama.books.push({title,status,cover});
+    addModal.style.display = 'none';
+    render();
+    // tu ewentualnie: zapisz do localStorage / Firebase
+  };
+
+  // podgląd okładki
+  document.getElementById('coverClose').onclick = () => {
+    coverPreview.style.display = 'none';
+    coverImg.src = '';
+  };
+  coverPreview.addEventListener('click', () => {
+    coverPreview.style.display = 'none';
+    coverImg.src = '';
+  });
+
+  // init
+  render();
+</script>
+
+
+</body></html>
