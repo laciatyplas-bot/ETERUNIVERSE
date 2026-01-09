@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ETERNIVERSE — Mapa Architekta</title>
-  <meta name="description" content="System zarządzania księgami ETERUNIVERSE. Modułowy interfejs z danymi, audio i panelami edycji.">
-  
+  <meta name="description" content="System zarządzania księgami i rozdziałami ETERNIVERSE.">
+
   <style>
     :root {
       --bg: #050814;
@@ -79,15 +79,6 @@
     .book-main { flex: 1; min-width: 0; }
     .book-title { font-size: 12px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .book-meta { font-size: 10px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
-    .status {
-      font-size: 9px; padding: 2px 6px; border-radius: 999px;
-      text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;
-    }
-    .st-published { background: rgba(18,198,91,0.2); color: var(--green); }
-    .st-ready { background: rgba(217,164,65,0.2); color: var(--gold); }
-    .st-writing { background: rgba(40,211,198,0.2); color: var(--teal); }
-    .st-draft { background: rgba(255,177,75,0.2); color: var(--orange); }
-    .st-idea { background: rgba(139,143,160,0.25); color: var(--gray); }
     audio { width: 100%; margin-top: 4px; }
     @media (max-width: 768px) {
       header { padding-top: 18px; }
@@ -101,15 +92,12 @@
 <div class="wrap">
   <header>
     <h1>ETERNIVERSE</h1>
-    <div class="subtitle">Modułowy interfejs Architekta Woli — zarządzanie księgami, bramami i audiobookami.</div>
-
+    <div class="subtitle">Interfejs Architekta — zarządzaj bramami, książkami i rozdziałami.</div>
     <div class="toolbar">
       <div class="search">
         <input type="text" id="searchInput" placeholder="Szukaj tytułu, tagu...">
       </div>
-      <select id="gateFilter">
-        <option value="all">Wszystkie bramy</option>
-      </select>
+      <select id="gateFilter"><option value="all">Wszystkie bramy</option></select>
       <select id="statusFilter">
         <option value="all">Wszystkie statusy</option>
         <option value="published">Opublikowane</option>
@@ -121,52 +109,30 @@
       <button class="main" id="addBookBtn">+ Dodaj księgę</button>
     </div>
   </header>
-
   <main>
     <section class="grid" id="gatesGrid"></section>
   </main>
 </div>
 
-<!-- Modal dodawania -->
+<!-- Modal dodawania księgi -->
 <div class="modal-backdrop" id="addModal" style="display:none;align-items:center;justify-content:center;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:1000;">
   <div class="modal" style="background:#050B16;border:1px solid var(--border);border-radius:18px;padding:16px;max-width:400px;width:100%;">
     <h2>Nowa księga</h2>
-    <div class="modal-row">
-      <label>Brama</label>
-      <select id="modalGate"></select>
-    </div>
-    <div class="modal-row">
-      <label>Tytuł</label>
-      <input id="modalTitle" placeholder="np. InterSeeker — Atlas Wewnętrzny" style="width:100%;">
-    </div>
-    <div class="modal-row">
-      <label>Status</label>
-      <select id="modalStatus">
-        <option value="idea">Idea</option>
-        <option value="draft">Szkic</option>
-        <option value="writing">W trakcie pisania</option>
-        <option value="ready">Gotowe</option>
-        <option value="published">Opublikowane</option>
-      </select>
-    </div>
-    <div class="modal-row">
-      <label>URL okładki</label>
-      <input id="modalCover" placeholder="https://…">
-    </div>
-    <div class="modal-actions" style="margin-top:10px;text-align:right;">
+    <label>Brama</label><select id="modalGate"></select>
+    <label>Tytuł</label><input id="modalTitle" style="width:100%;margin-bottom:6px;">
+    <label>Status</label>
+    <select id="modalStatus" style="width:100%;margin-bottom:6px;">
+      <option value="idea">Idea</option><option value="draft">Szkic</option><option value="writing">W trakcie pisania</option><option value="ready">Gotowe</option><option value="published">Opublikowane</option>
+    </select>
+    <label>URL okładki</label><input id="modalCover" style="width:100%;">
+    <div style="margin-top:10px;text-align:right;">
       <button id="modalCancel">Anuluj</button>
-      <button class="primary" id="modalSave" style="background:var(--teal);color:#000;border:none;">Zapisz</button>
+      <button id="modalSave" style="background:var(--teal);border:none;color:#000;">Zapisz</button>
     </div>
   </div>
 </div>
 
-<!-- Podgląd okładki -->
-<div class="cover-preview" id="coverPreview" style="display:none;align-items:center;justify-content:center;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:2000;">
-  <span class="cover-preview-close" id="coverClose" style="position:fixed;top:14px;right:18px;font-size:24px;cursor:pointer;color:#eee;">×</span>
-  <img id="coverImg" src="" alt="Okładka księgi" style="max-width:90vw;max-height:90vh;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,0.9);">
-</div>
-
-<!-- Silniki ETERNIVERSE -->
+<!-- Silniki -->
 <script type="module" src="./js/core.js"></script>
 
 </body>
