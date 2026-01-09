@@ -4,15 +4,47 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ETERNIVERSE — Centrum Ksiąg</title>
-  <meta name="description" content="System ETERNIVERSE — zarządzaj książkami, rozdziałami i audiobookami.">
+
+  <!-- Opis SEO -->
+  <meta name="description" content="ETERNIVERSE: Interaktywny system zarządzania książkami, rozdziałami i audiobookami. Stworzony przez Architekta Dominika.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="./favicon.ico">
+
+  <!-- Główny styl -->
   <link rel="stylesheet" href="./style.css">
+
+  <!-- Czcionka (opcjonalnie) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
-  <h1>📚 MAPA ETERNIVERSE</h1>
-  <div class="subtitle">Panel zarządzania książkami, rozdziałami i audio</div>
+  <header>
+    <h1>📚 MAPA ETERNIVERSE</h1>
+    <div class="subtitle">
+      Centrum Architekta Woli — zarządzaj światami, księgami, rozdziałami i audio.
+    </div>
+  </header>
 
   <main id="app"></main>
 
+  <footer style="margin-top: 40px; text-align: center; font-size: 13px; color: #9BA9C8;">
+    © 2026 ETERNIVERSE — Stworzony przez Architekta Dominika.
+  </footer>
+
+  <!-- ========================================================= -->
+  <!-- 🚀 SILNIKI SYSTEMU ETERNIVERSE -->
+  <!-- ========================================================= -->
   <script type="module" src="./js/core.js"></script>
+  <script type="module" src="./js/dataEngine.js"></script>
+  <script type="module" src="./js/bookEngine.js"></script>
+  <script type="module" src="./js/chapterEngine.js"></script>
+  <script type="module" src="./js/audioEngine.js"></script>
+  <script type="module" src="./js/uiEngine.js"></script>
+
+  <!-- ========================================================= -->
+  <!-- 🌌 DODATKOWY ŚWIAT: INTERSEEKER WORLD -->
+  <!-- ========================================================= -->
+  <script type="module" src="./js/interseeker_world.js"></script>
 </body>
 </html>
