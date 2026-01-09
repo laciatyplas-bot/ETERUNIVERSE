@@ -1,5 +1,5 @@
 // ========================================================
-//  MAPA ETERNIVERSE — WERSJA 2.0 z AUDIOBOOKAMI
+//  MAPA ETERNIVERSE v3.0 — PANEL ARCHITEKTA (edycja + audio)
 // ========================================================
 
 // Wczytaj dane z localStorage (jeśli istnieją)
@@ -19,13 +19,7 @@ let DATA = JSON.parse(localStorage.getItem("eterniverseData")) || [
       {
         title: "ShadowSeeker – Anatomia Cienia",
         status: "ready",
-        cover: "https://i.imgur.com/PR9xzMx.jpeg",
-        audio: "https://cdn.pixabay.com/download/audio/2023/03/06/audio_ae5985f344.mp3?filename=dark-mystery-soundscape-141085.mp3"
-      },
-      {
-        title: "MemorySeeker – Archeologia Wspomnień",
-        status: "draft",
-        cover: "https://i.imgur.com/K5zEmZs.jpeg"
+        cover: "https://i.imgur.com/PR9xzMx.jpeg"
       }
     ]
   },
@@ -38,127 +32,79 @@ let DATA = JSON.parse(localStorage.getItem("eterniverseData")) || [
       {
         title: "Geneza",
         status: "ready",
-        cover: "https://i.imgur.com/DuBvlOB.jpeg",
-        audio: "https://cdn.pixabay.com/download/audio/2022/03/10/audio_358b5f2efb.mp3?filename=epic-cinematic-ambient-11089.mp3"
-      },
-      { title: "Custos: Kodeks Głębi", status: "idea", cover: "https://i.imgur.com/t1Ilvwz.jpeg" }
-    ]
-  },
-  {
-    id: 3,
-    name: "BRAMA III — ETERSEEKER",
-    sub: "Wola · Pole · Architektura",
-    tag: "CORE / FIELD",
-    books: [
-      { title: "EterSeeker – Księga Zakazana (Tom Zero)", status: "writing", cover: "https://i.imgur.com/bKoQBSx.jpeg" },
-      { title: "EterSeeker – Architektura Woli", status: "idea", cover: "https://i.imgur.com/NutdKPt.jpeg" }
-    ]
-  },
-  {
-    id: 4,
-    name: "BRAMA IV — ARCHETYPY / WOLA",
-    sub: "Konstrukcja · Role · Przeznaczenie",
-    tag: "CORE / WILL",
-    books: [
-      { title: "ArchetypSeeker – System Archetypów Eteru", status: "idea", cover: "https://i.imgur.com/ALEsWoj.jpeg" },
-      { title: "Kronika Woli", status: "idea", cover: "https://i.imgur.com/vHWU3mM.jpeg" }
-    ]
-  },
-  {
-    id: 5,
-    name: "BRAMA V — OBFITOSEEKER",
-    sub: "Materia · Przepływ · Manifestacja",
-    tag: "EMBODIED / FLOW",
-    books: [
-      {
-        title: "ObfitoSeeker – Kod Obfitości",
-        status: "published",
-        cover: "https://i.imgur.com/ctYMX2e.jpeg",
-        audio: "https://cdn.pixabay.com/download/audio/2022/10/25/audio_8a8b9d6ed5.mp3?filename=inspiring-meditation-ambient-122890.mp3"
-      },
-      { title: "MateriaSeeker – Przewodnik Ciała i Przepływu", status: "draft", cover: "https://i.imgur.com/HJ4zddT.jpeg" }
-    ]
-  },
-  {
-    id: 6,
-    name: "BRAMA VI — BIOSEEKER",
-    sub: "Ciało · Biologia · Regulacja",
-    tag: "EMBODIED / BIO",
-    books: [
-      { title: "BioSeeker – Sekret Biologii Pola", status: "idea", cover: "https://i.imgur.com/RpknkSN.jpeg" }
-    ]
-  },
-  {
-    id: 7,
-    name: "BRAMA VII — SPLĄTANIE / AI",
-    sub: "Obserwator · Meta-tożsamość · Technologia",
-    tag: "META / TECH",
-    books: [
-      { title: "SplatanieSeeker – Protokół Obserwatora", status: "idea", cover: "https://i.imgur.com/yBfABfn.jpeg" },
-      { title: "InterfejsSeeker – Interfejs Świadomości", status: "idea", cover: "https://i.imgur.com/ekFuE6H.jpeg" }
-    ]
-  },
-  {
-    id: 8,
-    name: "BRAMA VIII — TRAJEKTORIE",
-    sub: "Kod Życia · Linie Czasu · Fizyka Duszy",
-    tag: "META / PHYSICS",
-    books: [
-      {
-        title: "TrajektoriaSeeker – Mapa Linii Życia",
-        status: "ready",
-        cover: "https://i.imgur.com/hiA0JHi.jpeg",
-        audio: "https://cdn.pixabay.com/download/audio/2023/03/13/audio_017aef38c3.mp3?filename=ethereal-ambient-141711.mp3"
-      },
-      { title: "QuantumSeeker – Fizyka Duszy", status: "idea", cover: "https://i.imgur.com/vYUZH2U.jpeg" }
-    ]
-  },
-  {
-    id: 9,
-    name: "BRAMA IX — ETERNIONY / KOLEKTYW",
-    sub: "Węzły Pola · Wspólnota · Misja",
-    tag: "COLLECTIVE",
-    books: [
-      { title: "Eteriony – Tom I", status: "idea", cover: "https://i.imgur.com/HrMTF5F.jpeg" },
-      { title: "Eteriony – Tom II", status: "idea", cover: "https://i.imgur.com/x2uY3qq.jpeg" }
-    ]
-  },
-  {
-    id: 10,
-    name: "BRAMA X — ETERUNIVERSE",
-    sub: "Integracja · Jedność · Architekt",
-    tag: "INTEGRATION",
-    books: [
-      {
-        title: "Architekt Eteru — Manifest Twórcy",
-        status: "writing",
-        cover: "https://i.imgur.com/YrK1Jb3.jpeg",
-        audio: "https://cdn.pixabay.com/download/audio/2023/03/10/audio_cfa5570c31.mp3?filename=space-soundscape-141470.mp3"
-      },
-      { title: "Mapa Uniwersum Eteru", status: "idea", cover: "https://i.imgur.com/FAdTuO5.jpeg" }
+        cover: "https://i.imgur.com/DuBvlOB.jpeg"
+      }
     ]
   }
 ];
 
-// Zapis do localStorage
+// ==============================================
+//  ZAPIS / ODCZYT
+// ==============================================
+
 function saveData() {
   localStorage.setItem("eterniverseData", JSON.stringify(DATA));
 }
 
-// Elementy DOM
+// ==============================================
+//  ELEMENTY DOM
+// ==============================================
+
 const gatesGrid = document.getElementById("gatesGrid");
 const gateFilter = document.getElementById("gateFilter");
 const statusFilter = document.getElementById("statusFilter");
 const searchInput = document.getElementById("searchInput");
+
 const addModal = document.getElementById("addModal");
 const modalGate = document.getElementById("modalGate");
 const modalTitle = document.getElementById("modalTitle");
 const modalStatus = document.getElementById("modalStatus");
 const modalCover = document.getElementById("modalCover");
+
 const coverPreview = document.getElementById("coverPreview");
 const coverImg = document.getElementById("coverImg");
 
-// Uzupełnij selecty bram
+// Tworzymy dodatkowy modal do edycji
+const editModal = document.createElement("div");
+editModal.className = "modal-backdrop";
+editModal.innerHTML = `
+  <div class="modal">
+    <h2>Edycja księgi</h2>
+    <div class="modal-row">
+      <label>Tytuł</label>
+      <input id="editTitle">
+    </div>
+    <div class="modal-row">
+      <label>Status</label>
+      <select id="editStatus">
+        <option value="idea">Idea</option>
+        <option value="draft">Szkic</option>
+        <option value="writing">W trakcie pisania</option>
+        <option value="ready">Gotowe</option>
+        <option value="published">Opublikowane</option>
+      </select>
+    </div>
+    <div class="modal-row">
+      <label>URL okładki</label>
+      <input id="editCover">
+    </div>
+    <div class="modal-row">
+      <label>URL audio (MP3)</label>
+      <input id="editAudio">
+    </div>
+    <div class="modal-actions">
+      <button id="editCancel">Anuluj</button>
+      <button id="editDelete" style="background:#FF6B6B;border:none;color:#fff;">Usuń</button>
+      <button class="primary" id="editSave">Zapisz zmiany</button>
+    </div>
+  </div>
+`;
+document.body.appendChild(editModal);
+
+// ==============================================
+//  GENEROWANIE DANYCH
+// ==============================================
+
 DATA.forEach((b) => {
   const opt = document.createElement("option");
   opt.value = b.id;
@@ -181,7 +127,10 @@ function statusClass(st) {
   }
 }
 
-// Główne renderowanie
+// ==============================================
+//  RENDEROWANIE
+// ==============================================
+
 function render() {
   const q = searchInput.value.toLowerCase().trim();
   const gate = gateFilter.value;
@@ -218,7 +167,7 @@ function render() {
       info.textContent = "Brak tytułów.";
       booksWrap.appendChild(info);
     } else {
-      filtered.forEach((book) => {
+      filtered.forEach((book, index) => {
         const el = document.createElement("div");
         el.className = "book";
         el.innerHTML = `
@@ -233,11 +182,16 @@ function render() {
             </div>
             ${
               book.audio
-                ? `<audio controls preload="none" style="width:100%;margin-top:6px;"><source src="${book.audio}" type="audio/mpeg">Twoja przeglądarka nie obsługuje audio.</audio>`
+                ? `<audio controls preload="none" style="width:100%;margin-top:6px;"><source src="${book.audio}" type="audio/mpeg">Audio</audio>`
                 : ""
             }
           </div>
         `;
+
+        // Kliknięcie książki = edycja
+        el.addEventListener("click", () => openEditModal(brama.id, index));
+
+        // Kliknięcie okładki = podgląd
         const thumb = el.querySelector(".book-cover-thumb");
         if (book.cover) {
           thumb.addEventListener("click", (ev) => {
@@ -246,6 +200,7 @@ function render() {
             coverPreview.style.display = "flex";
           });
         }
+
         booksWrap.appendChild(el);
       });
     }
@@ -255,13 +210,17 @@ function render() {
   });
 }
 
-// Filtry
+// ==============================================
+//  OBSŁUGA PANELI
+// ==============================================
+
+// FILTRY
 [searchInput, gateFilter, statusFilter].forEach((el) => {
   el.addEventListener("input", render);
   el.addEventListener("change", render);
 });
 
-// Modal dodawania książki
+// MODAL DODAWANIA
 document.getElementById("addBookBtn").onclick = () => {
   modalTitle.value = "";
   modalCover.value = "";
@@ -287,7 +246,47 @@ document.getElementById("modalSave").onclick = () => {
   addModal.style.display = "none";
 };
 
-// Podgląd okładki fullscreen
+// MODAL EDYCJI
+function openEditModal(gateId, bookIndex) {
+  const brama = DATA.find((b) => b.id === gateId);
+  const book = brama.books[bookIndex];
+
+  editModal.style.display = "flex";
+  const titleInput = editModal.querySelector("#editTitle");
+  const statusInput = editModal.querySelector("#editStatus");
+  const coverInput = editModal.querySelector("#editCover");
+  const audioInput = editModal.querySelector("#editAudio");
+
+  titleInput.value = book.title;
+  statusInput.value = book.status;
+  coverInput.value = book.cover || "";
+  audioInput.value = book.audio || "";
+
+  editModal.querySelector("#editCancel").onclick = () => {
+    editModal.style.display = "none";
+  };
+
+  editModal.querySelector("#editSave").onclick = () => {
+    book.title = titleInput.value.trim();
+    book.status = statusInput.value;
+    book.cover = coverInput.value.trim();
+    book.audio = audioInput.value.trim();
+    saveData();
+    render();
+    editModal.style.display = "none";
+  };
+
+  editModal.querySelector("#editDelete").onclick = () => {
+    if (confirm("Na pewno usunąć tę księgę?")) {
+      brama.books.splice(bookIndex, 1);
+      saveData();
+      render();
+      editModal.style.display = "none";
+    }
+  };
+}
+
+// PODGLĄD OKŁADKI
 document.getElementById("coverClose").onclick = () => {
   coverPreview.style.display = "none";
   coverImg.src = "";
@@ -297,5 +296,5 @@ coverPreview.addEventListener("click", () => {
   coverImg.src = "";
 });
 
-// Inicjalizacja
+// START
 render();
