@@ -2,48 +2,59 @@ export const WORLD_PSYCHE = {
   id: "world_psyche",
   name: "ŚWIAT I — PSYCHE / INTERSEEKER",
   description:
-    "Pierwszy świat ETERNIVERSE. Psychika, cień, archetypy, pamięć, podświadomość. Tu zaczyna się podróż Architekta.",
+    "Świat introspekcji, cienia i pamięci. Pierwszy wymiar przebudzenia Woli.",
   gates: [
     {
       id: "gate_1",
       name: "BRAMA I — INTERSEEKER",
+      color: "#28D3C6",
       theme: "Psychika · Cień · Trauma · Tożsamość",
       books: [
         {
+          id: "book_1_1",
           title: "InterSeeker — Atlas Wewnętrzny",
+          cover: "media/covers/interseeker.jpg",
           description:
-            "Mapa wnętrza człowieka. Mechanizmy obronne, fałszywa tożsamość, pierwsze pęknięcie iluzji.",
+            "Mapa wnętrza człowieka. Mechanizmy obronne i fałszywe ja. Pierwsze pęknięcie iluzji.",
+          chapters: [
+            {
+              title: "Rozdział 1 — Początek",
+              audio: "media/audio/interseeker_ch1.mp3"
+            },
+            {
+              title: "Rozdział 2 — Mechanizmy",
+              audio: "media/audio/interseeker_ch2.mp3"
+            }
+          ]
         },
         {
+          id: "book_1_2",
           title: "ShadowSeeker — Anatomia Cienia",
+          cover: "media/covers/shadowseeker.jpg",
           description:
-            "Praca z cieniem bez duchowej ściemy. Agresja, wstyd, tabu jako paliwo świadomości.",
-        },
-      ],
+            "Praca z cieniem bez duchowej ściemy. Wstyd, agresja, tabu jako energia transformacji.",
+          chapters: [
+            {
+              title: "Rozdział 1 — Wprowadzenie",
+              audio: "media/audio/shadowseeker_ch1.mp3"
+            }
+          ]
+        }
+      ]
     },
     {
       id: "gate_2",
       name: "BRAMA II — MEMORY SEEKER",
+      color: "#1FB5A5",
       theme: "Pamięć · Archeologia Wspomnień",
-      books: [
-        {
-          title: "MemorySeeker — Archeologia Wspomnień",
-          description:
-            "Rozkodowanie pamięci. Przeszłość jako aktywny system sterowania teraźniejszością.",
-        },
-      ],
+      books: []
     },
     {
       id: "gate_3",
       name: "BRAMA III — SELF SPLIT",
+      color: "#1AA8A8",
       theme: "Jaźń · Rozszczepienie · Integracja",
-      books: [
-        {
-          title: "SelfSplit Seeker — Anatomia Rozszczepienia",
-          description:
-            "Jak powstaje fałszywe ja i jak je zintegrować. Zrozumienie siebie poprzez ból i lustra.",
-        },
-      ],
-    },
-  ],
+      books: []
+    }
+  ]
 };
