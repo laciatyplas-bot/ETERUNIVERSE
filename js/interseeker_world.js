@@ -1,151 +1,153 @@
-/* ============================
-   ETHERUNIVERSE — WORLD I
-   ŚWIAT I: INTERSEEKER
-   Architekt: Maciej Maciuszek
-   ============================ */
+// ===============================
+// 🌌 ETHERUNIVERSE — ŚWIAT I
+// ŚWIAT PSYCHE / INTERSEEKER
+// Architekt: Maciej Maciuszek
+// ===============================
 
-const DATA = {
-  system: "ETHERUNIVERSE",
-  version: "1.0",
-  architect: "Maciej Maciuszek",
+export const WORLD_PSYCHE = {
+  id: "world_psyche",
+  index: 1,
+  name: "ŚWIAT I — PSYCHE / INTERSEEKER",
+  theme: "Psychika · Cień · Archetyp · Wewnętrzny Wszechświat",
+  color: "#28D3C6",
+  description:
+    "Pierwsze przebicie świadomości. Świat introspekcji, konfrontacji z cieniem i pamięcią. Początek rozumienia siebie i natury Ja.",
 
-  worlds: [
+  meta: {
+    architect: "Maciej Maciuszek",
+    creationDate: "2026-01-09",
+    version: "1.0.0",
+  },
+
+  gates: [
     {
-      id: "world_1",
-      name: "ŚWIAT I — INTERSEEKER",
+      id: "gate_1",
+      name: "BRAMA I — INTERSEEKER",
+      theme: "Psychika · Cień · Trauma · Tożsamość",
+      color: "#12C6B0",
       description:
-        "Świat wejścia w psychikę. Rozpad iluzji, konfrontacja z cieniem, pamięcią i tożsamością. Nie rozwój — tylko prawda.",
-
-      gates: [
+        "Wejście do wnętrza. Mapa ludzkiej psychiki i pierwsze spojrzenie na cień — to, co zostało wyparte.",
+      books: [
         {
-          id: "gate_1",
-          name: "BRAMA I — INTERSEEKER",
-          color: "#28D3C6", // turkus eteru
-          theme: "Psychika · Cień · Trauma · Tożsamość",
-          systemRole:
-            "Brama wejścia. Odpowiada za uświadomienie mechanizmów przetrwania, fałszywego ja i bólu zapisanego w pamięci.",
-
-          books: [
-            {
-              id: "interseeker_atlas",
-              title: "InterSeeker — Atlas Wewnętrzny",
-              trilogy: true,
-              description:
-                "Mapa wnętrza człowieka. Mechanizmy obronne, fałszywa tożsamość, pierwsze pęknięcie iluzji."
-            },
-            {
-              id: "shadowseeker",
-              title: "ShadowSeeker — Anatomia Cienia",
-              trilogy: true,
-              description:
-                "Praca z cieniem bez duchowej ściemy. Agresja, wstyd, tabu jako paliwo świadomości."
-            },
-            {
-              id: "memoryseeker",
-              title: "MemorySeeker — Archeologia Wspomnień",
-              trilogy: true,
-              description:
-                "Rozkodowanie pamięci. Przeszłość jako aktywny system sterowania teraźniejszością."
-            },
-            {
-              id: "selfsplit",
-              title: "SelfSplit Seeker — Rozszczepienie Tożsamości",
-              trilogy: true,
-              description:
-                "Moment pęknięcia jaźni. Jak powstaje fałszywe ja i jak je zintegrować."
-            },
-            {
-              id: "bolseeker",
-              title: "BólSeeker — Anatomia Rany",
-              trilogy: false,
-              description:
-                "Ból jako wejście, nie kara. Rany jako portale świadomości."
-            },
-            {
-              id: "mirrorseeker",
-              title: "MirrorSeeker — Twoje Prawdziwe Odbicie",
-              trilogy: false,
-              description:
-                "Relacje jako lustra. To, co widzisz w innych, jest kodem ciebie."
-            },
-            {
-              id: "underseeker",
-              title: "UnderSeeker — Podświadomość, która steruje tobą",
-              trilogy: true,
-              description:
-                "Automaty, skrypty i impulsy, które rządzą decyzjami zanim pomyślisz."
-            },
-            {
-              id: "senseeker",
-              title: "SenSeeker — Mechanika Snów",
-              trilogy: true,
-              description:
-                "Sny jako system komunikacji. Instrukcja czytania sygnałów nocnych."
-            }
-          ]
-        }
-      ]
-    }
-  ]
+          id: "book_1_1",
+          title: "InterSeeker — Atlas Wewnętrzny",
+          status: "published",
+          description:
+            "Mapa wnętrza człowieka. Mechanizmy obronne, fałszywa tożsamość, pierwsze pęknięcie iluzji.",
+          cover: "",
+          chapters: [],
+        },
+        {
+          id: "book_1_2",
+          title: "ShadowSeeker — Anatomia Cienia",
+          status: "ready",
+          description:
+            "Praca z cieniem bez duchowej ściemy. Agresja, wstyd, tabu jako paliwo świadomości.",
+          cover: "",
+          chapters: [],
+        },
+      ],
+    },
+    {
+      id: "gate_2",
+      name: "BRAMA II — MEMORY SEEKER",
+      theme: "Pamięć · Archeologia Wspomnień",
+      color: "#1FB5A5",
+      description:
+        "Zejście w przeszłość. Archeologia wspomnień — to, co zostało zapisane w polu świadomości.",
+      books: [
+        {
+          id: "book_2_1",
+          title: "MemorySeeker — Archeologia Wspomnień",
+          status: "writing",
+          description:
+            "Rozkodowanie pamięci. Przeszłość jako aktywny system sterowania teraźniejszością.",
+          cover: "",
+          chapters: [],
+        },
+      ],
+    },
+    {
+      id: "gate_3",
+      name: "BRAMA III — SELF SPLIT",
+      theme: "Jaźń · Rozszczepienie · Integracja",
+      color: "#1AA8A8",
+      description:
+        "Punkt pęknięcia Jaźni. Fałszywe ja, które broni się przed świadomością, i droga do jego integracji.",
+      books: [
+        {
+          id: "book_3_1",
+          title: "SelfSplit Seeker — Anatomia Rozszczepienia",
+          status: "idea",
+          description:
+            "Jak powstaje fałszywe ja i jak je zintegrować. Zrozumienie siebie poprzez ból i lustra.",
+          cover: "",
+          chapters: [],
+        },
+      ],
+    },
+    {
+      id: "gate_4",
+      name: "BRAMA IV — UNDER SEEKER",
+      theme: "Podświadomość · Mechanizmy",
+      color: "#18A2B2",
+      description:
+        "Zejście w podświadomość. Automaty, które nami sterują, zanim pomyślimy.",
+      books: [],
+    },
+    {
+      id: "gate_5",
+      name: "BRAMA V — SENSEEKER",
+      theme: "Sny · Symbole · Przekazy",
+      color: "#1B9DC0",
+      description:
+        "Praca ze snami jako z systemem komunikacji. Świadomość śniąca odkrywa swoje kody.",
+      books: [],
+    },
+    {
+      id: "gate_6",
+      name: "BRAMA VI — BÓL SEEKER",
+      theme: "Rana · Wrażliwość · Uzdrawianie",
+      color: "#1C95D3",
+      description:
+        "Ból jako portal, nie kara. Przejście przez rany ku wewnętrznemu światłu.",
+      books: [],
+    },
+    {
+      id: "gate_7",
+      name: "BRAMA VII — MIRROR SEEKER",
+      theme: "Relacje · Odbicie · Lustro",
+      color: "#1E8CE0",
+      description:
+        "Ludzie jako lustra naszego wnętrza. Każdy związek to odbicie fragmentu psyche.",
+      books: [],
+    },
+    {
+      id: "gate_8",
+      name: "BRAMA VIII — VOID SEEKER",
+      theme: "Pustka · Cisza · Niewiedza",
+      color: "#2280F0",
+      description:
+        "Spotkanie z pustką. Zanurzenie w przestrzeni bez formy, gdzie świadomość odnajduje siebie bez masek.",
+      books: [],
+    },
+    {
+      id: "gate_9",
+      name: "BRAMA IX — ARCHETYPE SEEKER",
+      theme: "Symbole · Role · Wzorce",
+      color: "#2675FF",
+      description:
+        "Rozpoznanie archetypów działających w psyche. Bohater, Cień, Dziecko, Mędrzec i inni.",
+      books: [],
+    },
+    {
+      id: "gate_10",
+      name: "BRAMA X — INTEGRATOR",
+      theme: "Jedność · Synteza · Wola",
+      color: "#2C69FF",
+      description:
+        "Integracja wszystkich aspektów psyche w jedną całość. Architekt Woli odzyskuje moc tworzenia.",
+      books: [],
+    },
+  ],
 };
-
-/* ============================
-   RENDER ENGINE (MINIMAL)
-   ============================ */
-
-function renderWorld(world) {
-  const root = document.getElementById("app");
-  root.innerHTML = "";
-
-  const h1 = document.createElement("h1");
-  h1.textContent = world.name;
-  root.appendChild(h1);
-
-  const p = document.createElement("p");
-  p.textContent = world.description;
-  root.appendChild(p);
-
-  world.gates.forEach(gate => {
-    const gateBox = document.createElement("div");
-    gateBox.style.borderLeft = `6px solid ${gate.color}`;
-    gateBox.style.padding = "16px";
-    gateBox.style.margin = "24px 0";
-    gateBox.style.background = "#0b1624";
-
-    const h2 = document.createElement("h2");
-    h2.textContent = gate.name;
-    h2.style.color = gate.color;
-    gateBox.appendChild(h2);
-
-    const theme = document.createElement("p");
-    theme.textContent = gate.theme;
-    gateBox.appendChild(theme);
-
-    gate.books.forEach(book => {
-      const bookEl = document.createElement("div");
-      bookEl.style.padding = "8px";
-      bookEl.style.margin = "6px 0";
-      bookEl.style.cursor = "pointer";
-      bookEl.style.background = "rgba(255,255,255,0.05)";
-      bookEl.textContent =
-        book.title + (book.trilogy ? " (TRYLOGIA)" : "");
-
-      bookEl.onclick = () => {
-        alert(book.description);
-      };
-
-      gateBox.appendChild(bookEl);
-    });
-
-    root.appendChild(gateBox);
-  });
-}
-
-/* ============================
-   INIT
-   ============================ */
-
-document.addEventListener("DOMContentLoaded", () => {
-  const world = DATA.worlds[0];
-  renderWorld(world);
-});
