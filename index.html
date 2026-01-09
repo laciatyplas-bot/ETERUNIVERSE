@@ -2,90 +2,172 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MAPA ETERNIVERSE — Centrum Ksiąg</title>
-  <meta name="description" content="Centralny interfejs Architekta Woli. Wszystkie Bramy i Księgi w jednym, czytelnym widoku.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ETERNIVERSE — Mapa Architekta</title>
+  <meta name="description" content="System zarządzania księgami ETERUNIVERSE. Modułowy interfejs z danymi, audio i panelami edycji.">
   
-  <!-- Ikona strony (favicon) -->
-  <link rel="icon" href="data:," />
-
-  <!-- GŁÓWNY STYL STRONY -->
-  <link rel="stylesheet" href="style.css" />
-
+  <style>
+    :root {
+      --bg: #050814;
+      --card: #0A1727;
+      --card-soft: #0D1C30;
+      --text: #E9F4FF;
+      --muted: #9BA9C8;
+      --border: #20324A;
+      --gold: #D9A441;
+      --teal: #28D3C6;
+      --green: #12C65B;
+      --orange: #FFB14B;
+      --red: #FF6B6B;
+      --gray: #8B8FA0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at top, #15223A 0%, #050814 55%, #01030A 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 32px 16px 40px; }
+    header { margin-bottom: 24px; }
+    h1 { font-size: 32px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); }
+    .subtitle { margin-top: 8px; color: var(--muted); font-size: 14px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; align-items: center; }
+    .search { flex: 1 1 220px; position: relative; }
+    .search input {
+      width: 100%; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border);
+      background: #050B16; color: var(--text); font-size: 13px;
+    }
+    .toolbar select, .toolbar button {
+      border-radius: 10px; border: 1px solid var(--border); padding: 9px 12px;
+      font-size: 13px; background: #050B16; color: var(--text); cursor: pointer;
+    }
+    .toolbar button.main {
+      background: var(--gold); color: #02030A; font-weight: 700; border: none;
+    }
+    .toolbar button.main:hover { filter: brightness(1.03); }
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px; margin-top: 20px;
+    }
+    .brama-card {
+      background: var(--card); border-radius: 14px; border: 1px solid var(--border);
+      padding: 14px 14px 10px; display: flex; flex-direction: column; min-height: 200px;
+    }
+    .brama-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .brama-title { font-size: 14px; font-weight: 700; }
+    .brama-sub { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-top: 4px; }
+    .badge {
+      font-size: 10px; padding: 3px 8px; border-radius: 999px;
+      background: rgba(217,164,65,0.15); color: var(--gold);
+      text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap;
+    }
+    .books { margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;
+      display: flex; flex-direction: column; gap: 6px; flex: 1; overflow: hidden; }
+    .book {
+      background: var(--card-soft); border-radius: 10px; padding: 7px 8px;
+      border: 1px solid rgba(255,255,255,0.04); display: flex; gap: 8px; align-items: flex-start;
+      cursor: pointer; transition: background 0.15s, border-color 0.15s, transform 0.1s;
+      position: relative;
+    }
+    .book:hover { background: #0F2138; border-color: rgba(217,164,65,0.35); transform: translateY(-1px); }
+    .book-cover-thumb {
+      width: 28px; height: 40px; border-radius: 4px; flex-shrink: 0;
+      background: #101624; background-size: cover; background-position: center;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .book-main { flex: 1; min-width: 0; }
+    .book-title { font-size: 12px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .book-meta { font-size: 10px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
+    .status {
+      font-size: 9px; padding: 2px 6px; border-radius: 999px;
+      text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;
+    }
+    .st-published { background: rgba(18,198,91,0.2); color: var(--green); }
+    .st-ready { background: rgba(217,164,65,0.2); color: var(--gold); }
+    .st-writing { background: rgba(40,211,198,0.2); color: var(--teal); }
+    .st-draft { background: rgba(255,177,75,0.2); color: var(--orange); }
+    .st-idea { background: rgba(139,143,160,0.25); color: var(--gray); }
+    audio { width: 100%; margin-top: 4px; }
+    @media (max-width: 768px) {
+      header { padding-top: 18px; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .toolbar button, .toolbar select { width: 100%; }
+    }
+  </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <header>
-      <h1>MAPA ETERNIVERSE</h1>
-      <div class="subtitle">
-        Centralny interfejs Architekta Woli (Maciej Maciuszek). Szukaj, filtruj, zarządzaj stanem ksiąg.
-      </div>
 
-      <div class="toolbar">
-        <div class="search">
-          <input type="text" id="searchInput" placeholder="Szukaj tytułu, tagu, opisu...">
-        </div>
-        <select id="gateFilter">
-          <option value="all">Wszystkie bramy</option>
-        </select>
-        <select id="statusFilter">
-          <option value="all">Wszystkie statusy</option>
-          <option value="published">Opublikowane</option>
-          <option value="ready">Gotowe</option>
-          <option value="writing">W trakcie pisania</option>
-          <option value="draft">Szkic</option>
-          <option value="idea">Idea</option>
-        </select>
-        <button class="main" id="addBookBtn">+ Dodaj księgę</button>
-      </div>
-    </header>
+<div class="wrap">
+  <header>
+    <h1>ETERNIVERSE</h1>
+    <div class="subtitle">Modułowy interfejs Architekta Woli — zarządzanie księgami, bramami i audiobookami.</div>
 
-    <main>
-      <section class="grid" id="gatesGrid"></section>
-    </main>
-  </div>
+    <div class="toolbar">
+      <div class="search">
+        <input type="text" id="searchInput" placeholder="Szukaj tytułu, tagu...">
+      </div>
+      <select id="gateFilter">
+        <option value="all">Wszystkie bramy</option>
+      </select>
+      <select id="statusFilter">
+        <option value="all">Wszystkie statusy</option>
+        <option value="published">Opublikowane</option>
+        <option value="ready">Gotowe</option>
+        <option value="writing">W trakcie pisania</option>
+        <option value="draft">Szkic</option>
+        <option value="idea">Idea</option>
+      </select>
+      <button class="main" id="addBookBtn">+ Dodaj księgę</button>
+    </div>
+  </header>
 
-  <!-- Modal dodawania księgi -->
-  <div class="modal-backdrop" id="addModal">
-    <div class="modal">
-      <h2>Nowa księga</h2>
-      <div class="modal-row">
-        <label>Brama</label>
-        <select id="modalGate"></select>
-      </div>
-      <div class="modal-row">
-        <label>Tytuł</label>
-        <input id="modalTitle" placeholder="np. InterSeeker – Atlas Wewnętrzny">
-      </div>
-      <div class="modal-row">
-        <label>Status</label>
-        <select id="modalStatus">
-          <option value="idea">Idea</option>
-          <option value="draft">Szkic</option>
-          <option value="writing">W trakcie pisania</option>
-          <option value="ready">Gotowe</option>
-          <option value="published">Opublikowane</option>
-        </select>
-      </div>
-      <div class="modal-row">
-        <label>URL okładki</label>
-        <input id="modalCover" placeholder="https://adres-okladki.jpg">
-      </div>
-      <div class="modal-actions">
-        <button id="modalCancel">Anuluj</button>
-        <button class="primary" id="modalSave">Zapisz</button>
-      </div>
+  <main>
+    <section class="grid" id="gatesGrid"></section>
+  </main>
+</div>
+
+<!-- Modal dodawania -->
+<div class="modal-backdrop" id="addModal" style="display:none;align-items:center;justify-content:center;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:1000;">
+  <div class="modal" style="background:#050B16;border:1px solid var(--border);border-radius:18px;padding:16px;max-width:400px;width:100%;">
+    <h2>Nowa księga</h2>
+    <div class="modal-row">
+      <label>Brama</label>
+      <select id="modalGate"></select>
+    </div>
+    <div class="modal-row">
+      <label>Tytuł</label>
+      <input id="modalTitle" placeholder="np. InterSeeker — Atlas Wewnętrzny" style="width:100%;">
+    </div>
+    <div class="modal-row">
+      <label>Status</label>
+      <select id="modalStatus">
+        <option value="idea">Idea</option>
+        <option value="draft">Szkic</option>
+        <option value="writing">W trakcie pisania</option>
+        <option value="ready">Gotowe</option>
+        <option value="published">Opublikowane</option>
+      </select>
+    </div>
+    <div class="modal-row">
+      <label>URL okładki</label>
+      <input id="modalCover" placeholder="https://…">
+    </div>
+    <div class="modal-actions" style="margin-top:10px;text-align:right;">
+      <button id="modalCancel">Anuluj</button>
+      <button class="primary" id="modalSave" style="background:var(--teal);color:#000;border:none;">Zapisz</button>
     </div>
   </div>
+</div>
 
-  <!-- Podgląd okładki -->
-  <div class="cover-preview" id="coverPreview">
-    <span class="cover-preview-close" id="coverClose">×</span>
-    <img id="coverImg" src="" alt="Okładka księgi">
-  </div>
+<!-- Podgląd okładki -->
+<div class="cover-preview" id="coverPreview" style="display:none;align-items:center;justify-content:center;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:2000;">
+  <span class="cover-preview-close" id="coverClose" style="position:fixed;top:14px;right:18px;font-size:24px;cursor:pointer;color:#eee;">×</span>
+  <img id="coverImg" src="" alt="Okładka księgi" style="max-width:90vw;max-height:90vh;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,0.9);">
+</div>
 
-  <!-- GŁÓWNY SKRYPT -->
-  <script src="script.js"></script>
+<!-- Silniki ETERNIVERSE -->
+<script type="module" src="./js/core.js"></script>
+
 </body>
 </html>
