@@ -50,63 +50,13 @@
       <label>Plik audio (lokalna ścieżka lub URL):</label>
       <input type="text" id="bookAudio" placeholder="media/audio/interseeker_ch1.mp3 lub https://...">
       <div class="modal-actions">
-        <button id="cancelBtn" onclick="document.getElementById('modal').classList.add('hidden')">Anuluj</button>
+        <button id="cancelBtn">Anuluj</button>
         <button id="saveBtn">Zapisz</button>
       </div>
     </div>
   </div>
 
-  <!-- Skrypty – bezpieczne, sekwencyjne ładowanie -->
-  <script>
-    // Singleton – ładowanie tylko raz
-    if (!window.enginesLoaded) {
-      window.enginesLoaded = true;
-
-      const ENGINES = [
-        "js/world_psyche.js",
-        "js/core.js",
-        "js/book_editor.js",
-        "js/eter_console.js"
-      ];
-
-      function loadEngine(i = 0) {
-        if (i >= ENGINES.length) {
-          console.log("✅ Wszystkie silniki załadowane");
-          if (typeof initEterniverse === "function") {
-            initEterniverse();
-          }
-          const loading = document.querySelector('.loading');
-          if (loading) loading.remove();
-          return;
-        }
-
-        const src = ENGINES[i];
-        if (document.querySelector(`script[src="${src}"]`)) {
-          console.log(`Pomijam już załadowany: ${src}`);
-          loadEngine(i + 1);
-          return;
-        }
-
-        const s = document.createElement("script");
-        s.src = src;
-        s.onload = () => {
-          console.log(`⚙️ Załadowano: ${src}`);
-          loadEngine(i + 1);
-        };
-        s.onerror = () => {
-          console.error(`❌ Błąd ładowania: ${src}`);
-          if (!document.querySelector('#error-message').style.display) {
-            document.querySelector('.loading').style.display = 'none';
-            document.getElementById('error-message').style.display = 'block';
-          }
-          loadEngine(i + 1); // Kontynuuj mimo błędu
-        };
-        document.head.appendChild(s);
-      }
-
-      console.log("🌌 Start ładowania silników ETERNIVERSE...");
-      loadEngine();
-    }
-  </script>
+  <!-- MASTER LOADER v2.2 – JEDNA LINIJA -->
+  <script src="js/engine_loader.js"></script>
 </body>
 </html>
