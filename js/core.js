@@ -1,4 +1,22 @@
-window.addEventListener("DOMContentLoaded", () => {
+// ============================
+//  ETERNIVERSE — CORE SYSTEM
+//  Redakcja Świata I (v2.1 SAFE)
+//  Autor: Maciej Maciuszek
+// ============================
+
+// 🔄 Bezpieczne ładowanie świata
+function waitForWorldData(callback) {
+  if (window.WORLD_PSYCHE) {
+    callback();
+  } else {
+    console.log("⏳ Czekam na dane świata...");
+    setTimeout(() => waitForWorldData(callback), 300);
+  }
+}
+
+waitForWorldData(() => {
+  console.log("🌌 ETERNIVERSE WORLD DETECTED:", WORLD_PSYCHE.name);
+
   const app = document.getElementById("app");
   const modal = document.getElementById("modal");
   const addBtn = document.getElementById("addBookBtn");
@@ -11,15 +29,22 @@ window.addEventListener("DOMContentLoaded", () => {
   const coverInput = document.getElementById("bookCover");
   const audioInput = document.getElementById("bookAudio");
 
-  let gateSelect; // selektor bram
+  let gateSelect;
   let editing = null;
 
-  // 🔄 Załaduj dane z LocalStorage
+  // 🔄 Wczytaj dane z LocalStorage
   const loadData = () => {
     const saved = localStorage.getItem("eterniverse_world_1");
     if (saved) {
-      const parsed = JSON.parse(saved);
-      WORLD_PSYCHE.gates = parsed.gates;
+      try {
+        const parsed = JSON.parse(saved);
+        WORLD_PSYCHE.gates = parsed.gates;
+        console.log("📦 Dane świata wczytane z pamięci.");
+      } catch (err) {
+        console.warn("⚠️ Błąd przy wczytywaniu danych:", err);
+      }
+    } else {
+      console.log("🆕 Brak danych lokalnych — używam domyślnych.");
     }
   };
 
@@ -28,16 +53,17 @@ window.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("eterniverse_world_1", JSON.stringify(WORLD_PSYCHE));
   };
 
-  // 🧱 Renderuj świat
+  // 🎨 Renderuj świat
   const render = () => {
     app.innerHTML = "";
     WORLD_PSYCHE.gates.forEach(gate => {
       const gateEl = document.createElement("div");
       gateEl.className = "gate";
       gateEl.style.borderColor = gate.color;
-
-      gateEl.innerHTML = `<h2 style="color:${gate.color}">${gate.name}</h2>
-        <p>${gate.sub || gate.theme || ""}</p>`;
+      gateEl.innerHTML = `
+        <h2 style="color:${gate.color}">${gate.name}</h2>
+        <p>${gate.sub || gate.theme || ""}</p>
+      `;
 
       gate.books.forEach((book, i) => {
         const b = document.createElement("div");
@@ -74,16 +100,16 @@ window.addEventListener("DOMContentLoaded", () => {
     audioInput.value = "";
     document.getElementById("modalTitle").textContent = "Nowa książka";
 
-    // Dodaj selektor bramy
+    // Selektor bramy
     let selectorHTML = `<label>Wybierz bramę:</label><select id="gateSelect">`;
     WORLD_PSYCHE.gates.forEach(g => {
       selectorHTML += `<option value="${g.id}" style="color:${g.color}">${g.name}</option>`;
     });
     selectorHTML += `</select>`;
     const modalContent = modal.querySelector(".modal-content");
-    if (!modal.querySelector("#gateSelect")) {
-      modalContent.insertAdjacentHTML("afterbegin", selectorHTML);
-    }
+    const oldSelect = modal.querySelector("#gateSelect");
+    if (oldSelect) oldSelect.remove();
+    modalContent.insertAdjacentHTML("afterbegin", selectorHTML);
 
     modal.classList.remove("hidden");
     gateSelect = document.getElementById("gateSelect");
@@ -92,11 +118,16 @@ window.addEventListener("DOMContentLoaded", () => {
   // 💾 Zapisz książkę
   saveBtn.onclick = () => {
     const newBook = {
-      title: titleInput.value,
-      description: descInput.value,
-      cover: coverInput.value,
-      audio: audioInput.value
+      title: titleInput.value.trim(),
+      description: descInput.value.trim(),
+      cover: coverInput.value.trim(),
+      audio: audioInput.value.trim()
     };
+
+    if (!newBook.title) {
+      alert("Podaj tytuł książki!");
+      return;
+    }
 
     const selectedGateId = gateSelect ? gateSelect.value : (editing ? editing.gateId : WORLD_PSYCHE.gates[0].id);
     const gate = WORLD_PSYCHE.gates.find(g => g.id == selectedGateId);
@@ -115,7 +146,7 @@ window.addEventListener("DOMContentLoaded", () => {
   // ❌ Anuluj
   cancelBtn.onclick = () => modal.classList.add("hidden");
 
-  // ✏️ / 🗑️ Kliknięcia na książkach
+  // ✏️ / 🗑️ Edycja / Usuwanie
   app.addEventListener("click", e => {
     if (e.target.classList.contains("edit")) {
       const gateId = e.target.dataset.gate;
@@ -129,7 +160,6 @@ window.addEventListener("DOMContentLoaded", () => {
       coverInput.value = book.cover;
       audioInput.value = book.audio;
       document.getElementById("modalTitle").textContent = "Edytuj książkę";
-
       modal.classList.remove("hidden");
       gateSelect = null;
     }
@@ -155,7 +185,7 @@ window.addEventListener("DOMContentLoaded", () => {
     link.click();
   };
 
-  // 🔄 Start
+  // 🚀 Uruchomienie
   loadData();
   render();
 });
