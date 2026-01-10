@@ -1,13 +1,13 @@
 /* =====================================
-   ETERNIVERSE ENGINE LOADER v2.2 – PEŁNY POPRAWIONY
+   ETERNIVERSE ENGINE LOADER v2.3 – PEŁNY KOD 1:1
    Architekt: Maciej Maciuszek + AI Assistant
-   100% KOMPATYBILNY: core v4.4 + book_editor v2.1 + eter_console
+   Wszystkie silniki: core + book + chapters + console
    ===================================== */
 
 (function () {
   // Singleton – kod wykonuje się TYLKO RAZ
   if (window.enginesLoaded) {
-    console.log("🚀 Silniki ETERNIVERSE v2.2 już załadowane");
+    console.log("🚀 Silniki ETERNIVERSE v2.3 już załadowane");
     return;
   }
   window.enginesLoaded = true;
@@ -17,13 +17,15 @@
     "js/world_psyche.js",     // 1️⃣ DANE – window.WORLD_PSYCHE (10 bram)
     "js/core.js",             // 2️⃣ RENDER + UI + initEterniverse()
     "js/book_editor.js",      // 3️⃣ ✏️🗑️ CRUD + modal actions
-    "js/eter_console.js"      // 4️⃣ DEV TOOLS (opcjonalne – kontynuuje przy błędzie)
+    "js/chapters_init.js",    // 4️⃣ AUTOMATYCZNE ROZDZIAŁY
+    "js/chapter_editor.js",   // 5️⃣ 📖 MODAL ROZDZIAŁÓW
+    "js/eter_console.js"      // 6️⃣ DEV TOOLS (Ctrl + `)
   ];
 
   function loadEngine(i = 0) {
     // KONIEC ŁADOWANIA = SUKCES
     if (i >= ENGINES.length) {
-      console.log("✅ Wszystkie silniki ETERNIVERSE v2.2 załadowane!");
+      console.log("✅ Wszystkie silniki ETERNIVERSE v2.3 załadowane!");
       
       // START GŁÓWNY – core.js musi być gotowy
       if (typeof window.initEterniverse === "function") {
@@ -90,8 +92,8 @@
           <p>${msg}</p>
           <p><strong>F12 → Console → sprawdź błędy ładowania JS</strong></p>
           <details>
-            <summary>Debug info</summary>
-            <pre>${ENGINES.map(s => `❌ ${s}`).join('\n')}</pre>
+            <summary>Debug info (ładowane pliki)</summary>
+            <pre>${ENGINES.map((s, i) => `${i+1}. ${s}`).join('\n')}</pre>
           </details>
         </div>
       `;
@@ -101,11 +103,11 @@
   // START AUTOMATYCZNY
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      console.log("🌌 ETERNIVERSE v2.2 – MASTER LOADER START");
+      console.log("🌌 ETERNIVERSE v2.3 – MASTER LOADER START");
       setTimeout(loadEngine, 50); // Lekkie opóźnienie dla stabilności
     });
   } else {
-    console.log("🌌 ETERNIVERSE v2.2 – MASTER LOADER START");
+    console.log("🌌 ETERNIVERSE v2.3 – MASTER LOADER START");
     loadEngine();
   }
 })();
