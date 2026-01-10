@@ -60,22 +60,23 @@ function renderWorld(world) {
       const bookBox = document.createElement("div");
       bookBox.className = "book";
 
-      // ====== OBRAZEK OKŁADKI - NAPRAWIONY ======
+      // ====== OBRAZEK OKŁADKI - BEZ MIGANIA ======
       const left = document.createElement("div");
       left.className = "book-left";
 
       const img = document.createElement("img");
       img.alt = book.title;
 
-      // Ustaw obrazek - PROSTY sposób
+      // Ustaw obrazek
       if (book.cover && book.cover.trim() !== "") {
         img.src = book.cover;
       } else {
         img.src = "media/covers/default.jpg";
       }
 
-      // Jeśli nie załaduje - default
+      // Jeśli nie załaduje - default (RAZ, bez pętli)
       img.onerror = function() {
+        this.onerror = null;
         this.src = "media/covers/default.jpg";
       };
 
