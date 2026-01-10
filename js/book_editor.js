@@ -1,5 +1,6 @@
 /* =====================================
-   BOOK EDITOR — PANEL DODAWANIA KSIĄŻEK
+   BOOK EDITOR — DODAWANIE / EDYCJA / USUWANIE
+   Architekt: Maciej Maciuszek
    ===================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -13,17 +14,36 @@ document.addEventListener("DOMContentLoaded", () => {
   const coverInput = document.getElementById("book-cover");
   const audioInput = document.getElementById("book-audio");
 
-  // otwieranie
+  let editIndex = null; // śledzenie, czy edytujemy książkę
+
+  // === Otwieranie modalu ===
   addBtn.addEventListener("click", () => {
-    modal.classList.remove("hidden");
+    openModal();
   });
 
-  // zamykanie
+  function openModal(book = null, index = null) {
+    modal.classList.remove("hidden");
+    editIndex = index;
+
+    if (book) {
+      titleInput.value = book.title;
+      descInput.value = book.description;
+      coverInput.value = book.cover || "";
+      audioInput.value = book.audio || "";
+    } else {
+      titleInput.value = "";
+      descInput.value = "";
+      coverInput.value = "";
+      audioInput.value = "";
+    }
+  }
+
+  // === Zamykanie ===
   cancelBtn.addEventListener("click", () => {
     modal.classList.add("hidden");
   });
 
-  // zapis nowej książki
+  // === Zapis nowej lub edytowanej książki ===
   saveBtn.addEventListener("click", () => {
     const title = titleInput.value.trim();
     const desc = descInput.value.trim();
@@ -37,29 +57,57 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const newBook = { title, description: desc, cover, audio };
 
-    // dodaj do BRAMY 1
-    window.WORLD_PSYCHE.gates[0].books.push(newBook);
+    const gate = window.WORLD_PSYCHE.gates[0];
 
-    // zapisz w localStorage
-    localStorage.setItem("WORLD_PSYCHE", JSON.stringify(window.WORLD_PSYCHE));
+    if (editIndex !== null) {
+      gate.books[editIndex] = newBook;
+      editIndex = null;
+    } else {
+      gate.books.push(newBook);
+    }
 
-    // odśwież render
-    document.getElementById("app").innerHTML = "";
+    saveWorld();
     renderWorld(window.WORLD_PSYCHE);
-
     modal.classList.add("hidden");
-    titleInput.value = descInput.value = coverInput.value = audioInput.value = "";
   });
 
-  // przy starcie – wczytaj z localStorage
+  // === Zapis do localStorage ===
+  function saveWorld() {
+    localStorage.setItem("WORLD_PSYCHE", JSON.stringify(window.WORLD_PSYCHE));
+  }
+
+  // === Przywracanie danych ===
   const saved = localStorage.getItem("WORLD_PSYCHE");
   if (saved) {
     try {
       window.WORLD_PSYCHE = JSON.parse(saved);
-      document.getElementById("app").innerHTML = "";
-      renderWorld(window.WORLD_PSYCHE);
     } catch (e) {
       console.error("Błąd wczytywania zapisanych danych:", e);
     }
   }
+
+  // === Edycja i usuwanie książek ===
+  window.enableBookActions = function () {
+    document.querySelectorAll(".edit-btn").forEach((btn) => {
+      btn.onclick = (e) => {
+        const index = parseInt(btn.dataset.index);
+        const book = window.WORLD_PSYCHE.gates[0].books[index];
+        openModal(book, index);
+      };
+    });
+
+    document.querySelectorAll(".delete-btn").forEach((btn) => {
+      btn.onclick = (e) => {
+        const index = parseInt(btn.dataset.index);
+        if (confirm("Na pewno chcesz usunąć tę książkę?")) {
+          window.WORLD_PSYCHE.gates[0].books.splice(index, 1);
+          saveWorld();
+          renderWorld(window.WORLD_PSYCHE);
+        }
+      };
+    });
+  };
+
+  // === Pierwsze renderowanie ===
+  renderWorld(window.WORLD_PSYCHE);
 });
