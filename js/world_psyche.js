@@ -5,89 +5,109 @@
 
 window.DATA = {
   id: 1,
-  system: "ETHERUNIVERSE",
-  worldCode: "PSYCHE",
   name: "ŚWIAT I — PSYCHE / INTERSEEKER",
-  description:
-    "Świat wejścia w psychikę. Przestrzeń prawdy o naturze jaźni. Kronika Cienia i Woli.",
+  description: "Świat wejścia w psychikę. Rozpad iluzji, konfrontacja z cieniem, pamięcią i tożsamością. Nie rozwój — tylko prawda.",
 
   gates: [
-    {
-      id: "gate_1",
-      name: "BRAMA I — INTERSEEKER",
+    { 
+      id: 1, name: "BRAMA I — INTERSEEKER", sub: "Psychika · Cień · Pamięć · Trauma", 
       color: "#28D3C6",
-      theme: "Psychika · Cień · Trauma · Tożsamość",
       books: [
-        {
-          id: "interseeker_atlas",
-          title: "InterSeeker — Atlas Wewnętrzny",
-          description:
-            "Mapa wnętrza człowieka. Mechanizmy obronne i fałszywa tożsamość.",
-          cover: "media/covers/interseeker.jpg",
-          audio: "media/audio/interseeker_ch1.mp3"
-        },
-        {
-          id: "shadowseeker",
-          title: "ShadowSeeker — Anatomia Cienia",
-          description:
-            "Praca z cieniem bez duchowej ściemy. Agresja i wstyd jako paliwo świadomości.",
-          cover: "media/covers/shadowseeker.jpg",
-          audio: "media/audio/shadowseeker_ch1.mp3"
-        },
-        {
-          id: "memoryseeker",
-          title: "MemorySeeker — Archeologia Wspomnień",
-          description:
-            "Rozkodowanie pamięci i przeszłości jako aktywnego systemu sterowania.",
-          cover: "media/covers/memoryseeker.jpg",
-          audio: "media/audio/memoryseeker_ch1.mp3"
-        }
+        { title: "InterSeeker – Atlas Wewnętrzny", status: "published" },
+        { title: "ShadowSeeker – Anatomia Cienia", status: "ready" },
+        { title: "MemorySeeker – Archeologia Wspomnień", status: "writing" },
+        { title: "BólSeeker – Anatomia Rany", status: "draft" }
       ]
     },
-    {
-      id: "gate_2",
-      name: "BRAMA II — CUSTOS / GENEZA",
+    { 
+      id: 2, name: "BRAMA II — CUSTOS / GENEZA", sub: "Strażnik · Rdzeń · Początek", 
       color: "#FF6B6B",
-      theme: "Strażnik · Rdzeń · Początek",
       books: [
-        {
-          id: "geneza",
-          title: "Custos — Geneza Pola",
-          description:
-            "Początek świadomości pola. Pierwszy moment oddzielenia i narodzin jaźni.",
-          cover: "media/covers/interseeker.jpg",
-          audio: "media/audio/interseeker_ch1.mp3"
-        }
+        { title: "Geneza", status: "ready" },
+        { title: "Custos: Kodeks Głębi", status: "writing" }
       ]
     },
-    {
-      id: "gate_3",
-      name: "BRAMA III — ETERSEEKER",
+    { 
+      id: 3, name: "BRAMA III — ETERSEEKER", sub: "Wola · Pole · Architektura", 
       color: "#D9A441",
-      theme: "Wola · Pole · Architektura",
       books: [
-        {
-          id: "eterseeker_zero",
-          title: "EterSeeker — Księga Zakazana (Tom Zero)",
-          description:
-            "Pierwsza manifestacja architektury woli. Struktura i energia decyzji.",
-          cover: "media/covers/memoryseeker.jpg",
-          audio: "media/audio/memoryseeker_ch1.mp3"
-        }
+        { title: "EterSeeker – Księga Zakazana (Tom Zero)", status: "published" },
+        { title: "EterSeeker – Architektura Woli", status: "ready" },
+        { title: "PoleSeeker – Topologia Ludzkiego Pola", status: "writing" }
+      ]
+    },
+    { 
+      id: 4, name: "BRAMA IV — ARCHETYPY / WOLA", sub: "Konstrukcja · Role · Przeznaczenie", 
+      color: "#9B6BFF",
+      books: [
+        { title: "ArchetypSeeker – System Archetypów Eteru", status: "ready" },
+        { title: "WolaSeeker – Kwant Woli", status: "draft" },
+        { title: "Kronika Woli", status: "idea" }
+      ]
+    },
+    { 
+      id: 5, name: "BRAMA V — OBFITOSEEKER", sub: "Materia · Przepływ · Manifestacja", 
+      color: "#12C65B",
+      books: [
+        { title: "ObfitoSeeker – Kod Obfitości", status: "published" },
+        { title: "MateriaSeeker – Przewodnik Ciała i Przepływu", status: "ready" },
+        { title: "Księga Przepływu", status: "writing" }
+      ]
+    },
+    { 
+      id: 6, name: "BRAMA VI — BIOSEEKER", sub: "Ciało · Biologia · Regulacja", 
+      color: "#FFB14B",
+      books: [
+        { title: "BioSeeker – Sekret Biologii Pola", status: "ready" },
+        { title: "Ciało jako Interfejs Pola", status: "draft" },
+        { title: "RytmSeeker – Mechanika Ruchu Życia", status: "idea" }
+      ]
+    },
+    { 
+      id: 7, name: "BRAMA VII — SPLĄTANIE / AI", sub: "Obserwator · Meta-tożsamość · Technologia", 
+      color: "#5DADE2",
+      books: [
+        { title: "SplatanieSeeker – Protokół Obserwatora", status: "writing" },
+        { title: "InterfejsSeeker – Interfejs Świadomości", status: "ready" },
+        { title: "Protokół Splątania (wersja meta)", status: "draft" }
+      ]
+    },
+    { 
+      id: 8, name: "BRAMA VIII — TRAJEKTORIE", sub: "Kod Życia · Linie Czasu · Fizyka Duszy", 
+      color: "#FF9FF3",
+      books: [
+        { title: "TrajektoriaSeeker – Mapa Linii Życia", status: "published" },
+        { title: "QuantumSeeker – Fizyka Duszy", status: "ready" },
+        { title: "CzasSeeker – Fizyka Linii Czasu", status: "writing" }
+      ]
+    },
+    { 
+      id: 9, name: "BRAMA IX — ETERNIONY / KOLEKTYW", sub: "Węzły Pola · Wspólnota · Misja", 
+      color: "#667eea",
+      books: [
+        { title: "Eteriony – Tom I", status: "ready" },
+        { title: "Eteriony – Tom II", status: "draft" },
+        { title: "Mapa Uniwersum Eteru", status: "idea" }
+      ]
+    },
+    { 
+      id: 10, name: "BRAMA X — ETERUNIVERSE", sub: "Integracja · Jedność · Architekt", 
+      color: "#D9A441",
+      books: [
+        { title: "Architekt Eteru — Manifest Twórcy", status: "writing" },
+        { title: "Mapa Trajektorii Życia (rozszerzona)", status: "ready" }
       ]
     }
   ]
 };
 
-/* =====================================
+/* ===========================
    RENDER ENGINE
-   ===================================== */
-
+   =========================== */
 function renderWorld(world) {
   const root = document.getElementById("app");
   root.innerHTML = "";
 
-  // Tytuł świata
   const h1 = document.createElement("h1");
   h1.textContent = world.name;
   root.appendChild(h1);
@@ -96,7 +116,6 @@ function renderWorld(world) {
   desc.textContent = world.description;
   root.appendChild(desc);
 
-  // Bramy
   world.gates.forEach((gate) => {
     const gateBox = document.createElement("div");
     gateBox.style.borderLeft = `6px solid ${gate.color}`;
@@ -104,67 +123,26 @@ function renderWorld(world) {
     gateBox.style.padding = "16px";
     gateBox.style.margin = "24px 0";
     gateBox.style.borderRadius = "12px";
-    gateBox.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)";
 
     const h2 = document.createElement("h2");
     h2.textContent = gate.name;
     h2.style.color = gate.color;
     gateBox.appendChild(h2);
 
-    const theme = document.createElement("p");
-    theme.textContent = gate.theme;
-    theme.style.color = "#9BA9C8";
-    theme.style.fontSize = "13px";
-    gateBox.appendChild(theme);
+    const sub = document.createElement("p");
+    sub.textContent = gate.sub;
+    sub.style.color = "#9BA9C8";
+    gateBox.appendChild(sub);
 
-    // Książki
     gate.books.forEach((book) => {
       const bookEl = document.createElement("div");
       bookEl.style.display = "flex";
-      bookEl.style.alignItems = "center";
-      bookEl.style.gap = "10px";
+      bookEl.style.justifyContent = "space-between";
       bookEl.style.background = "rgba(255,255,255,0.05)";
-      bookEl.style.padding = "8px";
-      bookEl.style.margin = "8px 0";
-      bookEl.style.borderRadius = "10px";
-      bookEl.style.cursor = "pointer";
-
-      // okładka
-      const img = document.createElement("img");
-      img.src = book.cover || "";
-      img.alt = book.title;
-      img.style.width = "60px";
-      img.style.height = "90px";
-      img.style.objectFit = "cover";
-      img.style.borderRadius = "6px";
-      img.style.border = "1px solid rgba(255,255,255,0.1)";
-      bookEl.appendChild(img);
-
-      // główna sekcja
-      const info = document.createElement("div");
-      const title = document.createElement("h3");
-      title.textContent = book.title;
-      title.style.color = "#E9F4FF";
-      title.style.fontSize = "15px";
-      title.style.margin = "0";
-      info.appendChild(title);
-
-      const desc = document.createElement("p");
-      desc.textContent = book.description;
-      desc.style.color = "#9BA9C8";
-      desc.style.fontSize = "12px";
-      desc.style.margin = "4px 0";
-      info.appendChild(desc);
-
-      // audio player
-      const audio = document.createElement("audio");
-      audio.controls = true;
-      audio.src = book.audio;
-      audio.style.width = "100%";
-      audio.style.marginTop = "4px";
-      info.appendChild(audio);
-
-      bookEl.appendChild(info);
+      bookEl.style.margin = "4px 0";
+      bookEl.style.padding = "8px 10px";
+      bookEl.style.borderRadius = "8px";
+      bookEl.innerHTML = `<span>${book.title}</span><span style="color:#${getStatusColor(book.status)};">${book.status}</span>`;
       gateBox.appendChild(bookEl);
     });
 
@@ -172,11 +150,18 @@ function renderWorld(world) {
   });
 }
 
-/* =====================================
-   INIT
-   ===================================== */
+function getStatusColor(status) {
+  switch (status) {
+    case "published": return "28D3C6";
+    case "ready": return "A0E7E5";
+    case "writing": return "FFD166";
+    case "draft": return "FF6B6B";
+    case "idea": return "9BA9C8";
+    default: return "FFFFFF";
+  }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   renderWorld(window.DATA);
-  console.log("🌀 ŚWIAT I — PSYCHE / INTERSEEKER załadowany.");
+  console.log("🌀 ŚWIAT I — PSYCHE / INTERSEEKER załadowany");
 });
