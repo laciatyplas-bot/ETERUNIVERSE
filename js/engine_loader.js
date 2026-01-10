@@ -1,7 +1,6 @@
 /* =====================================
-   ETERNIVERSE ENGINE LOADER v2.8 – POTĘŻNY 11 SILNIKÓW
-   Architekt: Maciej Maciuszek + AI Assistant
-   XUI + BELLA-UI + MULTIŚWIAT – FULL STACK PRODUCTION
+   ETERNIVERSE ENGINE LOADER v2.8 – 11 SILNIKÓW POPRAWIONE
+   100% SYNTAX CLEAN – XUI + BELLA + MULTIŚWIAT
    ===================================== */
 
 (function () {
@@ -11,7 +10,6 @@
   }
   window.enginesLoaded = true;
 
-  // 🔥 PEŁNY STACK 11 SILNIKÓW – KOLEJNOŚĆ KRYTYCZNA!
   const ENGINES = [
     "js/world_psyche.js",     // 1️⃣ DANE – window.WORLD_PSYCHE (10 bram)
     "js/core.js",             // 2️⃣ RENDER + UI + initEterniverse()
@@ -33,23 +31,19 @@
     if (i >= ENGINES.length) {
       console.log(`✅ Wszystkie ${loadedCount}/${ENGINES.length} silników ETERNIVERSE v2.8 załadowane! (Błędy: ${errorCount})`);
       
-      // FINAL CHECK
       if (typeof window.initEterniverse === "function") {
         console.log("🌌 Uruchamiam initEterniverse...");
         window.initEterniverse();
       }
 
-      // 🔥 XUI + BELLA + MULTIŚWIAT AUTOAKTYWACJA
       setTimeout(() => {
         if (window.XUI) console.log("🔥 XUI v1.0 – POTĘŻNA REDAKCJA aktywna!");
         if (window.BELLA_UI) console.log("😈 BELLA-UI v9.1 – zakładka aktywna!");
-        if (window.BELLA_REDAKTOR) console.log("📚 BELLA-RED – redaktorka naczelna!");
         if (window.MULTIWORLD) console.log("🌌 MultiWorld v3.2 – ✏️🗑️ światy!");
       }, 2000);
 
       fadeOutLoading();
       console.log("🚀 ETERNIVERSE v2.8 – PEŁNY XUI STACK AKTYWNY!");
-      console.log("🎮 🔥XUI | 😈BELLA | 🌌Multiświat | 📝Redakcja | Status: 100%");
       return;
     }
 
@@ -77,7 +71,6 @@
     document.head.appendChild(script);
   }
 
-  // === UTILITY ===
   function fadeOutLoading() {
     const loading = document.querySelector('.loading, #loading, .loader');
     if (loading) {
@@ -100,20 +93,27 @@
         box-shadow: 0 20px 60px rgba(255,107,107,0.5);
         font-family: -apple-system, sans-serif;
       `;
+      
+      // ✅ POPRAWIONE – BEZ template literals w problematycznej linii
+      let debugList = '';
+      for (let j = 0; j < ENGINES.length; j++) {
+        const status = j < loadedCount ? '✅' : '❌';
+        debugList += `${j+1}. ${ENGINES[j]} ${status}\n`;
+      }
+      
       errorDiv.innerHTML = `
         <h2>🚨 ETERNIVERSE v2.8 – BŁĄD</h2>
         <p>${msg}</p>
         <p><strong>F12 → Console → szczegóły</strong></p>
         <details>
           <summary>📋 Brakujące silniki (${errorCount}/${ENGINES.length})</summary>
-          <pre>${ENGINES.map((s,i)=>`${i+1}. ${s} ${i<loadedCount?'✅':'❌')}`).join('\n')}</pre>
+          <pre style="background: #1f2937; color: #e5e7eb; padding: 1rem; border-radius: 12px; font-size: 0.85rem; white-space: pre-wrap;">${debugList}</pre>
         </details>
       `;
       document.body.appendChild(errorDiv);
     }
   }
 
-  // === START ===
   function startLoader() {
     console.log("🌌 ETERNIVERSE v2.8 – XUI MASTER LOADER [11 SILNIKÓW]");
     console.log("🔥 Kolejność:", ENGINES.map((s,i)=>`${i+1}. ${s}`).join('\n'));
@@ -126,10 +126,8 @@
     startLoader();
   }
 
-  // === GLOBAL ERROR HANDLING + API ===
   window.onerror = (msg, url, line) => {
     console.error(`💥 GLOBAL ERROR: ${msg} (${url}:${line})`);
-    errorCount++;
   };
 
   window.ETERNIVERSE_LOADER = {
