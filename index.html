@@ -3,42 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ŚWIAT I — PSYCHE / INTERSEEKER</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <title>ŚWIAT I — PSYCHE / INTERSEEKER | ETERNIVERSE</title>
+  <meta name="description" content="Świat I — PSYCHE / INTERSEEKER. Kronika świadomości, architektura Woli i Cienia.">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
+  <div id="app" class="container">
+    <header class="world-header">
+      <h1>🌌 ŚWIAT I — PSYCHE / INTERSEEKER</h1>
+      <p>Centralna Mapa Wnętrza. Wejście w świadomość, pamięć, cień i wolę.</p>
+    </header>
 
-  <div id="app"></div>
-
-  <div id="book-modal" class="modal hidden">
-    <div class="modal-content">
-      <h2>➕ Dodaj nową książkę</h2>
-      <label>Tytuł</label>
-      <input type="text" id="book-title" placeholder="np. ArchetypSeeker — System Archetypów Eteru">
-
-      <label>Opis</label>
-      <textarea id="book-desc" placeholder="Krótki opis książki..."></textarea>
-
-      <label>URL okładki</label>
-      <input type="text" id="book-cover" placeholder="media/covers/...jpg">
-
-      <label>URL audio (opcjonalnie)</label>
-      <input type="text" id="book-audio" placeholder="media/audio/...mp3">
-
-      <div class="modal-actions">
-        <button id="cancel-book">Anuluj</button>
-        <button id="save-book" class="primary">Zapisz</button>
-      </div>
-    </div>
+    <main id="gates-container"></main>
   </div>
 
-  <button id="add-book-btn" class="floating-btn">＋</button>
+  <footer class="footer">
+    <p>© 2026 Architekt Woli — Maciej Maciuszek | ETERNIVERSE</p>
+  </footer>
 
   <!-- Skrypty -->
   <script src="js/world_psyche.js"></script>
-  <script src="js/core.js"></script>
-  <script src="js/book_editor.js"></script>
-  <script src="js/eter_console.js"></script>
+  <script>
+    // ====== RENDEROWANIE ŚWIATA ======
+    const container = document.getElementById("gates-container");
+    const data = window.DATA;
+
+    // Funkcja renderująca całość
+    function renderWorld(world) {
+      container.innerHTML = "";
+      world.gates.forEach(gate => {
+        const gateBox = document.createElement("section");
+        gateBox.classList.add("gate-box");
+        gateBox.style.borderColor = gate.color;
+
+        gateBox.innerHTML = `
+          <h2 style="color:${gate.color}">${gate.name}</h2>
+          <p class="gate-sub">${gate.sub}</p>
+        `;
+
+        const bookList = document.createElement("div");
+        bookList.classList.add("book-list");
+
+        gate.books.forEach(book => {
+          const bookEl = document.createElement("div");
+          bookEl.classList.add("book-card");
+          bookEl.innerHTML = `
+            <img src="${book.cover || 'media/covers/default.jpg'}" alt="${book.title}" class="book-cover" onerror="this.src='media/covers/default.jpg'">
+            <div class="book-info">
+              <h3>${book.title}</h3>
+              <p>${book.description || "Brak opisu"}</p>
+              <p class="status"><strong>Status:</strong> ${book.status}</p>
+              ${book.audio ? `
+              <audio controls class="audio-player">
+                <source src="${book.audio}" type="audio/mpeg">
+                Twoja przeglądarka nie obsługuje audio.
+              </audio>` : ""}
+            </div>
+          `;
+          bookList.appendChild(bookEl);
+        });
+
+        gateBox.appendChild(bookList);
+        container.appendChild(gateBox);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderWorld(data);
+      console.log("🌠 Świat I — PSYCHE / INTERSEEKER został załadowany");
+    });
+  </script>
 </body>
 </html>
