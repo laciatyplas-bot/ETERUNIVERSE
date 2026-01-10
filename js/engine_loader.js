@@ -1,32 +1,33 @@
 /* =====================================
-   ETERNIVERSE ENGINE LOADER v2.4 – PEŁNY KOD ZE WSZYSTKIMI SILNIKAMI
+   ETERNIVERSE ENGINE LOADER v2.5 – PEŁNY KOD 1:1 Z BELLA
    Architekt: Maciej Maciuszek + AI Assistant
-   100% PRODUCTION READY – 7 SILNIKÓW
+   8 SILNIKÓW PRODUCTION READY – WKLEJ 1:1
    ===================================== */
 
 (function () {
   // Singleton – kod wykonuje się TYLKO RAZ
   if (window.enginesLoaded) {
-    console.log("🚀 Silniki ETERNIVERSE v2.4 już załadowane");
+    console.log("🚀 Silniki ETERNIVERSE v2.5 już załadowane");
     return;
   }
   window.enginesLoaded = true;
 
-  // 🚀 PEŁNA KOLEJNOŚĆ SILNIKÓW (KRYTYCZNA!)
+  // 🚀 PEŁNA KOLEJNOŚĆ 8 SILNIKÓW (KRYTYCZNA!)
   const ENGINES = [
     "js/world_psyche.js",     // 1️⃣ DANE – window.WORLD_PSYCHE (10 bram)
-    "js/core.js",             // 2️⃣ RENDER + UI + initEterniverse() + Belle
+    "js/core.js",             // 2️⃣ RENDER + UI + initEterniverse()
     "js/book_editor.js",      // 3️⃣ ✏️🗑️ CRUD + modal książek
     "js/chapters_init.js",    // 4️⃣ AUTOMATYCZNE ROZDZIAŁY (5+)
     "js/chapter_editor.js",   // 5️⃣ 📖 MODAL ROZDZIAŁÓW (CRUD + drag)
     "js/eter_console.js",     // 6️⃣ DEV TOOLS (Ctrl + `)
-    "js/autosave.js"          // 7️⃣ 💾 AUTOZAPIS co 30s + backup
+    "js/autosave.js",         // 7️⃣ 💾 AUTOZAPIS co 30s + backup
+    "js/bella-console.js"     // 8️⃣ 😈🔥 BELLA 8.00 EVOLVER
   ];
 
   function loadEngine(i = 0) {
     // KONIEC ŁADOWANIA = SUKCES 🎉
     if (i >= ENGINES.length) {
-      console.log("✅ Wszystkie 7 silników ETERNIVERSE v2.4 załadowane!");
+      console.log("✅ Wszystkie 8 silników ETERNIVERSE v2.5 załadowane!");
       
       // START GŁÓWNY – core.js musi być gotowy
       if (typeof window.initEterniverse === "function") {
@@ -35,6 +36,13 @@
       } else {
         console.error("❌ initEterniverse() nie istnieje – sprawdź js/core.js");
         showError("Core engine niezaładowany. Sprawdź konsolę F12.");
+      }
+
+      // FINALNA AKTYWACJA BELLI
+      if (window.BELLA) {
+        setTimeout(() => {
+          window.BELLA.process("ETERNIWERS v2.5 – wszystkie silniki aktywne");
+        }, 1000);
       }
 
       // Usuń loading screen z animacją
@@ -46,8 +54,8 @@
       }
       
       // FINALNY LOG SUKCESU
-      console.log("🚀 ETERNIVERSE v2.4 – PEŁNY SYSTEM AKTYWNY!");
-      console.log("📋 Funkcje: Książki ✏️🗑️ | Rozdziały 📖 | Autozapis 💾 | Console 🌀");
+      console.log("🚀 ETERNIVERSE v2.5 – PEŁNY SYSTEM Z BELLA AKTYWNY!");
+      console.log("📋 Funkcje: Książki ✏️🗑️ | Rozdziały 📖 | Autozapis 💾 | BELLA 😈 | Console 🌀");
       return;
     }
 
@@ -66,12 +74,12 @@
     script.async = false; // SEKWENCYJNE – WAŻNE!
 
     script.onload = () => {
-      console.log(`✅ [${i+1}/7] Załadowano: ${src}`);
+      console.log(`✅ [${i+1}/8] Załadowano: ${src}`);
       loadEngine(i + 1);
     };
 
     script.onerror = () => {
-      console.warn(`⚠️  [${i+1}/7] BRAK pliku: ${src} – KONTYNUUJĘ...`);
+      console.warn(`⚠️  [${i+1}/8] BRAK pliku: ${src} – KONTYNUUJĘ...`);
       loadEngine(i + 1); // NIGDY NIE ZATRZYMUJ SYSTEMU
     };
 
@@ -99,7 +107,7 @@
           <p>${msg}</p>
           <p><strong>F12 → Console → sprawdź błędy ładowania JS</strong></p>
           <details style="margin-top: 1rem;">
-            <summary>📋 Debug info (7 plików do załadowania)</summary>
+            <summary>📋 Debug info (8 plików do załadowania)</summary>
             <pre style="background: #1f2937; color: #e5e7eb; padding: 1rem; border-radius: 8px; font-size: 0.9rem;">${ENGINES.map((s, i) => `${i+1}. ${s}`).join('\n')}</pre>
           </details>
           <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">
@@ -113,12 +121,12 @@
   // START AUTOMATYCZNY
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      console.log("🌌 ETERNIVERSE v2.4 – MASTER LOADER START [7 SILNIKÓW]");
+      console.log("🌌 ETERNIVERSE v2.5 – MASTER LOADER START [8 SILNIKÓW]");
       console.log("📋 Ładowanie:", ENGINES.map((s,i) => `${i+1}. ${s}`).join('\n'));
-      setTimeout(loadEngine, 50); // Lekkie opóźnienie dla stabilności
+      setTimeout(loadEngine, 50);
     });
   } else {
-    console.log("🌌 ETERNIVERSE v2.4 – MASTER LOADER START [7 SILNIKÓW]");
+    console.log("🌌 ETERNIVERSE v2.5 – MASTER LOADER START [8 SILNIKÓW]");
     loadEngine();
   }
 })();
