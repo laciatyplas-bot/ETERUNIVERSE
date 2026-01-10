@@ -1,201 +1,229 @@
-// ==========================================
-// ⚙️ CORE ENGINE — ETERNIVERSE SYSTEM
-// ŚWIAT I: PSYCHE / INTERSEEKER
-// Architekt: Maciej Maciuszek
-// ==========================================
+/* =====================================
+   ETERNIVERSE — CORE ENGINE v2
+   Architekt: Maciej Maciuszek
+   ===================================== */
 
-function waitForWorld(callback) {
-  if (window.WORLD_PSYCHE) callback();
-  else setTimeout(() => waitForWorld(callback), 200);
+let WORLD = null;
+
+/* ==============================
+   START SYSTEMU
+============================== */
+function initEterniverse() {
+  console.log("🌌 Uruchamiam ETERNIVERSE: PSYCHE / INTERSEEKER...");
+  WORLD = loadWorldData() || WORLD_PSYCHE;
+  renderWorld(WORLD);
+  setupUI();
+  belleSpeak("System Kroniki Woli aktywowany.");
 }
 
-waitForWorld(() => {
-  console.log("⚙️ Ładowanie systemu redakcyjnego PSYCHE...");
-
+/* ==============================
+   RENDER ŚWIATA
+============================== */
+function renderWorld(world) {
   const app = document.getElementById("app");
-  const modal = document.getElementById("modal");
+  app.innerHTML = "";
 
+  const title = document.createElement("h2");
+  title.textContent = world.name;
+  app.appendChild(title);
+
+  const desc = document.createElement("p");
+  desc.textContent = world.description;
+  app.appendChild(desc);
+
+  world.gates.forEach((gate) => {
+    const gateBox = document.createElement("div");
+    gateBox.className = "gate";
+    gateBox.style.borderColor = gate.color;
+
+    const gateTitle = document.createElement("h3");
+    gateTitle.textContent = gate.name;
+    gateTitle.style.color = gate.color;
+    gateBox.appendChild(gateTitle);
+
+    const gateSub = document.createElement("p");
+    gateSub.textContent = gate.sub;
+    gateBox.appendChild(gateSub);
+
+    gate.books.forEach((book, i) => {
+      const bookBox = document.createElement("div");
+      bookBox.className = "book";
+
+      const left = document.createElement("div");
+      left.className = "book-left";
+
+      const img = document.createElement("img");
+      img.src = book.cover || "media/covers/default.jpg";
+      img.alt = book.title;
+      img.onerror = () => (img.src = "media/covers/default.jpg");
+
+      const info = document.createElement("div");
+      const name = document.createElement("strong");
+      name.textContent = book.title;
+
+      const stat = document.createElement("div");
+      stat.className = "status";
+      stat.textContent = book.status ? book.status.toUpperCase() : "IDEA";
+
+      info.appendChild(name);
+      info.appendChild(stat);
+      left.appendChild(img);
+      left.appendChild(info);
+
+      const right = document.createElement("div");
+      if (book.audio) {
+        const audio = document.createElement("audio");
+        audio.controls = true;
+        audio.src = book.audio;
+        right.appendChild(audio);
+      }
+
+      const editBtn = document.createElement("button");
+      editBtn.textContent = "✏️";
+      editBtn.onclick = () => openEditor(gate, book);
+      right.appendChild(editBtn);
+
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "🗑️";
+      delBtn.onclick = () => deleteBook(gate, book);
+      right.appendChild(delBtn);
+
+      bookBox.appendChild(left);
+      bookBox.appendChild(right);
+      gateBox.appendChild(bookBox);
+    });
+
+    app.appendChild(gateBox);
+  });
+}
+
+/* ==============================
+   EDYTOR I UI
+============================== */
+function setupUI() {
   const addBtn = document.getElementById("addBookBtn");
   const exportBtn = document.getElementById("exportBtn");
+  const modal = document.getElementById("modal");
   const cancelBtn = document.getElementById("cancelBtn");
   const saveBtn = document.getElementById("saveBtn");
+  const select = document.getElementById("gateSelect");
 
-  const gateSelect = document.getElementById("gateSelect");
-  const titleInput = document.getElementById("bookTitle");
-  const descInput = document.getElementById("bookDesc");
-  const coverInput = document.getElementById("bookCover");
-  const audioInput = document.getElementById("bookAudio");
+  // Załaduj bramy
+  select.innerHTML = "";
+  WORLD.gates.forEach((g) => {
+    const opt = document.createElement("option");
+    opt.value = g.id;
+    opt.textContent = g.name;
+    select.appendChild(opt);
+  });
 
-  let editing = null;
-
-  // ==========================================
-  // 🔁 STATUS SYSTEM
-  // ==========================================
-  const STATUS = {
-    published: { label: "Opublikowana", color: "#3AED8D" },
-    ready: { label: "Gotowa", color: "#28D3C6" },
-    writing: { label: "W trakcie pisania", color: "#FFD700" },
-    draft: { label: "Szkic", color: "#F78D2F" },
-    idea: { label: "Koncepcja", color: "#FF5A5A" },
-  };
-
-  // ==========================================
-  // 🔄 Ładowanie / zapisywanie danych
-  // ==========================================
-  const loadData = () => {
-    const saved = localStorage.getItem("eterniverse_psyche");
-    if (saved) WORLD_PSYCHE.gates = JSON.parse(saved).gates;
-  };
-
-  const saveData = () => {
-    localStorage.setItem("eterniverse_psyche", JSON.stringify(WORLD_PSYCHE));
-  };
-
-  // ==========================================
-  // 🧱 RENDER
-  // ==========================================
-  function render() {
-    app.innerHTML = "";
-
-    WORLD_PSYCHE.gates.forEach((gate) => {
-      const gateBox = document.createElement("div");
-      gateBox.className = "gate";
-      gateBox.style.borderColor = gate.color;
-
-      gateBox.innerHTML = `
-        <h2 style="color:${gate.color}">${gate.name}</h2>
-        <p class="sub">${gate.sub || ""}</p>
-      `;
-
-      gate.books.forEach((book, i) => {
-        const bookEl = document.createElement("div");
-        bookEl.className = "book";
-
-        const statusInfo = STATUS[book.status] || { label: "Nieznany", color: "#ccc" };
-
-        bookEl.innerHTML = `
-          <div class="book-left">
-            <img src="${book.cover || 'media/covers/default.jpg'}" alt="okładka">
-            <div class="book-info">
-              <strong>${book.title}</strong>
-              <p>${book.description || ""}</p>
-              <span class="status" style="color:${statusInfo.color}">● ${statusInfo.label}</span>
-              <audio class="audio" controls src="${book.audio || ""}"></audio>
-            </div>
-          </div>
-          <div class="book-actions">
-            <button class="edit" data-gate="${gate.id}" data-index="${i}">✏️</button>
-            <button class="delete" data-gate="${gate.id}" data-index="${i}">🗑️</button>
-          </div>
-        `;
-        gateBox.appendChild(bookEl);
-      });
-
-      app.appendChild(gateBox);
-    });
-
-    saveData();
-  }
-
-  // ==========================================
-  // ➕ DODAWANIE KSIĄŻKI
-  // ==========================================
   addBtn.onclick = () => {
+    currentEdit = null;
+    document.getElementById("modalTitle").textContent = "Nowa książka";
     modal.classList.remove("hidden");
-    editing = null;
-    titleInput.value = "";
-    descInput.value = "";
-    coverInput.value = "";
-    audioInput.value = "";
-
-    gateSelect.innerHTML = "";
-    WORLD_PSYCHE.gates.forEach((g) => {
-      const opt = document.createElement("option");
-      opt.value = g.id;
-      opt.textContent = g.name;
-      opt.style.color = g.color;
-      gateSelect.appendChild(opt);
-    });
-  };
-
-  // ==========================================
-  // 💾 ZAPISYWANIE KSIĄŻKI
-  // ==========================================
-  saveBtn.onclick = () => {
-    const newBook = {
-      title: titleInput.value.trim(),
-      description: descInput.value.trim(),
-      cover: coverInput.value.trim(),
-      audio: audioInput.value.trim(),
-      status: "idea", // domyślnie nowa książka = koncepcja
-    };
-
-    if (!newBook.title) {
-      alert("Podaj tytuł książki!");
-      return;
-    }
-
-    const gateId = editing ? editing.gateId : gateSelect.value;
-    const gate = WORLD_PSYCHE.gates.find((g) => g.id == gateId);
-
-    if (editing) gate.books[editing.index] = newBook;
-    else gate.books.push(newBook);
-
-    modal.classList.add("hidden");
-    saveData();
-    render();
+    belleSpeak("Nowa księga pojawia się w świadomości...");
   };
 
   cancelBtn.onclick = () => modal.classList.add("hidden");
 
-  // ==========================================
-  // ✏️ EDYCJA I USUWANIE
-  // ==========================================
-  app.addEventListener("click", (e) => {
-    if (e.target.classList.contains("edit")) {
-      const gateId = e.target.dataset.gate;
-      const index = e.target.dataset.index;
-      const gate = WORLD_PSYCHE.gates.find((g) => g.id == gateId);
-      const book = gate.books[index];
+  saveBtn.onclick = () => {
+    const gid = parseInt(select.value);
+    const gate = WORLD.gates.find((g) => g.id === gid);
+    const title = document.getElementById("bookTitle").value;
+    const desc = document.getElementById("bookDesc").value;
+    const cover = document.getElementById("bookCover").value;
+    const audio = document.getElementById("bookAudio").value;
 
-      editing = { gateId, index };
-      titleInput.value = book.title;
-      descInput.value = book.description;
-      coverInput.value = book.cover;
-      audioInput.value = book.audio;
-      modal.classList.remove("hidden");
+    if (!title.trim()) {
+      alert("Podaj tytuł książki!");
+      return;
     }
 
-    if (e.target.classList.contains("delete")) {
-      const gateId = e.target.dataset.gate;
-      const index = e.target.dataset.index;
-      const gate = WORLD_PSYCHE.gates.find((g) => g.id == gateId);
-
-      if (confirm("Usunąć tę książkę?")) {
-        gate.books.splice(index, 1);
-        saveData();
-        render();
-      }
+    if (currentEdit) {
+      Object.assign(currentEdit, { title, description: desc, cover, audio });
+      belleSpeak(`Zaktualizowano książkę: ${title}`);
+    } else {
+      gate.books.push({
+        title,
+        description: desc,
+        cover,
+        audio,
+        status: "idea",
+      });
+      belleSpeak(`Dodano nową książkę: ${title}`);
     }
-  });
 
-  // ==========================================
-  // 💾 EKSPORT DO JSON
-  // ==========================================
-  exportBtn.onclick = () => {
-    const blob = new Blob([JSON.stringify(WORLD_PSYCHE, null, 2)], {
-      type: "application/json",
-    });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "eterniverse_psyche_export.json";
-    link.click();
+    modal.classList.add("hidden");
+    saveWorldData();
+    renderWorld(WORLD);
   };
 
-  // ==========================================
-  // 🚀 START SYSTEMU
-  // ==========================================
-  loadData();
-  render();
-  console.log("🚀 ETERNIVERSE — PSYCHE SYSTEM ONLINE");
-});
+  exportBtn.onclick = () => exportWorldJSON();
+}
+
+let currentEdit = null;
+
+function openEditor(gate, book) {
+  const modal = document.getElementById("modal");
+  modal.classList.remove("hidden");
+  document.getElementById("modalTitle").textContent = "Edytuj książkę";
+
+  const select = document.getElementById("gateSelect");
+  select.value = gate.id;
+  document.getElementById("bookTitle").value = book.title;
+  document.getElementById("bookDesc").value = book.description || "";
+  document.getElementById("bookCover").value = book.cover || "";
+  document.getElementById("bookAudio").value = book.audio || "";
+
+  currentEdit = book;
+}
+
+/* ==============================
+   ZAPIS I ODCZYT
+============================== */
+function saveWorldData() {
+  localStorage.setItem("ETERNIVERSE_WORLD_PSYCHE", JSON.stringify(WORLD));
+}
+
+function loadWorldData() {
+  const data = localStorage.getItem("ETERNIVERSE_WORLD_PSYCHE");
+  return data ? JSON.parse(data) : null;
+}
+
+/* ==============================
+   EKSPORT JSON
+============================== */
+function exportWorldJSON() {
+  const dataStr =
+    "data:text/json;charset=utf-8," +
+    encodeURIComponent(JSON.stringify(WORLD, null, 2));
+  const a = document.createElement("a");
+  a.href = dataStr;
+  a.download = "ETERNIVERSE_WORLD_PSYCHE.json";
+  a.click();
+  belleSpeak("Eksport ukończony. Kronika zapisana w pamięci pola.");
+}
+
+/* ==============================
+   USUWANIE KSIĄŻEK
+============================== */
+function deleteBook(gate, book) {
+  if (confirm(`Usunąć książkę "${book.title}"?`)) {
+    gate.books = gate.books.filter((b) => b !== book);
+    saveWorldData();
+    renderWorld(WORLD);
+    belleSpeak(`Usunięto książkę ${book.title}`);
+  }
+}
+
+/* ==============================
+   BELLE — HOLOGRAFICZNY ASYSTENT
+============================== */
+function belleSpeak(msg) {
+  const el = document.getElementById("belleSpeech");
+  if (!el) return;
+  el.textContent = msg;
+  setTimeout(() => {
+    el.textContent = "Czekam na Twoje intencje...";
+  }, 6000);
+}
