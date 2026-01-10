@@ -172,3 +172,30 @@ audio {
 .floating-btn:hover {
   background: #7dd3fc;
 }
+/* === PANEL EDYCJI / USUWANIA === */
+.book-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.book-actions button {
+  background: #1e293b;
+  border: none;
+  color: #e2e8f0;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.book-actions button.edit {
+  background: #38bdf8;
+  color: #0f172a;
+}
+
+.book-actions button.delete {
+  background: #ef4444;
+  color: white;
+}
