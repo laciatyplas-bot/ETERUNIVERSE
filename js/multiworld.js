@@ -1,18 +1,18 @@
 /* =====================================
-   MULTIWORLD.js v3.1 – KOMPАКTNY UI 1:1
-   Mały przycisk + wysuwany panel – NIE ZASłania!
+   MULTIWORLD.js v3.2 – EDYCJA ŚWIATÓW 1:1
+   ✏️ Edytuj nazwę/kolor/liczbę bram + 🗑️ Usuń
    ===================================== */
 
 (function() {
   if (window.MULTIWORLD) {
-    console.log("🌌 MultiWorld v3.1 już aktywny");
+    console.log("🌌 MultiWorld v3.2 już aktywny");
     return;
   }
   window.MULTIWORLD = true;
 
-  console.log("🌌 MultiWorld v3.1 – KOMPAKTNY UI aktywny!");
+  console.log("🌌 MultiWorld v3.2 – EDYCJA ŚWIATÓW aktywna!");
 
-  // === 5 ŚWIATÓW ===
+  // === 5 ŚWIATÓW Z PEŁNĄ EDYCJĄ ===
   window.WORLDS = {
     "PSYCHE": { name: "PSYCHE", color: "#8b5cf6", gates: 10, active: true },
     "CIEN": { name: "CIEN", color: "#1f2937", gates: 8, active: false },
@@ -28,7 +28,9 @@
       id: worldId,
       data: JSON.parse(JSON.stringify(window.WORLD_PSYCHE)),
       timestamp: new Date().toISOString(),
-      booksCount: window.WORLD_PSYCHE.gates.reduce((sum, g) => sum + g.books.length, 0)
+      booksCount: window.WORLD_PSYCHE.gates.reduce((sum, g) => sum + g.books.length, 0),
+      gatesCount: window.WORLD_PSYCHE.gates.length,
+      worldConfig: window.WORLDS[worldId]
     };
     localStorage.setItem(`ETERNIVERSE_WORLD_${worldId}`, JSON.stringify(worldData));
     localStorage.setItem('activeWorld', worldId);
@@ -61,18 +63,54 @@
     }
   };
 
+  window.editWorld = function(worldId) {
+    const world = window.WORLDS[worldId];
+    const newName = prompt("Nazwa świata:", world.name);
+    const newColor = prompt("Kolor HEX (#rrggbb):", world.color);
+    const newGates = prompt("Liczba bram:", world.gates);
+    
+    if (newName && newColor && newGates) {
+      window.WORLDS[worldId] = {
+        name: newName.toUpperCase(),
+        color: newColor,
+        gates: parseInt(newGates) || 10,
+        active: world.active
+      };
+      saveCurrentWorld(worldId);
+      updateWorldUI();
+      if (window.BELLA) window.BELLA.process(`ŚWIAT ${worldId} EDYTOWANY`);
+    }
+  };
+
+  window.deleteWorld = function(worldId) {
+    if (worldId === 'PSYCHE') {
+      alert("🌌 PSYCHE nie może być usunięty!");
+      return;
+    }
+    if (confirm(`🗑️ USUNĄĆ świat "${window.WORLDS[worldId].name}"?\nDane nieodwracalne!`)) {
+      delete window.WORLDS[worldId];
+      localStorage.removeItem(`ETERNIVERSE_WORLD_${worldId}`);
+      updateWorldUI();
+      if (window.BELLA) window.BELLA.process(`ŚWIAT ${worldId} USUNIĘTY`);
+    }
+  };
+
   window.createNewWorld = function() {
-    const name = prompt("Nazwa świata:").toUpperCase();
-    if (name) {
-      window.WORLDS[name] = { name, color: "#6366f1", gates: 10, active: false };
+    const name = prompt("Nazwa nowego świata:").toUpperCase();
+    if (name && !window.WORLDS[name]) {
+      window.WORLDS[name] = { 
+        name, 
+        color: "#6366f1", 
+        gates: 10, 
+        active: false 
+      };
       saveCurrentWorld(name);
       updateWorldUI();
     }
   };
 
-  // === KONKRETNY KOMPAKTNY UI ===
+  // === KOMPAKTNY UI Z EDYCJĄ ===
   function updateWorldUI() {
-    // Usuń stare
     const oldUI = document.getElementById('multiworld-ui');
     if (oldUI) oldUI.remove();
 
@@ -89,36 +127,30 @@
         box-shadow: 0 8px 32px rgba(139,92,246,0.4);
         backdrop-filter: blur(10px); transition: all 0.3s;
         font-weight: bold; color: white; font-size: 18px;
-      " title="Multiświat 🌌" onclick="toggleWorldPanel()">
+      " title="Multiświat 🌌 (Kliknij ✏️🗑️)" onclick="toggleWorldPanel()">
         🌌
       </div>
       
       <div id="world-panel" style="
-        position: fixed; top: 80px; right: -300px; z-index: 10000; width: 280px; height: calc(100vh - 100px);
-        background: rgba(30,30,46,0.98); backdrop-filter: blur(20px);
-        border-radius: 16px 0 0 16px; border: 1px solid rgba(139,92,246,0.3);
-        box-shadow: -8px 0 32px rgba(0,0,0,0.5); transition: right 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
-        padding: 20px; overflow-y: auto; font-family: -apple-system, sans-serif;
-        color: white;
+        position: fixed; top: 80px; right: -320px; z-index: 10000; width: 300px; 
+        height: calc(100vh - 100px); background: rgba(30,30,46,0.98); 
+        backdrop-filter: blur(20px); border-radius: 16px 0 0 16px; 
+        border: 1px solid rgba(139,92,246,0.3); box-shadow: -8px 0 32px rgba(0,0,0,0.5); 
+        transition: right 0.4s cubic-bezier(0.25,0.46,0.45,0.94); padding: 20px; 
+        overflow-y: auto; font-family: -apple-system, sans-serif; color: white;
       ">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #4b5563;">
-          <strong style="font-size: 16px;">🌌 MULTIŚWIAT</strong>
-          <button onclick="toggleWorldPanel()" style="background: none; border: none; color: #8b5cf6; font-size: 20px; cursor: pointer; padding: 0;">×</button>
+          <strong style="font-size: 16px;">🌌 MULTIŚWIAT v3.2</strong>
+          <div>
+            <button onclick="createNewWorld()" title="Nowy" style="margin-left: 8px; background: #10b981; border: none; border-radius: 6px; color: white; width: 32px; height: 32px; cursor: pointer;">➕</button>
+            <button onclick="toggleWorldPanel()" title="Zamknij" style="background: none; border: none; color: #8b5cf6; font-size: 20px; cursor: pointer; padding: 0;">×</button>
+          </div>
         </div>
         
-        <div id="world-list"></div>
+        <div id="world-list" style="max-height: calc(100vh - 220px); overflow-y: auto;"></div>
         
-        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #4b5563; text-align: center;">
-          <button onclick="createNewWorld()" style="
-            width: 100%; padding: 12px; background: linear-gradient(135deg, #ef4444, #dc2626);
-            border: none; border-radius: 10px; color: white; font-weight: 500; cursor: pointer;
-            transition: all 0.3s;
-          " onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-            ➕ Nowy świat
-          </button>
-          <div style="font-size: 12px; opacity: 0.7; margin-top: 12px;">
-            Aktywny: <span id="active-world" style="color: #8b5cf6;">PSYCHE</span>
-          </div>
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #4b5563; text-align: center; font-size: 12px; opacity: 0.8;">
+          Aktywny: <span id="active-world" style="color: #8b5cf6; font-weight: bold;">PSYCHE</span>
         </div>
       </div>
     `;
@@ -132,23 +164,23 @@
     if (!list) return;
     
     list.innerHTML = Object.entries(window.WORLDS).map(([id, data]) => `
-      <button onclick="switchWorld('${id}')" style="
-        width: 100%; padding: 14px 12px; margin: 6px 0; border: none; border-radius: 12px;
-        background: ${data.active ? data.color : data.color + '20'};
-        color: ${data.active ? 'white' : data.color}; cursor: pointer; font-size: 14px;
-        text-align: left; font-weight: ${data.active ? 'bold' : 'normal'};
-        border: ${data.active ? '2px solid rgba(255,255,255,0.5)' : 'none'};
-        transition: all 0.3s; position: relative; overflow: hidden;
-      ">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span>${data.name}</span>
-          <span style="font-size: 12px; opacity: 0.8;">
-            ${localStorage.getItem(`ETERNIVERSE_WORLD_${id}`) ? 
-              JSON.parse(localStorage.getItem(`ETERNIVERSE_WORLD_${id}`)).booksCount || 0 : 0} 📚
-          </span>
+      <div style="margin-bottom: 12px; padding: 12px; background: ${data.color}15; border-radius: 10px; border-left: 4px solid ${data.color}; position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <strong style="color: ${data.active ? 'white' : data.color}; font-size: 15px;">${data.name}</strong>
+          <div style="display: flex; gap: 4px;">
+            ${data.active ? '<span style="color: #10b981; font-size: 12px; font-weight: bold;">● AKTYWNY</span>' : ''}
+            <span style="font-size: 12px; opacity: 0.7;">${localStorage.getItem(`ETERNIVERSE_WORLD_${id}`) ? JSON.parse(localStorage.getItem(`ETERNIVERSE_WORLD_${id}`)).booksCount || 0 : 0} 📚</span>
+          </div>
         </div>
-        ${data.active ? '<div style="position: absolute; top: 4px; right: 8px; font-size: 10px;">●</div>' : ''}
-      </button>
+        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+          <button onclick="switchWorld('${id}')" style="padding: 6px 12px; background: ${data.color}; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">Przełącz</button>
+          <button onclick="editWorld('${id}')" style="padding: 6px 12px; background: #8b5cf6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">✏️ Edytuj</button>
+          <button onclick="deleteWorld('${id}')" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">🗑️ Usuń</button>
+        </div>
+        <div style="font-size: 11px; opacity: 0.6; margin-top: 6px;">
+          Bram: ${data.gates} | Kolor: ${data.color}
+        </div>
+      </div>
     `).join('');
     
     const activeId = localStorage.getItem('activeWorld') || 'PSYCHE';
@@ -162,15 +194,18 @@
     const toggle = document.getElementById('world-toggle');
     
     if (panel.style.right === '0px') {
-      panel.style.right = '-300px';
+      panel.style.right = '-320px';
       toggle.innerHTML = '🌌';
+      toggle.title = 'Multiświat (kliknij otwórz)';
     } else {
       panel.style.right = '0px';
       toggle.innerHTML = '✕';
+      toggle.title = 'Multiświat (kliknij zamknij)';
+      updateWorldList(); // Refresh danych
     }
   };
 
-  // === AUTOZAPIS INTEGRACJA ===
+  // === AUTOZAPIS ===
   const originalSave = window.saveWorldNow;
   window.saveWorldNow = function(reason) {
     const activeWorld = localStorage.getItem('activeWorld') || 'PSYCHE';
@@ -194,8 +229,8 @@
     
     updateWorldUI();
     
-    console.log("🌌 MultiWorld v3.1 – KOMPAKTNY UI (50px przycisk)");
-    if (window.BELLA) window.BELLA.process("Multiświat v3.1 – kompaktowy UI gotowy!");
+    console.log("🌌 MultiWorld v3.2 – ✏️🗑️ EDYCJA ŚWIATÓW aktywna!");
+    if (window.BELLA) window.BELLA.process("Multiświat v3.2 – pełna edycja światów!");
   }
 
   init();
