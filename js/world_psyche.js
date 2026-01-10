@@ -30,7 +30,8 @@ window.WORLD_PSYCHE = {
         {
           title: "MemorySeeker — Archeologia Wspomnień",
           description: "Rozkodowanie pamięci i przeszłości jako aktywnego systemu sterowania.",
-          cover: "media/covers/memoryseeker.jpg"
+          cover: "media/covers/memoryseeker.jpg",
+          audio: "media/audio/memoryseeker_ch1.mp3"
         }
       ]
     }
