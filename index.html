@@ -45,10 +45,10 @@
       <input type="text" id="bookTitle" placeholder="Tytuł książki">
       <label>Opis:</label>
       <textarea id="bookDesc" placeholder="Opis książki..."></textarea>
-      <label>Okładka (link zewnętrzny):</label>
-      <input type="text" id="bookCover" placeholder="https://i.imgur.com/... lub https://m.media-amazon.com/...">
-      <label>Plik audio (link zewnętrzny):</label>
-      <input type="text" id="bookAudio" placeholder="https://.../example.mp3">
+      <label>Okładka (link zewnętrzny lub lokalny):</label>
+      <input type="text" id="bookCover" placeholder="media/covers/... lub https://...">
+      <label>Plik audio (link zewnętrzny lub lokalny):</label>
+      <input type="text" id="bookAudio" placeholder="media/audio/... lub https://...">
       <div class="modal-actions">
         <button id="cancelBtn" onclick="document.getElementById('modal').classList.add('hidden')">Anuluj</button>
         <button id="saveBtn">Zapisz</button>
@@ -58,44 +58,54 @@
 
   <!-- Skrypty – kolejność krytyczna -->
   <script>
-    // Bezpieczne ładowanie skryptów z fallbackiem
-    const ENGINES = [
-      "js/engine_loader.js",
-      "js/core.js",
-      "js/book_editor.js",
-      "js/eter_console.js",
-      "js/world_psyche.js"
-    ];
+    // Bezpieczne ładowanie skryptów – tylko raz
+    if (!window.enginesLoaded) {
+      window.enginesLoaded = true;
 
-    function loadEngine(i = 0) {
-      if (i >= ENGINES.length) {
-        console.log("✅ Wszystkie silniki załadowane");
-        if (typeof initEterniverse === "function") initEterniverse();
-        document.querySelector('.loading')?.remove();
-        return;
+      const ENGINES = [
+        "js/world_psyche.js",
+        "js/core.js",
+        "js/book_editor.js",
+        "js/eter_console.js"
+        // Dodaj więcej jeśli potrzeba
+      ];
+
+      function loadEngine(i = 0) {
+        if (i >= ENGINES.length) {
+          console.log("✅ Wszystkie silniki załadowane");
+          if (typeof initEterniverse === "function") initEterniverse();
+          const loading = document.querySelector('.loading');
+          if (loading) loading.remove();
+          return;
+        }
+
+        const src = ENGINES[i];
+        if (document.querySelector(`script[src="${src}"]`)) {
+          console.log(`Pomijam już załadowany: ${src}`);
+          loadEngine(i + 1);
+          return;
+        }
+
+        const s = document.createElement("script");
+        s.src = src;
+        s.onload = () => {
+          console.log(`⚙️ Załadowano: ${src}`);
+          loadEngine(i + 1);
+        };
+        s.onerror = () => {
+          console.error(`❌ Błąd ładowania: ${src}`);
+          if (!document.querySelector('#error-message').style.display) {
+            document.querySelector('.loading').style.display = 'none';
+            document.getElementById('error-message').style.display = 'block';
+          }
+          loadEngine(i + 1); // Kontynuuj mimo błędu
+        };
+        document.head.appendChild(s);
       }
 
-      const s = document.createElement("script");
-      s.src = ENGINES[i];
-      s.onload = () => {
-        console.log(`⚙️ Załadowano: ${ENGINES[i]}`);
-        loadEngine(i + 1);
-      };
-      s.onerror = () => {
-        console.error(`❌ Błąd ładowania: ${ENGINES[i]}`);
-        // Pokazuje błąd tylko raz
-        if (!document.querySelector('#error-message').style.display) {
-          document.querySelector('.loading').style.display = 'none';
-          document.getElementById('error-message').style.display = 'block';
-        }
-      };
-      document.head.appendChild(s);
-    }
-
-    window.addEventListener("DOMContentLoaded", () => {
-      console.log("🌌 Start ETERNIVERSE...");
+      console.log("🌌 Start ładowania silników ETERNIVERSE...");
       loadEngine();
-    });
+    }
   </script>
 </body>
 </html>
