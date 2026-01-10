@@ -1,8 +1,13 @@
-export const WORLD_PSYCHE = {
-  id: "world_psyche",
+/* =====================================
+   ETERNIVERSE — ŚWIAT I: PSYCHE / INTERSEEKER
+   Architekt: Maciej Maciuszek
+   ===================================== */
+
+window.WORLD_PSYCHE = {
+  id: 1,
   name: "ŚWIAT I — PSYCHE / INTERSEEKER",
-  description:
-    "Świat introspekcji, cienia i pamięci. Pierwszy wymiar przebudzenia Woli.",
+  description: "Świat wejścia w psychikę. Przestrzeń prawdy o naturze jaźni. Kronika Cienia i Woli.",
+
   gates: [
     {
       id: "gate_1",
@@ -11,51 +16,23 @@ export const WORLD_PSYCHE = {
       theme: "Psychika · Cień · Trauma · Tożsamość",
       books: [
         {
-          id: "book_1_1",
           title: "InterSeeker — Atlas Wewnętrzny",
+          description: "Mapa wnętrza człowieka. Mechanizmy obronne i fałszywa tożsamość.",
           cover: "media/covers/interseeker.jpg",
-          description:
-            "Mapa wnętrza człowieka. Mechanizmy obronne i fałszywe ja. Pierwsze pęknięcie iluzji.",
-          chapters: [
-            {
-              title: "Rozdział 1 — Początek",
-              audio: "media/audio/interseeker_ch1.mp3"
-            },
-            {
-              title: "Rozdział 2 — Mechanizmy",
-              audio: "media/audio/interseeker_ch2.mp3"
-            }
-          ]
+          audio: "media/audio/interseeker_ch1.mp3"
         },
         {
-          id: "book_1_2",
           title: "ShadowSeeker — Anatomia Cienia",
+          description: "Praca z cieniem bez duchowej ściemy. Agresja i wstyd jako paliwo świadomości.",
           cover: "media/covers/shadowseeker.jpg",
-          description:
-            "Praca z cieniem bez duchowej ściemy. Wstyd, agresja, tabu jako energia transformacji.",
-          chapters: [
-            {
-              title: "Rozdział 1 — Wprowadzenie",
-              audio: "media/audio/shadowseeker_ch1.mp3"
-            }
-          ]
+          audio: "media/audio/shadowseeker_ch1.mp3"
         },
         {
-          id: "book_1_3",
           title: "MemorySeeker — Archeologia Wspomnień",
-          cover: "media/covers/memoryseeker.jpg",
-          description:
-            "Rozkodowanie pamięci i traum. Odkrywanie przeszłości jako kodu Woli.",
-          chapters: []
+          description: "Rozkodowanie pamięci i przeszłości jako aktywnego systemu sterowania.",
+          cover: "media/covers/memoryseeker.jpg"
         }
       ]
-    },
-    {
-      id: "gate_2",
-      name: "BRAMA II — MEMORY SEEKER",
-      color: "#1FB5A5",
-      theme: "Pamięć · Archeologia Wspomnień",
-      books: []
     }
   ]
 };
