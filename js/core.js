@@ -56,27 +56,32 @@ function renderWorld(world) {
     gateSub.textContent = gate.sub || gate.theme || "";
     gateBox.appendChild(gateSub);
 
-    gate.books.forEach((book) => {
+    gate.books.forEach((book, bookIdx) => {
       const bookBox = document.createElement("div");
       bookBox.className = "book";
 
-      // ====== OBRAZEK OKŁADKI ======
+      // ====== OBRAZEK OKŁADKI (NAPRAWIONY) ======
       const left = document.createElement("div");
       left.className = "book-left";
 
       const img = document.createElement("img");
-
-      // Obsługuje linki zewnętrzne i lokalne pliki
-      if (book.cover && (book.cover.startsWith("http://") || book.cover.startsWith("https://"))) {
-        img.src = book.cover;
-      } else if (book.cover && book.cover.trim() !== "") {
-        img.src = book.cover;
-      } else {
-        img.src = "media/covers/default.jpg";
-      }
-
       img.alt = book.title;
-      img.onerror = () => (img.src = "media/covers/default.jpg");
+      
+      // KLUCZ: Ustaw domyślny obrazek PRZED załadowaniem
+      img.src = "media/covers/default.jpg";
+      
+      // Potem dopiero próbuj załadować prawdziwy
+      if (book.cover && book.cover.trim() !== "") {
+        const tempImg = new Image();
+        tempImg.onload = () => {
+          img.src = book.cover;
+        };
+        tempImg.onerror = () => {
+          // Pozostaw default.jpg
+          console.warn(`Nie można załadować: ${book.cover}`);
+        };
+        tempImg.src = book.cover;
+      }
 
       const info = document.createElement("div");
       const name = document.createElement("strong");
@@ -112,9 +117,42 @@ function renderWorld(world) {
       delBtn.onclick = () => deleteBook(gate, book);
       right.appendChild(delBtn);
 
+      // ====== DODAJ PRZYCISK ROZDZIAŁÓW ======
+      const chapBtn = document.createElement("button");
+      chapBtn.textContent = "📖 Rozdziały";
+      chapBtn.onclick = () => openChapterManager(gate, book, bookIdx);
+      right.appendChild(chapBtn);
+
       bookBox.appendChild(left);
       bookBox.appendChild(right);
       gateBox.appendChild(bookBox);
+      
+      // ====== RENDER ROZDZIAŁÓW ======
+      if (book.chapters && book.chapters.length > 0) {
+        const chaptersBox = document.createElement("div");
+        chaptersBox.className = "chapters-list";
+        chaptersBox.style.marginLeft = "90px";
+        chaptersBox.style.marginTop = "10px";
+        
+        book.chapters.forEach((chapter, chIdx) => {
+          const chDiv = document.createElement("div");
+          chDiv.className = "chapter-item";
+          chDiv.style.background = "rgba(255,255,255,0.05)";
+          chDiv.style.padding = "8px";
+          chDiv.style.marginBottom = "5px";
+          chDiv.style.borderRadius = "4px";
+          chDiv.style.borderLeft = "3px solid " + gate.color;
+          chDiv.innerHTML = `
+            <strong style="color: ${gate.color}">${chapter.number}. ${chapter.title}</strong>
+            <button onclick="editChapter(${gate.id}, ${bookIdx}, ${chIdx})" style="float: right; margin-left: 6px; font-size: 11px;">✏️</button>
+            <button onclick="deleteChapter(${gate.id}, ${bookIdx}, ${chIdx})" style="float: right; font-size: 11px;">🗑️</button>
+            <div style="clear: both; font-size: 12px; opacity: 0.7; margin-top: 4px;">${chapter.content ? chapter.content.substring(0, 100) + '...' : 'Brak treści'}</div>
+          `;
+          chaptersBox.appendChild(chDiv);
+        });
+        
+        gateBox.appendChild(chaptersBox);
+      }
     });
 
     app.appendChild(gateBox);
@@ -179,6 +217,7 @@ function setupUI() {
         cover,
         audio,
         status: "idea",
+        chapters: []
       });
       belleSpeak(`Dodano nową książkę: ${title}`);
     }
@@ -207,6 +246,64 @@ function openEditor(gate, book) {
 }
 
 /* ==============================
+   MANAGER ROZDZIAŁÓW
+============================== */
+function openChapterManager(gate, book, bookIdx) {
+  if (!book.chapters) book.chapters = [];
+  
+  const chTitle = prompt("Tytuł rozdziału:");
+  if (!chTitle) return;
+  
+  const chNumber = book.chapters.length + 1;
+  const chContent = prompt("Treść rozdziału (opcjonalnie):");
+  
+  book.chapters.push({
+    number: chNumber,
+    title: chTitle,
+    content: chContent || ""
+  });
+  
+  saveWorldData();
+  renderWorld(WORLD);
+  belleSpeak(`Dodano rozdział: ${chTitle}`);
+}
+
+function editChapter(gateId, bookIdx, chIdx) {
+  const gate = WORLD.gates.find(g => g.id === gateId);
+  const book = gate.books[bookIdx];
+  const ch = book.chapters[chIdx];
+  
+  const num = prompt("Numer rozdziału:", ch.number);
+  if (!num) return;
+  
+  const title = prompt("Tytuł rozdziału:", ch.title);
+  if (!title) return;
+  
+  const content = prompt("Treść rozdziału:", ch.content);
+  
+  ch.number = parseInt(num);
+  ch.title = title;
+  ch.content = content || "";
+  
+  book.chapters.sort((a, b) => a.number - b.number);
+  
+  saveWorldData();
+  renderWorld(WORLD);
+  belleSpeak("Rozdział zaktualizowany.");
+}
+
+function deleteChapter(gateId, bookIdx, chIdx) {
+  if (!confirm("Usunąć ten rozdział?")) return;
+  
+  const gate = WORLD.gates.find(g => g.id === gateId);
+  gate.books[bookIdx].chapters.splice(chIdx, 1);
+  
+  saveWorldData();
+  renderWorld(WORLD);
+  belleSpeak("Rozdział usunięty.");
+}
+
+/* ==============================
    ZAPIS / ODCZYT / AUTO-NAPRAWA
 ============================== */
 function saveWorldData() {
@@ -224,6 +321,9 @@ function fixMissingCovers(world) {
     gate.books.forEach((book) => {
       if (!book.cover || book.cover.trim() === "") {
         book.cover = "media/covers/default.jpg";
+      }
+      if (!book.chapters) {
+        book.chapters = [];
       }
     });
   });
@@ -266,6 +366,3 @@ function belleSpeak(msg) {
     el.textContent = "Czekam na Twoje intencje...";
   }, 6000);
 }
-
-// Automatyczny start po załadowaniu strony
-document.addEventListener("DOMContentLoaded", initEterniverse);
