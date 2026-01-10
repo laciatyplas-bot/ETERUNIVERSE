@@ -2,9 +2,9 @@
    CORE RENDER ENGINE — PSYCHE
    ============================== */
 
-document.addEventListener("DOMContentLoaded", () => {
+function renderWorld(data) {
   const root = document.getElementById("app");
-  const data = window.WORLD_PSYCHE;
+  root.innerHTML = "";
 
   if (!data) {
     root.innerHTML = "<p style='color:red'>Błąd: brak danych świata.</p>";
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
   root.appendChild(desc);
 
   // Render bram
-  data.gates.forEach(gate => {
+  data.gates.forEach((gate) => {
     const gateDiv = document.createElement("div");
     gateDiv.className = "gate";
     gateDiv.style.borderLeftColor = gate.color;
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     gateDiv.appendChild(theme);
 
     // Książki
-    gate.books.forEach(book => {
+    gate.books.forEach((book, index) => {
       const bookDiv = document.createElement("div");
       bookDiv.className = "book";
 
@@ -68,9 +68,36 @@ document.addEventListener("DOMContentLoaded", () => {
         bookDiv.appendChild(audio);
       }
 
+      // Przyciski akcji
+      const actions = document.createElement("div");
+      actions.className = "book-actions";
+
+      const editBtn = document.createElement("button");
+      editBtn.textContent = "Edytuj";
+      editBtn.className = "edit-btn edit";
+      editBtn.dataset.index = index;
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "Usuń";
+      deleteBtn.className = "delete-btn delete";
+      deleteBtn.dataset.index = index;
+
+      actions.appendChild(editBtn);
+      actions.appendChild(deleteBtn);
+      bookDiv.appendChild(actions);
+
       gateDiv.appendChild(bookDiv);
     });
 
     root.appendChild(gateDiv);
   });
+
+  // aktywacja przycisków edycji i usuwania
+  if (window.enableBookActions) {
+    window.enableBookActions();
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderWorld(window.WORLD_PSYCHE);
 });
