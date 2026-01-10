@@ -101,3 +101,16 @@ function renderWorld(data) {
 document.addEventListener("DOMContentLoaded", () => {
   renderWorld(window.WORLD_PSYCHE);
 });
+document.addEventListener("DOMContentLoaded", () => {
+  renderWorld(window.DATA);
+  console.log("🌀 ŚWIAT I — PSYCHE / INTERSEEKER załadowany");
+  
+  // TEST: pokaż wszystkie ścieżki
+  window.DATA.gates.forEach(g => {
+    g.books.forEach(b => {
+      console.log("📘", b.title);
+      if (b.cover) console.log("🖼️ okładka:", b.cover);
+      if (b.audio) console.log("🎧 audio:", b.audio);
+    });
+  });
+});
