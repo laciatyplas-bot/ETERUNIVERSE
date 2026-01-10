@@ -23,7 +23,7 @@ if (typeof window.WORLD_PSYCHE !== 'undefined') {
             title: "InterSeeker – Atlas Wewnętrzny",
             description: "Mapa wnętrza człowieka. Mechanizmy obronne, fałszywa tożsamość i pierwsze pęknięcie iluzji.",
             status: "published",
-            cover: "https://img.wattpad.com/cover/405617436-288-k446508.jpg", // Twoja okładka z Wattpada
+            cover: "https://img.wattpad.com/cover/405617436-288-k446508.jpg", // Twój Wattpad – jedyny zewnętrzny link
             audio: "media/audio/interseeker_ch1.mp3",
             chapters: []
           },
@@ -269,10 +269,10 @@ if (typeof window.WORLD_PSYCHE !== 'undefined') {
   window.WORLD_PSYCHE.gates.forEach(gate => {
     gate.books.forEach(book => {
       if (!book.cover || book.cover.trim() === "") {
-        book.cover = "https://placehold.co/300x450/000/fff/png?text=" + encodeURIComponent(book.title.substring(0, 20));
+        book.cover = "media/covers/default.jpg";
       }
     });
   });
 
-  console.log("WORLD_PSYCHE v4.4 załadowany pomyślnie – wszystkie 10 bram + okładka z Wattpada.");
+  console.log("WORLD_PSYCHE v4.4 załadowany – zero Amazon, tylko Wattpad + lokalne pliki.");
 }
