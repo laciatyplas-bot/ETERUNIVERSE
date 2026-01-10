@@ -1,110 +1,69 @@
 body {
-  background: radial-gradient(circle at top, #101622, #050814);
-  color: #E9F4FF;
-  font-family: system-ui, sans-serif;
   margin: 0;
-  padding: 0;
+  background: radial-gradient(circle at top, #0b1323, #01030a);
+  font-family: 'Segoe UI', sans-serif;
+  color: #E8EEFA;
 }
 
 header {
   text-align: center;
   padding: 20px;
-  border-bottom: 1px solid #20324A;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid #22314A;
 }
 
-header h1 {
+h1 {
   color: #D9A441;
+  margin-bottom: 6px;
 }
 
 button {
   background: #28D3C6;
+  color: #000;
   border: none;
   border-radius: 6px;
   padding: 8px 14px;
-  color: #000;
   font-weight: bold;
   cursor: pointer;
-  margin: 6px;
+  margin: 4px;
 }
-button:hover {
-  filter: brightness(1.1);
-}
+button:hover { filter: brightness(1.2); }
 
 #app {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 20px auto;
   padding: 10px;
 }
 
 .gate {
-  border-left: 5px solid;
+  border-left: 6px solid;
   margin: 20px 0;
-  padding: 12px;
-  background: #0b1624;
+  padding: 16px;
+  background: rgba(255,255,255,0.03);
   border-radius: 6px;
 }
 
 .book {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.06);
   padding: 10px;
-  margin-top: 6px;
+  margin: 8px 0;
   border-radius: 6px;
 }
 
-.book img {
-  height: 70px;
-  width: 50px;
-  object-fit: cover;
-  border-radius: 4px;
-}
-
-.book-actions button {
-  margin-left: 5px;
-  background: #D9A441;
-}
-
-.audio {
-  width: 100%;
-  margin-top: 8px;
-}
-
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
+.book-left {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 10px;
 }
 
-.modal.hidden {
-  display: none;
-}
-
-.modal-content {
-  background: #050B16;
-  padding: 20px;
-  border-radius: 8px;
-  width: 320px;
-}
-
-.modal-content input,
-.modal-content textarea {
-  width: 100%;
-  margin: 5px 0 10px 0;
+.book img {
+  width: 70px;
+  height: 100px;
   border-radius: 4px;
-  border: 1px solid #20324A;
-  padding: 6px;
-  background: #0D1C30;
-  color: #fff;
+  object-fit: cover;
 }
 
-.modal-actions {
-  text-align: right;
-}
 .status {
   font-size: 12px;
   font-weight: bold;
@@ -112,15 +71,55 @@ button:hover {
   margin-top: 4px;
 }
 
-.book-left {
+.modal {
+  position: fixed;
+  inset: 0;
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.7);
+}
+.modal.hidden { display: none; }
+
+.modal-content {
+  background: #050B16;
+  padding: 20px;
+  border-radius: 8px;
+  color: #fff;
+  width: 360px;
 }
 
-.sub {
-  color: #8da2cc;
-  font-size: 0.9em;
-  margin-top: -8px;
-  margin-bottom: 10px;
+/* 💠 Belle */
+#belle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: float 4s ease-in-out infinite;
+}
+
+#belle img {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 2px solid #28D3C6;
+  box-shadow: 0 0 20px #28D3C6aa;
+}
+
+#belleSpeech {
+  margin-top: 6px;
+  background: rgba(0,0,0,0.6);
+  color: #28D3C6;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  max-width: 160px;
+  text-align: center;
+}
+
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
