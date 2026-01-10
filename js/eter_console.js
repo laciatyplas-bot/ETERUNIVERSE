@@ -1,100 +1,98 @@
 /* =====================================
-   ETERCONSOLE — Konsola Architekta Woli
+   ETERCONSOLE — Konsola Architekta Woli v1.1
    Twórca: Maciej Maciuszek
    ===================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Tworzymy element konsoli
+  // === TWORZENIE ELEMENTU KONSOLI ===
   const consoleBox = document.createElement("div");
-  consoleBox.style.position = "fixed";
-  consoleBox.style.bottom = "20px";
-  consoleBox.style.right = "20px";
-  consoleBox.style.width = "420px";
-  consoleBox.style.height = "300px";
-  consoleBox.style.background = "rgba(10, 15, 30, 0.95)";
-  consoleBox.style.border = "1px solid #38bdf8";
-  consoleBox.style.borderRadius = "12px";
-  consoleBox.style.color = "#e2e8f0";
-  consoleBox.style.fontFamily = "monospace";
-  consoleBox.style.fontSize = "13px";
-  consoleBox.style.display = "flex";
-  consoleBox.style.flexDirection = "column";
-  consoleBox.style.zIndex = "9999";
-  consoleBox.style.backdropFilter = "blur(6px)";
-  consoleBox.style.boxShadow = "0 0 20px rgba(56,189,248,0.3)";
+  consoleBox.id = "eter-console";
+  Object.assign(consoleBox.style, {
+    position: "fixed",
+    bottom: "20px",
+    right: "20px",
+    width: "420px",
+    height: "300px",
+    background: "rgba(10, 15, 30, 0.95)",
+    border: "1px solid #38bdf8",
+    borderRadius: "12px",
+    color: "#e2e8f0",
+    fontFamily: "monospace",
+    fontSize: "13px",
+    display: "flex",
+    flexDirection: "column",
+    zIndex: "9999",
+    backdropFilter: "blur(6px)",
+    boxShadow: "0 0 20px rgba(56,189,248,0.3)",
+    overflow: "hidden",
+  });
 
-  // Pasek tytułu
+  // === NAGŁÓWEK (przeciąganie) ===
   const header = document.createElement("div");
-  header.textContent = "🌀 ETERCONSOLE (wklej kod JS i naciśnij Run)";
-  header.style.background = "#0f172a";
-  header.style.padding = "6px 10px";
-  header.style.fontWeight = "bold";
-  header.style.color = "#38bdf8";
-  header.style.cursor = "move";
-  header.style.userSelect = "none";
+  header.textContent = "🌀 ETERCONSOLE v1.1 (Ctrl + ` aby schować/pokazać)";
+  Object.assign(header.style, {
+    background: "#0f172a",
+    padding: "6px 10px",
+    fontWeight: "bold",
+    color: "#38bdf8",
+    cursor: "move",
+    userSelect: "none",
+  });
   consoleBox.appendChild(header);
 
-  // Pole kodu
+  // === POLE KODU ===
   const textarea = document.createElement("textarea");
-  textarea.style.flex = "1";
-  textarea.style.background = "#0b1220";
-  textarea.style.color = "#e2e8f0";
-  textarea.style.border = "none";
-  textarea.style.outline = "none";
-  textarea.style.padding = "8px";
-  textarea.style.resize = "none";
-  textarea.placeholder = "// wpisz lub wklej kod JS tutaj...";
+  Object.assign(textarea.style, {
+    flex: "1",
+    background: "#0b1220",
+    color: "#e2e8f0",
+    border: "none",
+    outline: "none",
+    padding: "8px",
+    resize: "none",
+    fontFamily: "inherit",
+    fontSize: "inherit",
+  });
+  textarea.placeholder = "// Wpisz lub wklej kod JavaScript...\n// Naciśnij Run lub Ctrl + Enter";
   consoleBox.appendChild(textarea);
 
-  // Pasek przycisków
+  // === PASEK PRZYCISKÓW ===
   const footer = document.createElement("div");
-  footer.style.display = "flex";
-  footer.style.justifyContent = "space-between";
-  footer.style.padding = "6px 8px";
-  footer.style.background = "#1e293b";
+  Object.assign(footer.style, {
+    display: "flex",
+    justifyContent: "space-between",
+    padding: "6px 8px",
+    background: "#1e293b",
+  });
 
   const runBtn = document.createElement("button");
   runBtn.textContent = "▶️ Run";
-  runBtn.style.background = "#38bdf8";
-  runBtn.style.color = "#0f172a";
-  runBtn.style.fontWeight = "bold";
-  runBtn.style.border = "none";
-  runBtn.style.borderRadius = "6px";
-  runBtn.style.padding = "4px 10px";
-  runBtn.style.cursor = "pointer";
+  Object.assign(runBtn.style, {
+    background: "#38bdf8",
+    color: "#0f172a",
+    fontWeight: "bold",
+    border: "none",
+    borderRadius: "6px",
+    padding: "4px 10px",
+    cursor: "pointer",
+  });
+  footer.appendChild(runBtn);
 
   const clearBtn = document.createElement("button");
   clearBtn.textContent = "🧹 Clear";
-  clearBtn.style.background = "#475569";
-  clearBtn.style.color = "#e2e8f0";
-  clearBtn.style.border = "none";
-  clearBtn.style.borderRadius = "6px";
-  clearBtn.style.padding = "4px 10px";
-  clearBtn.style.cursor = "pointer";
-
-  footer.appendChild(runBtn);
+  Object.assign(clearBtn.style, {
+    background: "#475569",
+    color: "#e2e8f0",
+    border: "none",
+    borderRadius: "6px",
+    padding: "4px 10px",
+    cursor: "pointer",
+  });
   footer.appendChild(clearBtn);
+
   consoleBox.appendChild(footer);
 
-  // Wykonaj kod po kliknięciu
-  runBtn.addEventListener("click", () => {
-    const code = textarea.value.trim();
-    if (!code) return;
-    try {
-      const result = eval(code);
-      console.log("💠 Wynik:", result);
-      alert("✅ Kod wykonany poprawnie!");
-    } catch (err) {
-      console.error("❌ Błąd w kodzie:", err);
-      alert("❌ Błąd w kodzie: " + err.message);
-    }
-  });
-
-  clearBtn.addEventListener("click", () => {
-    textarea.value = "";
-  });
-
-  // Przeciąganie konsoli myszką
+  // === PRZECIĄGANIE KONSOLI ===
   let isDragging = false;
   let offsetX, offsetY;
 
@@ -102,12 +100,13 @@ document.addEventListener("DOMContentLoaded", () => {
     isDragging = true;
     offsetX = e.clientX - consoleBox.offsetLeft;
     offsetY = e.clientY - consoleBox.offsetTop;
+    e.preventDefault();
   });
 
   document.addEventListener("mousemove", (e) => {
     if (isDragging) {
-      consoleBox.style.left = e.clientX - offsetX + "px";
-      consoleBox.style.top = e.clientY - offsetY + "px";
+      consoleBox.style.left = `${e.clientX - offsetX}px`;
+      consoleBox.style.top = `${e.clientY - offsetY}px`;
       consoleBox.style.right = "auto";
       consoleBox.style.bottom = "auto";
     }
@@ -117,16 +116,46 @@ document.addEventListener("DOMContentLoaded", () => {
     isDragging = false;
   });
 
-  // Skrót klawiaturowy: Ctrl + ~ (tylda)
+  // === SKRÓT KLAWISZOWY Ctrl + ` ===
   document.addEventListener("keydown", (e) => {
     if (e.ctrlKey && e.key === "`") {
-      consoleBox.style.display =
-        consoleBox.style.display === "none" ? "flex" : "none";
+      e.preventDefault();
+      consoleBox.style.display = consoleBox.style.display === "none" ? "flex" : "none";
     }
   });
 
-  // Dodaj do strony
+  // === WYKONANIE KODU ===
+  function executeCode() {
+    const code = textarea.value.trim();
+    if (!code) return;
+
+    try {
+      // Bezpieczniejsze wykonanie kodu (bez eval)
+      const result = new Function(code)();
+      console.log("💠 Wynik wykonania:", result);
+      alert("✅ Kod wykonany poprawnie!\nWynik w konsoli.");
+    } catch (err) {
+      console.error("❌ Błąd w kodzie:", err);
+      alert("❌ Błąd wykonania kodu:\n" + err.message);
+    }
+  }
+
+  runBtn.addEventListener("click", executeCode);
+
+  // Ctrl + Enter też wykonuje
+  textarea.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && e.key === "Enter") {
+      e.preventDefault();
+      executeCode();
+    }
+  });
+
+  clearBtn.addEventListener("click", () => {
+    textarea.value = "";
+  });
+
+  // Dodaj konsolę do strony
   document.body.appendChild(consoleBox);
 
-  console.log("🌀 ETERCONSOLE załadowany. Użyj Ctrl + ` aby schować/pokazać.");
+  console.log("🌀 ETERCONSOLE v1.1 załadowany. Użyj Ctrl + ` aby schować/pokazać.");
 });
