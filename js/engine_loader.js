@@ -14,15 +14,17 @@
 
   // 🚀 PEŁNA KOLEJNOŚĆ 8 SILNIKÓW (KRYTYCZNA!)
   const ENGINES = [
-    "js/world_psyche.js",     // 1️⃣ DANE – window.WORLD_PSYCHE (10 bram)
-    "js/core.js",             // 2️⃣ RENDER + UI + initEterniverse()
-    "js/book_editor.js",      // 3️⃣ ✏️🗑️ CRUD + modal książek
-    "js/chapters_init.js",    // 4️⃣ AUTOMATYCZNE ROZDZIAŁY (5+)
-    "js/chapter_editor.js",   // 5️⃣ 📖 MODAL ROZDZIAŁÓW (CRUD + drag)
-    "js/eter_console.js",     // 6️⃣ DEV TOOLS (Ctrl + `)
-    "js/autosave.js",         // 7️⃣ 💾 AUTOZAPIS co 30s + backup
-    "js/bella-console.js"     // 8️⃣ 😈🔥 BELLA 8.00 EVOLVER
-  ];
+  "js/world_psyche.js",
+  "js/core.js",
+  "js/book_editor.js", 
+  "js/chapters_init.js",
+  "js/chapter_editor.js",
+  "js/eter_console.js",
+  "js/autosave.js",
+  "js/bella-console.js",
+  "js/multiworld.js"    // ← NOWE! 5+ ŚWIATÓW
+];
+
 
   function loadEngine(i = 0) {
     // KONIEC ŁADOWANIA = SUKCES 🎉
