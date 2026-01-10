@@ -78,7 +78,6 @@ function renderWorld(world) {
         };
         tempImg.onerror = () => {
           // Pozostaw default.jpg
-          console.warn(`Nie można załadować: ${book.cover}`);
         };
         tempImg.src = book.cover;
       }
