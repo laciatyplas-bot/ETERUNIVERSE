@@ -1,34 +1,37 @@
 // js/engine_loader.js – Bezpieczne ładowanie silników ETERNIVERSE (v2.1 – singleton + debug + kontynuacja przy błędzie)
 
 (function () {
-  // Singleton – wykonuje się tylko raz, nawet przy wielokrotnym include
+  // Singleton – kod wykonuje się tylko raz (nawet przy wielokrotnym include)
   if (window.enginesLoaded) {
     console.log("Silniki już załadowane – pomijam ponowne wykonanie.");
     return;
   }
   window.enginesLoaded = true;
 
-  // Lista silników – dodawaj tu nowe pliki w kolejności
+  // Lista silników – kolejność ważna!
   const ENGINES = [
-    "js/world_psyche.js",     // Dane świata
+    "js/world_psyche.js",     // Dane świata (najpierw!)
     "js/core.js",             // Główny engine + render
     "js/book_editor.js",      // Edycja/usuwanie książek
     "js/eter_console.js"      // Konsola deweloperska
-    // Dodaj kolejne jeśli potrzeba, np. "js/chapter_manager.js"
+    // Dodaj tu nowe pliki w przyszłości, np. "js/chapter_manager.js"
   ];
 
   function loadEngine(i = 0) {
     if (i >= ENGINES.length) {
       console.log("✅ Wszystkie silniki załadowane pomyślnie.");
+      
       // Uruchom główną funkcję inicjalizacyjną (z core.js)
       if (typeof window.initEterniverse === "function") {
         window.initEterniverse();
       } else {
         console.warn("⚠️ Funkcja initEterniverse nie znaleziona – sprawdź core.js");
       }
+
       // Usuń loading po sukcesie
       const loading = document.querySelector('.loading');
       if (loading) loading.remove();
+
       return;
     }
 
