@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ETERNIVERSE — Świat I: PSYCHE / INTERSEEKER</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="icon" href="favicon.ico" />
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="favicon.ico">
 </head>
-
 <body>
   <header>
     <h1>🌌 ETERNIVERSE — Świat I: PSYCHE</h1>
@@ -20,35 +19,34 @@
   </header>
 
   <main id="app">
-    <p class="loading">Ładowanie systemu ETERNIVERSE...</p>
+    <p class="loading">Ładowanie systemu ETERNIVERSE<span class="dots">...</span></p>
+    <div id="error-message" style="display:none; color:#ff6b6b; text-align:center; padding:2rem;">
+      <h2>Błąd ładowania</h2>
+      <p>Nie udało się załadować silnika. Sprawdź konsolę (F12) i upewnij się, że plik <code>js/engine_loader.js</code> istnieje.</p>
+    </div>
   </main>
 
   <!-- Belle avatar -->
-  <div id="belle">
-    <img src="media/covers/default.jpg" alt="Belle">
-    <div id="belleSpeech">Cześć, Architekcie...</div>
+  <div id="belle" class="belle-avatar">
+    <img src="media/covers/default.jpg" alt="Belle" onerror="this.src='https://via.placeholder.com/150?text=Belle'">
+    <div id="belleSpeech">Cześć, Architekcie... ładuję system...</div>
   </div>
 
   <!-- Modal edycji książki -->
   <div id="modal" class="modal hidden">
     <div class="modal-content">
+      <span class="close-modal" onclick="closeModal()">×</span>
       <h2 id="modalTitle">Nowa książka</h2>
-
       <label>Brama:</label>
       <select id="gateSelect"></select>
-
       <label>Tytuł:</label>
       <input type="text" id="bookTitle" placeholder="Tytuł książki">
-
       <label>Opis:</label>
       <textarea id="bookDesc" placeholder="Opis książki..."></textarea>
-
-      <label>Okładka (ścieżka):</label>
-      <input type="text" id="bookCover" placeholder="media/covers/example.jpg">
-
-      <label>Plik audio (ścieżka):</label>
-      <input type="text" id="bookAudio" placeholder="media/audio/example.mp3">
-
+      <label>Okładka (ścieżka lub URL):</label>
+      <input type="text" id="bookCover" placeholder="media/covers/example.jpg lub https://...">
+      <label>Plik audio (ścieżka lub URL):</label>
+      <input type="text" id="bookAudio" placeholder="media/audio/example.mp3 lub https://...">
       <div class="modal-actions">
         <button id="cancelBtn">Anuluj</button>
         <button id="saveBtn">Zapisz</button>
@@ -56,6 +54,27 @@
     </div>
   </div>
 
+  <!-- Skrypty – kolejność ważna -->
   <script src="js/engine_loader.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/book_editor.js"></script>
+  <script src="js/eter_console.js"></script>
+  <script src="js/world_psyche.js"></script>
+
+  <!-- Fallback jeśli coś się nie załaduje -->
+  <script>
+    window.addEventListener('error', function(e) {
+      if (e.filename.includes('engine_loader.js')) {
+        document.querySelector('.loading').style.display = 'none';
+        document.getElementById('error-message').style.display = 'block';
+      }
+    });
+
+    // Prosty loader animowany
+    setInterval(() => {
+      const dots = document.querySelector('.dots');
+      if (dots) dots.textContent = dots.textContent.length < 6 ? dots.textContent + '.' : '...';
+    }, 500);
+  </script>
 </body>
 </html>
