@@ -60,28 +60,24 @@ function renderWorld(world) {
       const bookBox = document.createElement("div");
       bookBox.className = "book";
 
-      // ====== OBRAZEK OKŁADKI (NAPRAWIONY) ======
+      // ====== OBRAZEK OKŁADKI - NAPRAWIONY ======
       const left = document.createElement("div");
       left.className = "book-left";
 
       const img = document.createElement("img");
       img.alt = book.title;
-      
-      // KLUCZ: Ustaw domyślny obrazek PRZED załadowaniem
-      const defaultCover = "media/covers/default.jpg";
-      img.src = defaultCover;
-      
-      // Potem dopiero próbuj załadować prawdziwy
+
+      // Ustaw obrazek - PROSTY sposób
       if (book.cover && book.cover.trim() !== "") {
-        const tempImg = new Image();
-        tempImg.onload = function() {
-          img.src = book.cover;
-        };
-        tempImg.onerror = function() {
-          // Pozostaw default.jpg - ciche niepowodzenie
-        };
-        tempImg.src = book.cover;
+        img.src = book.cover;
+      } else {
+        img.src = "media/covers/default.jpg";
       }
+
+      // Jeśli nie załaduje - default
+      img.onerror = function() {
+        this.src = "media/covers/default.jpg";
+      };
 
       const info = document.createElement("div");
       const name = document.createElement("strong");
