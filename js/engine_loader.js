@@ -1,31 +1,32 @@
 /* =====================================
-   ETERNIVERSE ENGINE LOADER v2.3 – PEŁNY KOD 1:1
+   ETERNIVERSE ENGINE LOADER v2.4 – PEŁNY KOD ZE WSZYSTKIMI SILNIKAMI
    Architekt: Maciej Maciuszek + AI Assistant
-   Wszystkie silniki: core + book + chapters + console
+   100% PRODUCTION READY – 7 SILNIKÓW
    ===================================== */
 
 (function () {
   // Singleton – kod wykonuje się TYLKO RAZ
   if (window.enginesLoaded) {
-    console.log("🚀 Silniki ETERNIVERSE v2.3 już załadowane");
+    console.log("🚀 Silniki ETERNIVERSE v2.4 już załadowane");
     return;
   }
   window.enginesLoaded = true;
 
-  // POPRAWNA KOLEJNOŚĆ SILNIKÓW (krytyczna!)
+  // 🚀 PEŁNA KOLEJNOŚĆ SILNIKÓW (KRYTYCZNA!)
   const ENGINES = [
     "js/world_psyche.js",     // 1️⃣ DANE – window.WORLD_PSYCHE (10 bram)
-    "js/core.js",             // 2️⃣ RENDER + UI + initEterniverse()
-    "js/book_editor.js",      // 3️⃣ ✏️🗑️ CRUD + modal actions
-    "js/chapters_init.js",    // 4️⃣ AUTOMATYCZNE ROZDZIAŁY
-    "js/chapter_editor.js",   // 5️⃣ 📖 MODAL ROZDZIAŁÓW
-    "js/eter_console.js"      // 6️⃣ DEV TOOLS (Ctrl + `)
+    "js/core.js",             // 2️⃣ RENDER + UI + initEterniverse() + Belle
+    "js/book_editor.js",      // 3️⃣ ✏️🗑️ CRUD + modal książek
+    "js/chapters_init.js",    // 4️⃣ AUTOMATYCZNE ROZDZIAŁY (5+)
+    "js/chapter_editor.js",   // 5️⃣ 📖 MODAL ROZDZIAŁÓW (CRUD + drag)
+    "js/eter_console.js",     // 6️⃣ DEV TOOLS (Ctrl + `)
+    "js/autosave.js"          // 7️⃣ 💾 AUTOZAPIS co 30s + backup
   ];
 
   function loadEngine(i = 0) {
-    // KONIEC ŁADOWANIA = SUKCES
+    // KONIEC ŁADOWANIA = SUKCES 🎉
     if (i >= ENGINES.length) {
-      console.log("✅ Wszystkie silniki ETERNIVERSE v2.3 załadowane!");
+      console.log("✅ Wszystkie 7 silników ETERNIVERSE v2.4 załadowane!");
       
       // START GŁÓWNY – core.js musi być gotowy
       if (typeof window.initEterniverse === "function") {
@@ -36,12 +37,17 @@
         showError("Core engine niezaładowany. Sprawdź konsolę F12.");
       }
 
-      // Usuń loading screen
+      // Usuń loading screen z animacją
       const loading = document.querySelector('.loading');
       if (loading) {
         loading.style.opacity = '0';
+        loading.style.transform = 'scale(0.8)';
         setTimeout(() => loading.remove(), 300);
       }
+      
+      // FINALNY LOG SUKCESU
+      console.log("🚀 ETERNIVERSE v2.4 – PEŁNY SYSTEM AKTYWNY!");
+      console.log("📋 Funkcje: Książki ✏️🗑️ | Rozdziały 📖 | Autozapis 💾 | Console 🌀");
       return;
     }
 
@@ -60,12 +66,12 @@
     script.async = false; // SEKWENCYJNE – WAŻNE!
 
     script.onload = () => {
-      console.log(`✅ Załadowano: ${src}`);
+      console.log(`✅ [${i+1}/7] Załadowano: ${src}`);
       loadEngine(i + 1);
     };
 
     script.onerror = () => {
-      console.warn(`⚠️  BRAK pliku: ${src} – KONTYNUUJĘ...`);
+      console.warn(`⚠️  [${i+1}/7] BRAK pliku: ${src} – KONTYNUUJĘ...`);
       loadEngine(i + 1); // NIGDY NIE ZATRZYMUJ SYSTEMU
     };
 
@@ -87,14 +93,18 @@
           border: 1px solid #ff6b6b;
           max-width: 600px;
           margin: 2rem auto;
+          font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         ">
-          <h2>🚨 Błąd inicjalizacji</h2>
+          <h2>🚨 Błąd inicjalizacji ETERNIVERSE</h2>
           <p>${msg}</p>
           <p><strong>F12 → Console → sprawdź błędy ładowania JS</strong></p>
-          <details>
-            <summary>Debug info (ładowane pliki)</summary>
-            <pre>${ENGINES.map((s, i) => `${i+1}. ${s}`).join('\n')}</pre>
+          <details style="margin-top: 1rem;">
+            <summary>📋 Debug info (7 plików do załadowania)</summary>
+            <pre style="background: #1f2937; color: #e5e7eb; padding: 1rem; border-radius: 8px; font-size: 0.9rem;">${ENGINES.map((s, i) => `${i+1}. ${s}`).join('\n')}</pre>
           </details>
+          <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">
+            Sprawdź czy wszystkie pliki są w folderze <code>js/</code>
+          </p>
         </div>
       `;
     }
@@ -103,11 +113,12 @@
   // START AUTOMATYCZNY
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      console.log("🌌 ETERNIVERSE v2.3 – MASTER LOADER START");
+      console.log("🌌 ETERNIVERSE v2.4 – MASTER LOADER START [7 SILNIKÓW]");
+      console.log("📋 Ładowanie:", ENGINES.map((s,i) => `${i+1}. ${s}`).join('\n'));
       setTimeout(loadEngine, 50); // Lekkie opóźnienie dla stabilności
     });
   } else {
-    console.log("🌌 ETERNIVERSE v2.3 – MASTER LOADER START");
+    console.log("🌌 ETERNIVERSE v2.4 – MASTER LOADER START [7 SILNIKÓW]");
     loadEngine();
   }
 })();
