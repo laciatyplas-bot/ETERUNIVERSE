@@ -67,13 +67,14 @@
         "js/core.js",
         "js/book_editor.js",
         "js/eter_console.js"
-        // Dodaj więcej jeśli potrzeba
       ];
 
       function loadEngine(i = 0) {
         if (i >= ENGINES.length) {
           console.log("✅ Wszystkie silniki załadowane");
-          if (typeof initEterniverse === "function") initEterniverse();
+          if (typeof initEterniverse === "function") {
+            initEterniverse();
+          }
           const loading = document.querySelector('.loading');
           if (loading) loading.remove();
           return;
