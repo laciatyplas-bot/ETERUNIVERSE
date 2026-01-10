@@ -11,8 +11,33 @@
 
   <div id="app"></div>
 
+  <div id="book-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>➕ Dodaj nową książkę</h2>
+      <label>Tytuł</label>
+      <input type="text" id="book-title" placeholder="np. ArchetypSeeker — System Archetypów Eteru">
+
+      <label>Opis</label>
+      <textarea id="book-desc" placeholder="Krótki opis książki..."></textarea>
+
+      <label>URL okładki</label>
+      <input type="text" id="book-cover" placeholder="media/covers/...jpg">
+
+      <label>URL audio (opcjonalnie)</label>
+      <input type="text" id="book-audio" placeholder="media/audio/...mp3">
+
+      <div class="modal-actions">
+        <button id="cancel-book">Anuluj</button>
+        <button id="save-book" class="primary">Zapisz</button>
+      </div>
+    </div>
+  </div>
+
+  <button id="add-book-btn" class="floating-btn">＋</button>
+
   <!-- Skrypty -->
   <script src="js/world_psyche.js"></script>
   <script src="js/core.js"></script>
+  <script src="js/book_editor.js"></script>
 </body>
 </html>
