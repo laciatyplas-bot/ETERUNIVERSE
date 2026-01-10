@@ -56,27 +56,32 @@ function renderWorld(world) {
     gateSub.textContent = gate.sub || gate.theme || "";
     gateBox.appendChild(gateSub);
 
-    gate.books.forEach((book) => {
+    gate.books.forEach((book, bookIdx) => {
       const bookBox = document.createElement("div");
       bookBox.className = "book";
 
-      // ====== OBRAZEK OKŁADKI ======
+      // ====== OBRAZEK OKŁADKI - NAPRAWIONY ======
       const left = document.createElement("div");
       left.className = "book-left";
 
       const img = document.createElement("img");
-
-      // Obsługuje linki zewnętrzne i lokalne pliki
-      if (book.cover && (book.cover.startsWith("http://") || book.cover.startsWith("https://"))) {
-        img.src = book.cover;
-      } else if (book.cover && book.cover.trim() !== "") {
-        img.src = book.cover;
-      } else {
-        img.src = "media/covers/default.jpg";
-      }
-
       img.alt = book.title;
-      img.onerror = () => (img.src = "media/covers/default.jpg");
+      
+      // NAJPIERW ustaw domyślny obrazek
+      const defaultCover = "media/covers/default.jpg";
+      img.src = defaultCover;
+      
+      // Potem spróbuj załadować prawdziwy w tle
+      if (book.cover && book.cover.trim() !== "") {
+        const testImg = new Image();
+        testImg.onload = function() {
+          img.src = book.cover;
+        };
+        testImg.onerror = function() {
+          // Zostaw default.jpg - nie rób nic
+        };
+        testImg.src = book.cover;
+      }
 
       const info = document.createElement("div");
       const name = document.createElement("strong");
