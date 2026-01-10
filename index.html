@@ -26,7 +26,7 @@
     </div>
   </main>
 
-  <!-- Belle avatar z bezpiecznym fallbackiem -->
+  <!-- Belle avatar – lokalny plik z fallbackiem -->
   <div id="belle" class="belle-avatar">
     <img src="media/covers/default.jpg" 
          alt="Belle" 
@@ -45,10 +45,10 @@
       <input type="text" id="bookTitle" placeholder="Tytuł książki">
       <label>Opis:</label>
       <textarea id="bookDesc" placeholder="Opis książki..."></textarea>
-      <label>Okładka (link zewnętrzny lub lokalny):</label>
-      <input type="text" id="bookCover" placeholder="media/covers/... lub https://...">
-      <label>Plik audio (link zewnętrzny lub lokalny):</label>
-      <input type="text" id="bookAudio" placeholder="media/audio/... lub https://...">
+      <label>Okładka (lokalna ścieżka lub URL):</label>
+      <input type="text" id="bookCover" placeholder="media/covers/interseeker.jpg lub https://...">
+      <label>Plik audio (lokalna ścieżka lub URL):</label>
+      <input type="text" id="bookAudio" placeholder="media/audio/interseeker_ch1.mp3 lub https://...">
       <div class="modal-actions">
         <button id="cancelBtn" onclick="document.getElementById('modal').classList.add('hidden')">Anuluj</button>
         <button id="saveBtn">Zapisz</button>
@@ -56,9 +56,9 @@
     </div>
   </div>
 
-  <!-- Skrypty – kolejność krytyczna -->
+  <!-- Skrypty – bezpieczne, sekwencyjne ładowanie -->
   <script>
-    // Bezpieczne ładowanie skryptów – tylko raz
+    // Singleton – ładowanie tylko raz
     if (!window.enginesLoaded) {
       window.enginesLoaded = true;
 
