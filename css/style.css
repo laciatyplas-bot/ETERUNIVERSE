@@ -1,49 +1,76 @@
-.book {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 10px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.05);
+body {
+  background: radial-gradient(circle at top, #111827 0%, #030712 100%);
+  color: #E5E7EB;
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  padding: 40px;
+}
+
+h1 {
+  color: #38BDF8;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 28px;
+}
+
+h2 {
+  color: #22D3EE;
+  font-size: 20px;
+  margin-top: 24px;
+}
+
+p {
+  color: #9CA3AF;
+  line-height: 1.5;
+}
+
+.gate {
+  background: rgba(255,255,255,0.05);
+  border-left: 6px solid #38BDF8;
+  padding: 16px;
+  margin-top: 24px;
   border-radius: 8px;
-  margin: 10px 0;
-  transition: 0.3s;
+}
+
+.book {
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
 .book:hover {
-  transform: scale(1.02);
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(217,164,65,0.4);
+  background: rgba(255,255,255,0.15);
 }
 
 .book img {
-  width: 80px;
-  height: 110px;
-  border-radius: 8px;
-  object-fit: cover;
-  flex-shrink: 0;
-  box-shadow: 0 0 10px rgba(0,0,0,0.4);
-}
-
-.book-info strong {
-  color: var(--text);
-  font-size: 1.05em;
-}
-
-.book-info p {
-  color: var(--muted);
-  font-size: 0.9em;
-}
-
-.audio-player {
-  margin-top: 8px;
-  background: #08101C;
-  padding: 6px;
+  width: 60px;
+  height: 90px;
   border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.1);
+  object-fit: cover;
+}
+
+.book-details {
+  flex: 1;
+}
+
+.book-title {
+  font-weight: bold;
+  color: #fff;
+}
+
+.book-desc {
+  font-size: 13px;
+  color: #a1a1aa;
 }
 
 audio {
   width: 100%;
-  height: 26px;
+  margin-top: 8px;
+  outline: none;
 }
