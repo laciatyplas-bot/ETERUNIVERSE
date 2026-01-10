@@ -16,9 +16,30 @@ window.WORLD_PSYCHE = {
       tag: "CORE / PSYCHE",
       color: "#28D3C6",
       books: [
-        {title: "InterSeeker – Atlas Wewnętrzny", status: "published", cover: "", audio: "", chapters: []},
-        {title: "ShadowSeeker – Anatomia Cienia", status: "ready", cover: "", audio: "", chapters: []},
-        {title: "MemorySeeker – Archeologia Wspomnień", status: "draft", cover: "", audio: "", chapters: []}
+        {
+          title: "InterSeeker – Atlas Wewnętrzny",
+          description: "Mapa wnętrza człowieka. Mechanizmy obronne, fałszywa tożsamość i pierwsze pęknięcie iluzji.",
+          status: "published",
+          cover: "media/covers/interseeker.jpg",
+          audio: "media/audio/interseeker_ch1.mp3",
+          chapters: []
+        },
+        {
+          title: "ShadowSeeker – Anatomia Cienia",
+          description: "Praca z cieniem bez duchowej ściemy. Agresja i wstyd jako paliwo świadomości.",
+          status: "ready",
+          cover: "media/covers/shadowseeker.jpg",
+          audio: "media/audio/shadowseeker_ch1.mp3",
+          chapters: []
+        },
+        {
+          title: "MemorySeeker – Archeologia Wspomnień",
+          description: "Rozkodowanie pamięci i przeszłości jako aktywnego systemu sterowania.",
+          status: "draft",
+          cover: "media/covers/memoryseeker.jpg",
+          audio: "",
+          chapters: []
+        }
       ]
     },
     {
@@ -28,8 +49,22 @@ window.WORLD_PSYCHE = {
       tag: "CORE / ORIGIN",
       color: "#FF6B6B",
       books: [
-        {title: "Geneza", status: "ready", cover: "", audio: "", chapters: []},
-        {title: "Custos: Kodeks Głębi", status: "idea", cover: "", audio: "", chapters: []}
+        {
+          title: "Geneza",
+          description: "Początek Kroniki Woli. Narodziny świadomości w eterze.",
+          status: "ready",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        },
+        {
+          title: "Custos: Kodeks Głębi",
+          description: "System ochrony wewnętrznego rdzenia. Wiedza strażników.",
+          status: "idea",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        }
       ]
     },
     {
@@ -39,8 +74,22 @@ window.WORLD_PSYCHE = {
       tag: "CORE / FIELD",
       color: "#D9A441",
       books: [
-        {title: "EterSeeker – Księga Zakazana (Tom Zero)", status: "writing", cover: "", audio: "", chapters: []},
-        {title: "EterSeeker – Architektura Woli", status: "idea", cover: "", audio: "", chapters: []}
+        {
+          title: "EterSeeker – Księga Zakazana (Tom Zero)",
+          description: "Początek architektury eteru i zapomniane protokoły pola.",
+          status: "writing",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        },
+        {
+          title: "EterSeeker – Architektura Woli",
+          description: "Jak wola tworzy rzeczywistość w przestrzeni pola.",
+          status: "idea",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        }
       ]
     },
     {
@@ -50,8 +99,22 @@ window.WORLD_PSYCHE = {
       tag: "CORE / WILL",
       color: "#9B6BFF",
       books: [
-        {title: "ArchetypSeeker – System Archetypów Eteru", status: "idea", cover: "", audio: "", chapters: []},
-        {title: "Kronika Woli", status: "idea", cover: "", audio: "", chapters: []}
+        {
+          title: "ArchetypSeeker – System Archetypów Eteru",
+          description: "Analiza wewnętrznych ról, wzorców i kodów istnienia.",
+          status: "idea",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        },
+        {
+          title: "Kronika Woli",
+          description: "Centralny zapis ewolucji świadomości ludzkiej.",
+          status: "idea",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        }
       ]
     },
     {
@@ -61,8 +124,22 @@ window.WORLD_PSYCHE = {
       tag: "EMBODIED / FLOW",
       color: "#12C65B",
       books: [
-        {title: "ObfitoSeeker – Kod Obfitości", status: "published", cover: "", audio: "", chapters: []},
-        {title: "MateriaSeeker – Przewodnik Ciała i Przepływu", status: "draft", cover: "", audio: "", chapters: []}
+        {
+          title: "ObfitoSeeker – Kod Obfitości",
+          description: "Mechanizmy przepływu energii materialnej i manifestacji.",
+          status: "published",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        },
+        {
+          title: "MateriaSeeker – Przewodnik Ciała i Przepływu",
+          description: "Jak ciało odbiera i przetwarza energię pola.",
+          status: "draft",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        }
       ]
     },
     {
@@ -72,7 +149,14 @@ window.WORLD_PSYCHE = {
       tag: "EMBODIED / BIO",
       color: "#FFB14B",
       books: [
-        {title: "BioSeeker – Sekret Biologii Pola", status: "idea", cover: "", audio: "", chapters: []}
+        {
+          title: "BioSeeker – Sekret Biologii Pola",
+          description: "Biologia człowieka jako odbiornik i nadajnik pola.",
+          status: "idea",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        }
       ]
     },
     {
@@ -82,8 +166,22 @@ window.WORLD_PSYCHE = {
       tag: "META / TECH",
       color: "#5DADE2",
       books: [
-        {title: "SplatanieSeeker – Protokół Obserwatora", status: "idea", cover: "", audio: "", chapters: []},
-        {title: "InterfejsSeeker – Interfejs Świadomości", status: "idea", cover: "", audio: "", chapters: []}
+        {
+          title: "SplatanieSeeker – Protokół Obserwatora",
+          description: "Kwantowe splątanie świadomości i rola obserwatora.",
+          status: "idea",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        },
+        {
+          title: "InterfejsSeeker – Interfejs Świadomości",
+          description: "Technologia jako rozszerzenie ludzkiej świadomości.",
+          status: "idea",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        }
       ]
     },
     {
@@ -93,8 +191,22 @@ window.WORLD_PSYCHE = {
       tag: "META / PHYSICS",
       color: "#FF9FF3",
       books: [
-        {title: "TrajektoriaSeeker – Mapa Linii Życia", status: "ready", cover: "", audio: "", chapters: []},
-        {title: "QuantumSeeker – Fizyka Duszy", status: "idea", cover: "", audio: "", chapters: []}
+        {
+          title: "TrajektoriaSeeker – Mapa Linii Życia",
+          description: "Mapowanie możliwych trajektorii rozwoju świadomości.",
+          status: "ready",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        },
+        {
+          title: "QuantumSeeker – Fizyka Duszy",
+          description: "Kwantowa natura świadomości i mechanika duszy.",
+          status: "idea",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        }
       ]
     },
     {
@@ -104,8 +216,22 @@ window.WORLD_PSYCHE = {
       tag: "COLLECTIVE",
       color: "#667eea",
       books: [
-        {title: "Eteriony – Tom I", status: "idea", cover: "", audio: "", chapters: []},
-        {title: "Eteriony – Tom II", status: "idea", cover: "", audio: "", chapters: []}
+        {
+          title: "Eteriony – Tom I",
+          description: "Pierwsi strażnicy i budowniczowie kolektywnego pola.",
+          status: "idea",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        },
+        {
+          title: "Eteriony – Tom II",
+          description: "Kontynuacja kroniki kolektywnej świadomości.",
+          status: "idea",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        }
       ]
     },
     {
@@ -115,8 +241,22 @@ window.WORLD_PSYCHE = {
       tag: "INTEGRATION",
       color: "#D9A441",
       books: [
-        {title: "Architekt Eteru — Manifest Twórcy", status: "writing", cover: "", audio: "", chapters: []},
-        {title: "Mapa Uniwersum Eteru", status: "idea", cover: "", audio: "", chapters: []}
+        {
+          title: "Architekt Eteru — Manifest Twórcy",
+          description: "Podsumowanie całej architektury świata PSYCHE.",
+          status: "writing",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        },
+        {
+          title: "Mapa Uniwersum Eteru",
+          description: "Kompletna mapa wszystkich światów i bram Eterniverse.",
+          status: "idea",
+          cover: "media/covers/default.jpg",
+          audio: "",
+          chapters: []
+        }
       ]
     }
   ]
