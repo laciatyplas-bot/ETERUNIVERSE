@@ -1,8 +1,11 @@
-// js/engine_loader.js – Bezpieczne ładowanie silników (wersja odporna na wielokrotne wykonanie)
+// js/engine_loader.js – Bezpieczne ładowanie silników ETERNIVERSE (v2.0 – odporny na wielokrotne wykonanie)
 
-if (window.enginesLoaded) {
-  console.log("Silniki już załadowane – pomijam");
-} else {
+(function () {
+  // Zapobieganie wielokrotnemu uruchomieniu (singleton)
+  if (window.enginesLoaded) {
+    console.log("Silniki już załadowane – pomijam ponowne wykonanie.");
+    return;
+  }
   window.enginesLoaded = true;
 
   const ENGINES = [
@@ -10,26 +13,48 @@ if (window.enginesLoaded) {
     "js/core.js",
     "js/book_editor.js",
     "js/eter_console.js"
-    // Dodaj kolejne jeśli potrzeba
+    // Dodaj tu kolejne pliki JS jeśli pojawią się nowe
   ];
 
-  function loadEnginesSequentially(i = 0) {
+  function loadEngine(i = 0) {
     if (i >= ENGINES.length) {
-      console.log("✅ Wszystkie silniki ETERNIVERSE załadowane.");
-      if (typeof initEterniverse === "function") initEterniverse();
+      console.log("✅ Wszystkie silniki ETERNIVERSE załadowane pomyślnie.");
+      // Uruchom główną funkcję inicjalizacyjną (jeśli istnieje)
+      if (typeof window.initEterniverse === "function") {
+        window.initEterniverse();
+      } else {
+        console.warn("Funkcja initEterniverse nie została znaleziona – sprawdź core.js");
+      }
       return;
     }
 
-    const s = document.createElement("script");
-    s.src = ENGINES[i];
-    s.onload = () => {
-      console.log(`⚙️ Załadowano: ${ENGINES[i]}`);
-      loadEnginesSequentially(i + 1);
+    const src = ENGINES[i];
+
+    // Sprawdź, czy skrypt już nie jest załadowany (unikamy duplikatów)
+    if (document.querySelector(`script[src="${src}"]`)) {
+      console.log(`Pomijam już załadowany: ${src}`);
+      loadEngine(i + 1);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+
+    script.onload = () => {
+      console.log(`⚙️ Załadowano pomyślnie: ${src}`);
+      loadEngine(i + 1);
     };
-    s.onerror = () => console.error(`❌ Nie można załadować ${ENGINES[i]}`);
-    document.head.appendChild(s);
+
+    script.onerror = () => {
+      console.error(`❌ Błąd ładowania: ${src} – plik nie istnieje lub ścieżka jest błędna`);
+      // Kontynuujemy mimo błędu, żeby nie zatrzymywać całego łańcucha
+      loadEngine(i + 1);
+    };
+
+    document.head.appendChild(script);
   }
 
-  console.log("🌌 Start ładowania silników...");
-  loadEnginesSequentially();
-}
+  console.log("🌌 Rozpoczynam sekwencyjne ładowanie silników ETERNIVERSE...");
+  loadEngine();
+})();
