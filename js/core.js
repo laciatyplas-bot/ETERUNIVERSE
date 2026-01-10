@@ -68,16 +68,17 @@ function renderWorld(world) {
       img.alt = book.title;
       
       // KLUCZ: Ustaw domyślny obrazek PRZED załadowaniem
-      img.src = "media/covers/default.jpg";
+      const defaultCover = "media/covers/default.jpg";
+      img.src = defaultCover;
       
       // Potem dopiero próbuj załadować prawdziwy
       if (book.cover && book.cover.trim() !== "") {
         const tempImg = new Image();
-        tempImg.onload = () => {
+        tempImg.onload = function() {
           img.src = book.cover;
         };
-        tempImg.onerror = () => {
-          // Pozostaw default.jpg
+        tempImg.onerror = function() {
+          // Pozostaw default.jpg - ciche niepowodzenie
         };
         tempImg.src = book.cover;
       }
@@ -306,11 +307,11 @@ function deleteChapter(gateId, bookIdx, chIdx) {
    ZAPIS / ODCZYT / AUTO-NAPRAWA
 ============================== */
 function saveWorldData() {
-  localStorage.setItem("ETERNIVERSE_WORLD_PSYCHE", JSON.stringify(WORLD));
+  localStorage.setItem("ETERNIVERSE_WORLD_PSYCHE_V2", JSON.stringify(WORLD));
 }
 
 function loadWorldData() {
-  const data = localStorage.getItem("ETERNIVERSE_WORLD_PSYCHE");
+  const data = localStorage.getItem("ETERNIVERSE_WORLD_PSYCHE_V2");
   return data ? JSON.parse(data) : null;
 }
 
