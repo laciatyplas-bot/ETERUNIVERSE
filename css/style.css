@@ -105,3 +105,22 @@ button:hover {
 .modal-actions {
   text-align: right;
 }
+.status {
+  font-size: 12px;
+  font-weight: bold;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+.book-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.sub {
+  color: #8da2cc;
+  font-size: 0.9em;
+  margin-top: -8px;
+  margin-bottom: 10px;
+}
