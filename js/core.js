@@ -1,116 +1,135 @@
-/* ==============================
-   CORE RENDER ENGINE — PSYCHE
-   ============================== */
+window.addEventListener("DOMContentLoaded", () => {
+  const app = document.getElementById("app");
+  const modal = document.getElementById("modal");
+  const addBtn = document.getElementById("addBookBtn");
+  const exportBtn = document.getElementById("exportBtn");
+  const saveBtn = document.getElementById("saveBtn");
+  const cancelBtn = document.getElementById("cancelBtn");
 
-function renderWorld(data) {
-  const root = document.getElementById("app");
-  root.innerHTML = "";
+  const titleInput = document.getElementById("bookTitle");
+  const descInput = document.getElementById("bookDesc");
+  const coverInput = document.getElementById("bookCover");
+  const audioInput = document.getElementById("bookAudio");
 
-  if (!data) {
-    root.innerHTML = "<p style='color:red'>Błąd: brak danych świata.</p>";
-    return;
-  }
+  let editing = null;
 
-  // Tytuł świata
-  const h1 = document.createElement("h1");
-  h1.textContent = data.name;
-  root.appendChild(h1);
+  // 🔄 Załaduj dane z LocalStorage
+  const loadData = () => {
+    const saved = localStorage.getItem("eterniverse_world_1");
+    return saved ? JSON.parse(saved) : WORLD_PSYCHE;
+  };
 
-  // Opis świata
-  const desc = document.createElement("p");
-  desc.textContent = data.description;
-  root.appendChild(desc);
+  // 💾 Zapisz dane
+  const saveData = () => {
+    localStorage.setItem("eterniverse_world_1", JSON.stringify(WORLD_PSYCHE));
+  };
 
-  // Render bram
-  data.gates.forEach((gate) => {
-    const gateDiv = document.createElement("div");
-    gateDiv.className = "gate";
-    gateDiv.style.borderLeftColor = gate.color;
+  // 🧱 Renderuj świat
+  const render = () => {
+    app.innerHTML = "";
+    WORLD_PSYCHE.gates.forEach(gate => {
+      const gateEl = document.createElement("div");
+      gateEl.className = "gate";
+      gateEl.style.borderColor = gate.color;
 
-    const h2 = document.createElement("h2");
-    h2.textContent = gate.name;
-    gateDiv.appendChild(h2);
+      gateEl.innerHTML = `<h2 style="color:${gate.color}">${gate.name}</h2>
+        <p>${gate.theme}</p>`;
 
-    const theme = document.createElement("p");
-    theme.textContent = gate.theme;
-    gateDiv.appendChild(theme);
+      gate.books.forEach((book, i) => {
+        const b = document.createElement("div");
+        b.className = "book";
+        b.innerHTML = `
+          <div>
+            <img src="${book.cover || 'media/covers/default.jpg'}" alt="${book.title}">
+            <div><strong>${book.title}</strong><br><small>${book.description}</small></div>
+            <audio class="audio" controls src="${book.audio || ''}"></audio>
+          </div>
+          <div class="book-actions">
+            <button data-gate="${gate.id}" data-index="${i}" class="edit">✏️</button>
+            <button data-gate="${gate.id}" data-index="${i}" class="delete">🗑️</button>
+          </div>
+        `;
+        gateEl.appendChild(b);
+      });
 
-    // Książki
-    gate.books.forEach((book, index) => {
-      const bookDiv = document.createElement("div");
-      bookDiv.className = "book";
+      app.appendChild(gateEl);
+    });
 
-      const img = document.createElement("img");
-      img.src = book.cover;
-      img.alt = book.title;
-      bookDiv.appendChild(img);
+    saveData();
+  };
 
-      const details = document.createElement("div");
-      details.className = "book-details";
+  // 🆕 Dodaj nową książkę
+  addBtn.onclick = () => {
+    editing = null;
+    titleInput.value = "";
+    descInput.value = "";
+    coverInput.value = "";
+    audioInput.value = "";
+    document.getElementById("modalTitle").textContent = "Nowa książka";
+    modal.classList.remove("hidden");
+  };
 
-      const title = document.createElement("div");
-      title.className = "book-title";
-      title.textContent = book.title;
+  // 💾 Zapisz książkę
+  saveBtn.onclick = () => {
+    const newBook = {
+      title: titleInput.value,
+      description: descInput.value,
+      cover: coverInput.value,
+      audio: audioInput.value
+    };
 
-      const desc = document.createElement("div");
-      desc.className = "book-desc";
-      desc.textContent = book.description;
+    if (editing) {
+      const gate = WORLD_PSYCHE.gates.find(g => g.id === editing.gateId);
+      gate.books[editing.index] = newBook;
+    } else {
+      WORLD_PSYCHE.gates[0].books.push(newBook);
+    }
 
-      details.appendChild(title);
-      details.appendChild(desc);
-      bookDiv.appendChild(details);
+    saveData();
+    render();
+    modal.classList.add("hidden");
+  };
 
-      // Audio
-      if (book.audio) {
-        const audio = document.createElement("audio");
-        audio.controls = true;
-        audio.src = book.audio;
-        bookDiv.appendChild(audio);
+  // ❌ Anuluj
+  cancelBtn.onclick = () => modal.classList.add("hidden");
+
+  // ✏️ / 🗑️ Kliknięcia na książkach
+  app.addEventListener("click", e => {
+    if (e.target.classList.contains("edit")) {
+      const gateId = e.target.dataset.gate;
+      const index = e.target.dataset.index;
+      const gate = WORLD_PSYCHE.gates.find(g => g.id == gateId);
+      const book = gate.books[index];
+
+      editing = { gateId, index };
+      titleInput.value = book.title;
+      descInput.value = book.description;
+      coverInput.value = book.cover;
+      audioInput.value = book.audio;
+      document.getElementById("modalTitle").textContent = "Edytuj książkę";
+      modal.classList.remove("hidden");
+    }
+
+    if (e.target.classList.contains("delete")) {
+      const gateId = e.target.dataset.gate;
+      const index = e.target.dataset.index;
+      const gate = WORLD_PSYCHE.gates.find(g => g.id == gateId);
+      if (confirm("Usunąć tę książkę?")) {
+        gate.books.splice(index, 1);
+        saveData();
+        render();
       }
-
-      // Przyciski akcji
-      const actions = document.createElement("div");
-      actions.className = "book-actions";
-
-      const editBtn = document.createElement("button");
-      editBtn.textContent = "Edytuj";
-      editBtn.className = "edit-btn edit";
-      editBtn.dataset.index = index;
-
-      const deleteBtn = document.createElement("button");
-      deleteBtn.textContent = "Usuń";
-      deleteBtn.className = "delete-btn delete";
-      deleteBtn.dataset.index = index;
-
-      actions.appendChild(editBtn);
-      actions.appendChild(deleteBtn);
-      bookDiv.appendChild(actions);
-
-      gateDiv.appendChild(bookDiv);
-    });
-
-    root.appendChild(gateDiv);
+    }
   });
 
-  // aktywacja przycisków edycji i usuwania
-  if (window.enableBookActions) {
-    window.enableBookActions();
-  }
-}
+  // 📤 Eksport JSON
+  exportBtn.onclick = () => {
+    const blob = new Blob([JSON.stringify(WORLD_PSYCHE, null, 2)], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "eterniverse_world_psyche.json";
+    link.click();
+  };
 
-document.addEventListener("DOMContentLoaded", () => {
-  renderWorld(window.WORLD_PSYCHE);
-});
-document.addEventListener("DOMContentLoaded", () => {
-  renderWorld(window.DATA);
-  console.log("🌀 ŚWIAT I — PSYCHE / INTERSEEKER załadowany");
-  
-  // TEST: pokaż wszystkie ścieżki
-  window.DATA.gates.forEach(g => {
-    g.books.forEach(b => {
-      console.log("📘", b.title);
-      if (b.cover) console.log("🖼️ okładka:", b.cover);
-      if (b.audio) console.log("🎧 audio:", b.audio);
-    });
-  });
+  render();
 });
