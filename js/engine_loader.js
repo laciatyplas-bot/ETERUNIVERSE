@@ -11,7 +11,6 @@ function loadEnginesSequentially(i = 0) {
     if (typeof initEterniverse === "function") initEterniverse();
     return;
   }
-
   const s = document.createElement("script");
   s.src = ENGINES[i];
   s.onload = () => {
