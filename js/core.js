@@ -11,12 +11,16 @@ window.addEventListener("DOMContentLoaded", () => {
   const coverInput = document.getElementById("bookCover");
   const audioInput = document.getElementById("bookAudio");
 
+  let gateSelect; // selektor bram
   let editing = null;
 
   // 🔄 Załaduj dane z LocalStorage
   const loadData = () => {
     const saved = localStorage.getItem("eterniverse_world_1");
-    return saved ? JSON.parse(saved) : WORLD_PSYCHE;
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      WORLD_PSYCHE.gates = parsed.gates;
+    }
   };
 
   // 💾 Zapisz dane
@@ -33,16 +37,19 @@ window.addEventListener("DOMContentLoaded", () => {
       gateEl.style.borderColor = gate.color;
 
       gateEl.innerHTML = `<h2 style="color:${gate.color}">${gate.name}</h2>
-        <p>${gate.theme}</p>`;
+        <p>${gate.sub || gate.theme || ""}</p>`;
 
       gate.books.forEach((book, i) => {
         const b = document.createElement("div");
         b.className = "book";
         b.innerHTML = `
-          <div>
+          <div style="display:flex;align-items:center;gap:10px;">
             <img src="${book.cover || 'media/covers/default.jpg'}" alt="${book.title}">
-            <div><strong>${book.title}</strong><br><small>${book.description}</small></div>
-            <audio class="audio" controls src="${book.audio || ''}"></audio>
+            <div>
+              <strong>${book.title}</strong><br>
+              <small>${book.description || ""}</small><br>
+              <audio class="audio" controls src="${book.audio || ''}"></audio>
+            </div>
           </div>
           <div class="book-actions">
             <button data-gate="${gate.id}" data-index="${i}" class="edit">✏️</button>
@@ -66,7 +73,20 @@ window.addEventListener("DOMContentLoaded", () => {
     coverInput.value = "";
     audioInput.value = "";
     document.getElementById("modalTitle").textContent = "Nowa książka";
+
+    // Dodaj selektor bramy
+    let selectorHTML = `<label>Wybierz bramę:</label><select id="gateSelect">`;
+    WORLD_PSYCHE.gates.forEach(g => {
+      selectorHTML += `<option value="${g.id}" style="color:${g.color}">${g.name}</option>`;
+    });
+    selectorHTML += `</select>`;
+    const modalContent = modal.querySelector(".modal-content");
+    if (!modal.querySelector("#gateSelect")) {
+      modalContent.insertAdjacentHTML("afterbegin", selectorHTML);
+    }
+
     modal.classList.remove("hidden");
+    gateSelect = document.getElementById("gateSelect");
   };
 
   // 💾 Zapisz książkę
@@ -78,11 +98,13 @@ window.addEventListener("DOMContentLoaded", () => {
       audio: audioInput.value
     };
 
+    const selectedGateId = gateSelect ? gateSelect.value : (editing ? editing.gateId : WORLD_PSYCHE.gates[0].id);
+    const gate = WORLD_PSYCHE.gates.find(g => g.id == selectedGateId);
+
     if (editing) {
-      const gate = WORLD_PSYCHE.gates.find(g => g.id === editing.gateId);
       gate.books[editing.index] = newBook;
     } else {
-      WORLD_PSYCHE.gates[0].books.push(newBook);
+      gate.books.push(newBook);
     }
 
     saveData();
@@ -107,7 +129,9 @@ window.addEventListener("DOMContentLoaded", () => {
       coverInput.value = book.cover;
       audioInput.value = book.audio;
       document.getElementById("modalTitle").textContent = "Edytuj książkę";
+
       modal.classList.remove("hidden");
+      gateSelect = null;
     }
 
     if (e.target.classList.contains("delete")) {
@@ -131,5 +155,7 @@ window.addEventListener("DOMContentLoaded", () => {
     link.click();
   };
 
+  // 🔄 Start
+  loadData();
   render();
 });
