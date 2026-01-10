@@ -1,5 +1,6 @@
 /* =====================================
-   ETERNIVERSE — CORE ENGINE v2
+   ETERNIVERSE — CORE ENGINE v3
+   AUTO FIX: OKŁADKI + DANE
    Architekt: Maciej Maciuszek
    ===================================== */
 
@@ -10,7 +11,16 @@ let WORLD = null;
 ============================== */
 function initEterniverse() {
   console.log("🌌 Uruchamiam ETERNIVERSE: PSYCHE / INTERSEEKER...");
+
+  // załaduj dane lub domyślny świat
   WORLD = loadWorldData() || WORLD_PSYCHE;
+
+  // sprawdź i napraw brakujące okładki
+  fixMissingCovers(WORLD);
+
+  // zapisz z powrotem poprawne dane
+  saveWorldData();
+
   renderWorld(WORLD);
   setupUI();
   belleSpeak("System Kroniki Woli aktywowany.");
@@ -45,7 +55,7 @@ function renderWorld(world) {
     gateSub.textContent = gate.sub;
     gateBox.appendChild(gateSub);
 
-    gate.books.forEach((book, i) => {
+    gate.books.forEach((book) => {
       const bookBox = document.createElement("div");
       bookBox.className = "book";
 
@@ -100,6 +110,8 @@ function renderWorld(world) {
 /* ==============================
    EDYTOR I UI
 ============================== */
+let currentEdit = null;
+
 function setupUI() {
   const addBtn = document.getElementById("addBookBtn");
   const exportBtn = document.getElementById("exportBtn");
@@ -161,8 +173,6 @@ function setupUI() {
   exportBtn.onclick = () => exportWorldJSON();
 }
 
-let currentEdit = null;
-
 function openEditor(gate, book) {
   const modal = document.getElementById("modal");
   modal.classList.remove("hidden");
@@ -179,7 +189,7 @@ function openEditor(gate, book) {
 }
 
 /* ==============================
-   ZAPIS I ODCZYT
+   ZAPIS / ODCZYT / AUTO-NAPRAWA
 ============================== */
 function saveWorldData() {
   localStorage.setItem("ETERNIVERSE_WORLD_PSYCHE", JSON.stringify(WORLD));
@@ -188,6 +198,17 @@ function saveWorldData() {
 function loadWorldData() {
   const data = localStorage.getItem("ETERNIVERSE_WORLD_PSYCHE");
   return data ? JSON.parse(data) : null;
+}
+
+// AUTOMATYCZNA NAPRAWA OKŁADEK
+function fixMissingCovers(world) {
+  world.gates.forEach((gate) => {
+    gate.books.forEach((book) => {
+      if (!book.cover || book.cover.trim() === "") {
+        book.cover = "media/covers/default.jpg";
+      }
+    });
+  });
 }
 
 /* ==============================
