@@ -4,24 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ETERNIVERSE — Świat I: PSYCHE / INTERSEEKER</title>
-
-  <!-- Styl -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="icon" href="favicon.ico" />
-
-  <!-- Info meta -->
-  <meta name="author" content="Architekt: Maciej Maciuszek" />
-  <meta name="description" content="ETERNIVERSE — Interaktywny wszechświat literacki, stworzony przez Macieja Maciuszka." />
 </head>
 
 <body>
   <header>
-    <h1>🌌 ETERNIVERSE — ŚWIAT I: PSYCHE / INTERSEEKER</h1>
-    <p>System redakcyjny — zarządzanie książkami, bramami i światem eteru.</p>
+    <h1>🌌 ETERNIVERSE — Świat I: PSYCHE</h1>
+    <p>System redakcyjny Kroniki Woli — Architekt: Maciej Maciuszek</p>
     <div class="header-buttons">
       <button id="addBookBtn">+ Dodaj książkę</button>
       <button id="exportBtn">💾 Eksport JSON</button>
-      <button id="openConsoleBtn">🪐 Konsola ETERU</button>
+      <button id="openConsoleBtn">🪐 Konsola Belle</button>
     </div>
   </header>
 
@@ -29,7 +23,13 @@
     <p class="loading">Ładowanie systemu ETERNIVERSE...</p>
   </main>
 
-  <!-- Modal dodawania książki -->
+  <!-- Belle avatar -->
+  <div id="belle">
+    <img src="media/covers/default.jpg" alt="Belle">
+    <div id="belleSpeech">Cześć, Architekcie...</div>
+  </div>
+
+  <!-- Modal edycji książki -->
   <div id="modal" class="modal hidden">
     <div class="modal-content">
       <h2 id="modalTitle">Nowa książka</h2>
@@ -56,7 +56,6 @@
     </div>
   </div>
 
-  <!-- Loader wszystkich silników -->
   <script src="js/engine_loader.js"></script>
 </body>
 </html>
