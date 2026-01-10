@@ -339,5 +339,6 @@ function belleSpeak(msg) {
     el.textContent = "Czekam na Twoje intencje...";
   }, 6000);
 }
+
 // Automatyczny start po załadowaniu strony
 document.addEventListener("DOMContentLoaded", initEterniverse);
