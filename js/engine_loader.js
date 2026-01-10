@@ -1,36 +1,40 @@
-// js/engine_loader.js – Bezpieczne ładowanie silników ETERNIVERSE (v2.0 – odporny na wielokrotne wykonanie)
+// js/engine_loader.js – Bezpieczne ładowanie silników ETERNIVERSE (v2.1 – singleton + debug + kontynuacja przy błędzie)
 
 (function () {
-  // Zapobieganie wielokrotnemu uruchomieniu (singleton)
+  // Singleton – wykonuje się tylko raz, nawet przy wielokrotnym include
   if (window.enginesLoaded) {
     console.log("Silniki już załadowane – pomijam ponowne wykonanie.");
     return;
   }
   window.enginesLoaded = true;
 
+  // Lista silników – dodawaj tu nowe pliki w kolejności
   const ENGINES = [
-    "js/world_psyche.js",
-    "js/core.js",
-    "js/book_editor.js",
-    "js/eter_console.js"
-    // Dodaj tu kolejne pliki JS jeśli pojawią się nowe
+    "js/world_psyche.js",     // Dane świata
+    "js/core.js",             // Główny engine + render
+    "js/book_editor.js",      // Edycja/usuwanie książek
+    "js/eter_console.js"      // Konsola deweloperska
+    // Dodaj kolejne jeśli potrzeba, np. "js/chapter_manager.js"
   ];
 
   function loadEngine(i = 0) {
     if (i >= ENGINES.length) {
-      console.log("✅ Wszystkie silniki ETERNIVERSE załadowane pomyślnie.");
-      // Uruchom główną funkcję inicjalizacyjną (jeśli istnieje)
+      console.log("✅ Wszystkie silniki załadowane pomyślnie.");
+      // Uruchom główną funkcję inicjalizacyjną (z core.js)
       if (typeof window.initEterniverse === "function") {
         window.initEterniverse();
       } else {
-        console.warn("Funkcja initEterniverse nie została znaleziona – sprawdź core.js");
+        console.warn("⚠️ Funkcja initEterniverse nie znaleziona – sprawdź core.js");
       }
+      // Usuń loading po sukcesie
+      const loading = document.querySelector('.loading');
+      if (loading) loading.remove();
       return;
     }
 
     const src = ENGINES[i];
 
-    // Sprawdź, czy skrypt już nie jest załadowany (unikamy duplikatów)
+    // Nie ładuj ponownie tego samego pliku
     if (document.querySelector(`script[src="${src}"]`)) {
       console.log(`Pomijam już załadowany: ${src}`);
       loadEngine(i + 1);
@@ -47,8 +51,8 @@
     };
 
     script.onerror = () => {
-      console.error(`❌ Błąd ładowania: ${src} – plik nie istnieje lub ścieżka jest błędna`);
-      // Kontynuujemy mimo błędu, żeby nie zatrzymywać całego łańcucha
+      console.error(`❌ Błąd ładowania: ${src} – plik nie istnieje lub ścieżka błędna`);
+      // Kontynuuj mimo błędu – nie zatrzymuj całego systemu
       loadEngine(i + 1);
     };
 
