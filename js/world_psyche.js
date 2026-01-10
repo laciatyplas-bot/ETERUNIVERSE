@@ -1,10 +1,10 @@
 /* =====================================
-   ETERNIVERSE — WORLD I: PSYCHE / INTERSEEKER v4.1
+   ETERNIVERSE — WORLD I: PSYCHE / INTERSEEKER v4.2
    Architekt: Maciej Maciuszek
    ===================================== */
 
 if (typeof window.WORLD_PSYCHE !== 'undefined') {
-  console.log("WORLD_PSYCHE już załadowany – pomijam.");
+  console.log("WORLD_PSYCHE już załadowany – pomijam ponowne wykonanie.");
 } else {
   window.WORLD_PSYCHE = {
     id: 1,
@@ -23,7 +23,7 @@ if (typeof window.WORLD_PSYCHE !== 'undefined') {
             title: "InterSeeker – Atlas Wewnętrzny",
             description: "Mapa wnętrza człowieka. Mechanizmy obronne, fałszywa tożsamość i pierwsze pęknięcie iluzji.",
             status: "published",
-            cover: "https://m.media-amazon.com/images/I/71l0m8q2mYL._SL1500_.jpg", // Realny link Amazon – działa natychmiast
+            cover: "https://m.media-amazon.com/images/I/71l0m8q2mYL._SL1500_.jpg",
             audio: "media/audio/interseeker_ch1.mp3",
             chapters: []
           },
@@ -31,7 +31,7 @@ if (typeof window.WORLD_PSYCHE !== 'undefined') {
             title: "ShadowSeeker – Anatomia Cienia",
             description: "Praca z cieniem bez duchowej ściemy. Agresja i wstyd jako paliwo świadomości.",
             status: "ready",
-            cover: "https://placehold.co/300x450/000/fff/png?text=ShadowSeeker", // Fallback jeśli lokalny nie działa
+            cover: "https://placehold.co/300x450/000/fff/png?text=ShadowSeeker",
             audio: "media/audio/shadowseeker_ch1.mp3",
             chapters: []
           },
@@ -70,21 +70,99 @@ if (typeof window.WORLD_PSYCHE !== 'undefined') {
           }
         ]
       },
-      // ... reszta bram – możesz dodać ręcznie lub później
-      // Na razie zostawiam tylko 2, żeby nie było za długie – dodaj resztę w ten sam sposób
+      {
+        id: 3,
+        name: "BRAMA III — ETERSEEKER",
+        sub: "Wola · Pole · Architektura",
+        tag: "CORE / FIELD",
+        color: "#D9A441",
+        books: [
+          {
+            title: "EterSeeker – Księga Zakazana (Tom Zero)",
+            description: "Początek architektury eteru i zapomniane protokoły pola.",
+            status: "writing",
+            cover: "https://placehold.co/300x450/000/fff/png?text=EterSeeker",
+            audio: "",
+            chapters: []
+          }
+        ]
+      },
+      {
+        id: 4,
+        name: "BRAMA IV — ARCHETYPY / WOLA",
+        sub: "Konstrukcja · Role · Przeznaczenie",
+        tag: "CORE / WILL",
+        color: "#9B6BFF",
+        books: []
+      },
+      {
+        id: 5,
+        name: "BRAMA V — OBFITOSEEKER",
+        sub: "Materia · Przepływ · Manifestacja",
+        tag: "EMBODIED / FLOW",
+        color: "#12C65B",
+        books: []
+      },
+      {
+        id: 6,
+        name: "BRAMA VI — BIOSEEKER",
+        sub: "Ciało · Biologia · Regulacja",
+        tag: "EMBODIED / BIO",
+        color: "#FFB14B",
+        books: []
+      },
+      {
+        id: 7,
+        name: "BRAMA VII — SPLĄTANIE / AI",
+        sub: "Obserwator · Meta-tożsamość · Technologia",
+        tag: "META / TECH",
+        color: "#5DADE2",
+        books: [
+          {
+            title: "Bella Asystent",
+            description: "Żywy Foton Redakcyjny – Twój osobisty asystent AI.",
+            status: "aktywny",
+            cover: "https://placehold.co/300x450/000/fff/png?text=Bella",
+            audio: "",
+            chapters: []
+          }
+        ]
+      },
+      {
+        id: 8,
+        name: "BRAMA VIII — TRAJEKTORIE",
+        sub: "Kod Życia · Linie Czasu · Fizyka Duszy",
+        tag: "META / PHYSICS",
+        color: "#FF9FF3",
+        books: []
+      },
+      {
+        id: 9,
+        name: "BRAMA IX — ETERNIONY / KOLEKTYW",
+        sub: "Węzły Pola · Wspólnota · Misja",
+        tag: "COLLECTIVE",
+        color: "#667eea",
+        books: []
+      },
+      {
+        id: 10,
+        name: "BRAMA X — ETERUNIVERSE",
+        sub: "Integracja · Jedność · Architekt",
+        tag: "INTEGRATION",
+        color: "#D9A441",
+        books: []
+      }
     ]
   };
 
-  // Automatyczna naprawa okładek (fallback na zewnętrzne lub default)
+  // Automatyczna naprawa okładek – zawsze działa
   window.WORLD_PSYCHE.gates.forEach(gate => {
     gate.books.forEach(book => {
-      // Jeśli cover pusty lub nie działa – fallback
       if (!book.cover || book.cover.trim() === "") {
         book.cover = "https://placehold.co/300x450/000/fff/png?text=" + encodeURIComponent(book.title.substring(0, 20));
       }
-      // Jeśli masz lokalne pliki – zachowaj je, fallback tylko przy błędzie
     });
   });
 
-  console.log("WORLD_PSYCHE v4.1 załadowany pomyślnie.");
+  console.log("WORLD_PSYCHE v4.2 załadowany pomyślnie – pełna struktura 10 bram.");
 }
