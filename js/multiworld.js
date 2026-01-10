@@ -1,157 +1,193 @@
 /* =====================================
-   ETERNIVERSE MULTIWORLD SYSTEM v3.0
-   Możliwość budowy KOLEJNYCH ŚWIATÓW
+   MULTIWORLD.js v3.0 – PEŁNY KOD 1:1
+   5 ŚWIATÓW + ➕ NOWE – PRODUCTION READY
    ===================================== */
 
 (function() {
-  // MULTIWORLD – sprawdź czy już istnieje
+  // Singleton
   if (window.MULTIWORLD) {
     console.log("🌌 MultiWorld v3.0 już aktywny");
     return;
   }
   window.MULTIWORLD = true;
 
-  // === STRUKTURA WIECZNYCH ŚWIATÓW ===
-  const DEFAULT_WORLDS = {
-    "PSYCHE": { 
-      name: "🌌 PSYCHE", 
-      color: "#8b5cf6", 
-      gates: 10,
-      books: window.WORLD_PSYCHE ? window.WORLD_PSYCHE.gates.reduce((sum, g) => sum + g.books.length, 0) : 0
-    },
-    "CIEN": { name: "🖤 CIEN", color: "#1f2937", gates: 8, books: 0 },
-    "WOLA": { name: "🔥 WOLA", color: "#ef4444", gates: 12, books: 0 },
-    "OBFITOSC": { name: "💎 OBFITOSC", color: "#10b981", gates: 6, books: 0 },
-    "POLE": { name: "⚡ POLE", color: "#f59e0b", gates: 15, books: 0 }
+  console.log("🌌 MultiWorld v3.0 – budowa wielu światów aktywna!");
+
+  // === STRUKTURA 5 ŚWIATÓW ===
+  window.WORLDS = {
+    "PSYCHE": { name: "🌌 PSYCHE", color: "#8b5cf6", gates: 10, active: true },
+    "CIEN": { name: "🖤 CIEN", color: "#1f2937", gates: 8, active: false },
+    "WOLA": { name: "🔥 WOLA", color: "#ef4444", gates: 12, active: false },
+    "OBFITOSC": { name: "💎 OBFITOSC", color: "#10b981", gates: 6, active: false },
+    "POLE": { name: "⚡ POLE", color: "#f59e0b", gates: 15, active: false }
   };
 
-  // === ZAPIS/WCZYTYWANIE ŚWIATÓW ===
-  function saveWorld(worldId) {
+  // === ZAPIS ŚWIATA ===
+  function saveCurrentWorld(worldId) {
     if (!window.WORLD_PSYCHE) return;
     
     const worldData = {
       id: worldId,
-      psyche: window.WORLD_PSYCHE,
+      data: JSON.parse(JSON.stringify(window.WORLD_PSYCHE)),
       timestamp: new Date().toISOString(),
-      booksCount: window.WORLD_PSYCHE.gates.reduce((sum, g) => sum + g.books.length, 0)
+      booksCount: window.WORLD_PSYCHE.gates.reduce((sum, g) => sum + g.books.length, 0),
+      gatesCount: window.WORLD_PSYCHE.gates.length
     };
     
     localStorage.setItem(`ETERNIVERSE_WORLD_${worldId}`, JSON.stringify(worldData));
-    console.log(`💾 Zapisano świat: ${worldId}`);
+    localStorage.setItem('activeWorld', worldId);
+    
+    console.log(`💾 Zapisano ${worldId}: ${worldData.booksCount} książek`);
   }
 
+  // === WCZYTYWANIE ŚWIATA ===
   function loadWorld(worldId) {
     const worldData = localStorage.getItem(`ETERNIVERSE_WORLD_${worldId}`);
+    
     if (!worldData) {
-      console.log(`🌌 Nowy świat: ${worldId}`);
-      window.WORLD_PSYCHE = JSON.parse(localStorage.getItem("ETERNIVERSE_WORLD_PSYCHE_V4") || '{}');
-      saveWorld(worldId);
-      return;
+      console.log(`🌌 Tworzę nowy świat: ${worldId}`);
+      // Kopiuj PSYCHE jako bazę
+      const psycheData = localStorage.getItem('ETERNIVERSE_WORLD_PSYCHE') || 
+                        localStorage.getItem('ETERNIVERSE_WORLD_PSYCHE_V4');
+      if (psycheData) {
+        window.WORLD_PSYCHE = JSON.parse(psycheData).data || JSON.parse(psycheData);
+      }
+      saveCurrentWorld(worldId);
+    } else {
+      const parsed = JSON.parse(worldData);
+      window.WORLD_PSYCHE = parsed.data;
+      console.log(`🌌 Wczytano ${worldId}: ${parsed.booksCount} książek`);
     }
-
-    window.WORLD_PSYCHE = JSON.parse(worldData).psyche;
-    console.log(`🌌 Wczytano świat: ${worldId} (${JSON.parse(worldData).booksCount} książek)`);
+    
+    // Update UI
+    window.WORLDS[worldId].active = true;
+    Object.keys(window.WORLDS).forEach(id => {
+      if (id !== worldId) window.WORLDS[id].active = false;
+    });
     
     if (typeof renderWorld === 'function') renderWorld(window.WORLD_PSYCHE);
+    updateWorldSelector();
   }
 
-  // === TWORZENIE NOWEGO ŚWIATU ===
-  window.createNewWorld = function(worldId = prompt("Nazwa nowego świata (CIEN/WOLA/OBFITOSC/POLE):")) {
-    if (!worldId) return;
-    
-    if (confirm(`🌌 UTWORZYĆ ŚWIAT "${worldId.toUpperCase()}"?\nTo skopiuje aktualny PSYCHE + doda nowe bramy`)) {
-      saveWorld(worldId);
-      loadWorld(worldId);
-      
-      if (window.BELLA) {
-        window.BELLA.process(`NOWY ŚWIAT ${worldId.toUpperCase()} STWORZONY!`);
-      }
-    }
-  };
-
-  // === PRZEŁĄCZANIE ŚWIATÓW ===
+  // === PRZEŁĄCZ ŚWIAT ===
   window.switchWorld = function(worldId) {
-    if (confirm(`🌌 PRZEŁĄCZ SIĘ DO ŚWIATA "${worldId}"?\nAktualny świat zostanie zapisany`)) {
-      saveWorld("PSYCHE"); // Zapisz obecny
+    if (window.WORLDS[worldId].active) {
+      console.log(`🌌 Już w świecie ${worldId}`);
+      return;
+    }
+    
+    if (confirm(`🌌 Przełączyć do świata "${window.WORLDS[worldId].name}"?\nAktualny zapisze się automatycznie`)) {
+      saveCurrentWorld(localStorage.getItem('activeWorld') || 'PSYCHE');
       loadWorld(worldId);
       
       if (window.BELLA) {
-        window.BELLA.process(`PRZEŁĄCZONO DO ŚWIATA ${worldId}`);
+        window.BELLA.process(`PRZEŁĄCZONO DO ${worldId}`);
       }
     }
   };
 
-  // === UI SELEKTOR ŚWIATÓW ===
-  function createWorldSelector() {
-    const selector = document.createElement("div");
-    selector.id = "world-selector";
+  // === NOWY ŚWIAT ===
+  window.createNewWorld = function() {
+    const name = prompt("Nazwa nowego świata (np. NOWY1, CHAOS):")?.toUpperCase();
+    if (!name || name.length < 2) return;
+    
+    if (confirm(`🌌 Utworzyć świat "${name}"?`)) {
+      window.WORLDS[name] = { name: `🌟 ${name}`, color: "#6366f1", gates: 10, active: false };
+      saveCurrentWorld(name);
+      updateWorldSelector();
+      
+      if (window.BELLA) {
+        window.BELLA.process(`NOWY ŚWIAT ${name} UTWORZONY!`);
+      }
+    }
+  };
+
+  // === UI SELEKTOR ===
+  function updateWorldSelector() {
+    const existing = document.getElementById('world-selector');
+    if (existing) existing.remove();
+
+    const selector = document.createElement('div');
+    selector.id = 'world-selector';
     selector.innerHTML = `
       <div style="
-        position: fixed; top: 20px; right: 20px; z-index: 9999;
+        position: fixed; top: 20px; right: 20px; z-index: 10000;
         background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
         border: 2px solid #8b5cf6; border-radius: 16px; padding: 16px;
-        backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(139,92,246,0.3);
-        font-family: -apple-system, sans-serif; color: white; min-width: 220px;
+        backdrop-filter: blur(20px); box-shadow: 0 8px 32px rgba(139,92,246,0.4);
+        font-family: -apple-system, sans-serif; color: white; min-width: 240px;
+        font-size: 14px;
       ">
-        <div style="font-size: 14px; font-weight: bold; margin-bottom: 12px; display: flex; align-items: center;">
-          🌌 MULTIŚWIAT v3.0
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <strong>🌌 MULTIŚWIAT v3.0</strong>
           <button onclick="createNewWorld()" title="Nowy świat" style="
-            margin-left: auto; background: #ef4444; border: none; border-radius: 50%; 
-            width: 28px; height: 28px; color: white; font-size: 16px; cursor: pointer;
+            background: #ef4444; border: none; border-radius: 50%; width: 32px; height: 32px;
+            color: white; font-size: 16px; cursor: pointer; font-weight: bold;
           ">➕</button>
         </div>
-        ${Object.entries(DEFAULT_WORLDS).map(([id, data]) => `
+        ${Object.entries(window.WORLDS).map(([id, data]) => `
           <button onclick="switchWorld('${id}')" style="
-            width: 100%; padding: 8px 12px; margin: 4px 0; border: none; border-radius: 8px;
-            background: ${data.color}20; color: white; cursor: pointer; font-size: 13px;
-            transition: all 0.3s; text-align: left;
-            ${window.WORLD_PSYCHE && localStorage.getItem('activeWorld') === id ? 'box-shadow: 0 0 0 2px #fff;' : ''}
-          "
-            onmouseover="this.style.background='${data.color}40'"
-            onmouseout="this.style.background='${data.color}20'">
-            ${data.name} (${data.books || 0} 📚)
+            width: 100%; padding: 10px 12px; margin: 4px 0; border: none; border-radius: 10px;
+            background: ${data.active ? data.color : data.color + '20'}; 
+            color: ${data.active ? 'white' : data.color}; cursor: pointer; font-size: 13px;
+            text-align: left; font-weight: ${data.active ? 'bold' : 'normal'};
+            border: ${data.active ? '2px solid white' : 'none'};
+            transition: all 0.3s;
+          " onmouseover="this.style.transform='translateX(4px)'" onmouseout="this.style.transform=''">
+            ${data.name} 
+            <span style="float: right; opacity: 0.7; font-size: 11px;">
+              ${localStorage.getItem(`ETERNIVERSE_WORLD_${id}`) ? 
+                JSON.parse(localStorage.getItem(`ETERNIVERSE_WORLD_${id}`)).booksCount || 0 : 0} 📚
+            </span>
           </button>
         `).join('')}
-        <div style="font-size: 11px; opacity: 0.7; margin-top: 12px; text-align: center;">
-          Aktywny: <span id="active-world" style="color: #8b5cf6;">PSYCHE</span>
+        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #4b5563; font-size: 12px; opacity: 0.8; text-align: center;">
+          Aktywny: <span id="active-world-name" style="color: #8b5cf6; font-weight: bold;">PSYCHE</span>
         </div>
       </div>
     `;
     
     document.body.appendChild(selector);
     
-    // Ustaw aktywny świat
-    const activeWorld = localStorage.getItem('activeWorld') || 'PSYCHE';
-    document.getElementById('active-world').textContent = DEFAULT_WORLDS[activeWorld]?.name || 'PSYCHE';
+    // Update active world name
+    const activeId = localStorage.getItem('activeWorld') || 'PSYCHE';
+    const activeName = document.getElementById('active-world-name');
+    if (activeName) activeName.textContent = window.WORLDS[activeId]?.name || 'PSYCHE';
   }
 
   // === INTEGRACJA Z AUTOZAPIS ===
   const originalSave = window.saveWorldNow;
-  window.saveWorldNow = function(reason) {
+  window.saveWorldNow = function(reason = "Autozapis") {
     const activeWorld = localStorage.getItem('activeWorld') || 'PSYCHE';
-    localStorage.setItem('activeWorld', activeWorld);
-    originalSave ? originalSave(reason) : console.log('💾 Zapisano ' + reason);
+    saveCurrentWorld(activeWorld);
+    if (originalSave) originalSave(reason);
   };
 
-  // === START MULTIŚWIAT ===
+  // === INICJALIZACJA ===
   function init() {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
       return;
     }
     
-    // Czekaj na core
-    if (!document.getElementById('app') && !window.initEterniverse) {
+    if (!document.body) {
       setTimeout(init, 500);
       return;
     }
     
-    createWorldSelector();
-    console.log("🌌 MULTIŚWIAT v3.0 – 5 gotowych światów + tworzenie nowych!");
-    console.log("🎮 createNewWorld('NOWY') | switchWorld('WOLA')");
+    // Załaduj aktualny świat
+    const activeWorld = localStorage.getItem('activeWorld') || 'PSYCHE';
+    if (activeWorld && activeWorld !== 'PSYCHE') {
+      loadWorld(activeWorld);
+    }
+    
+    updateWorldSelector();
+    
+    console.log("🌌 MULTIŚWIAT v3.0 – 5 światów + nowe!");
+    console.log("🎮 switchWorld('WOLA') | createNewWorld()");
     
     if (window.BELLA) {
-      window.BELLA.process("MULTIŚWIAT v3.0 – budowa kolejnych światów aktywna!");
+      window.BELLA.process("MULTIŚWIAT v3.0 – gotowy do budowy imperium światów!");
     }
   }
 
