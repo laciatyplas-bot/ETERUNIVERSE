@@ -1,67 +1,111 @@
-// js/engine_loader.js – Bezpieczne ładowanie silników ETERNIVERSE (v2.1 – singleton + debug + kontynuacja przy błędzie)
+/* =====================================
+   ETERNIVERSE ENGINE LOADER v2.2 – PEŁNY POPRAWIONY
+   Architekt: Maciej Maciuszek + AI Assistant
+   100% KOMPATYBILNY: core v4.4 + book_editor v2.1 + eter_console
+   ===================================== */
 
 (function () {
-  // Singleton – kod wykonuje się tylko raz (nawet przy wielokrotnym include)
+  // Singleton – kod wykonuje się TYLKO RAZ
   if (window.enginesLoaded) {
-    console.log("Silniki już załadowane – pomijam ponowne wykonanie.");
+    console.log("🚀 Silniki ETERNIVERSE v2.2 już załadowane");
     return;
   }
   window.enginesLoaded = true;
 
-  // Lista silników – kolejność ważna!
+  // POPRAWNA KOLEJNOŚĆ SILNIKÓW (krytyczna!)
   const ENGINES = [
-    "js/world_psyche.js",     // Dane świata (najpierw!)
-    "js/core.js",             // Główny engine + render
-    "js/book_editor.js",      // Edycja/usuwanie książek
-    "js/eter_console.js"      // Konsola deweloperska
-    // Dodaj tu nowe pliki w przyszłości, np. "js/chapter_manager.js"
+    "js/world_psyche.js",     // 1️⃣ DANE – window.WORLD_PSYCHE (10 bram)
+    "js/core.js",             // 2️⃣ RENDER + UI + initEterniverse()
+    "js/book_editor.js",      // 3️⃣ ✏️🗑️ CRUD + modal actions
+    "js/eter_console.js"      // 4️⃣ DEV TOOLS (opcjonalne – kontynuuje przy błędzie)
   ];
 
   function loadEngine(i = 0) {
+    // KONIEC ŁADOWANIA = SUKCES
     if (i >= ENGINES.length) {
-      console.log("✅ Wszystkie silniki załadowane pomyślnie.");
+      console.log("✅ Wszystkie silniki ETERNIVERSE v2.2 załadowane!");
       
-      // Uruchom główną funkcję inicjalizacyjną (z core.js)
+      // START GŁÓWNY – core.js musi być gotowy
       if (typeof window.initEterniverse === "function") {
+        console.log("🌌 Uruchamiam initEterniverse...");
         window.initEterniverse();
       } else {
-        console.warn("⚠️ Funkcja initEterniverse nie znaleziona – sprawdź core.js");
+        console.error("❌ initEterniverse() nie istnieje – sprawdź js/core.js");
+        showError("Core engine niezaładowany. Sprawdź konsolę F12.");
       }
 
-      // Usuń loading po sukcesie
+      // Usuń loading screen
       const loading = document.querySelector('.loading');
-      if (loading) loading.remove();
-
+      if (loading) {
+        loading.style.opacity = '0';
+        setTimeout(() => loading.remove(), 300);
+      }
       return;
     }
 
     const src = ENGINES[i];
 
-    // Nie ładuj ponownie tego samego pliku
+    // SKIP jeśli już załadowany
     if (document.querySelector(`script[src="${src}"]`)) {
-      console.log(`Pomijam już załadowany: ${src}`);
+      console.log(`⏭️  Pomijam (już załadowany): ${src}`);
       loadEngine(i + 1);
       return;
     }
 
+    // ŁADUJ NOWY SILNIK
     const script = document.createElement("script");
     script.src = src;
-    script.async = true;
+    script.async = false; // SEKWENCYJNE – WAŻNE!
 
     script.onload = () => {
-      console.log(`⚙️ Załadowano pomyślnie: ${src}`);
+      console.log(`✅ Załadowano: ${src}`);
       loadEngine(i + 1);
     };
 
     script.onerror = () => {
-      console.error(`❌ Błąd ładowania: ${src} – plik nie istnieje lub ścieżka błędna`);
-      // Kontynuuj mimo błędu – nie zatrzymuj całego systemu
-      loadEngine(i + 1);
+      console.warn(`⚠️  BRAK pliku: ${src} – KONTYNUUJĘ...`);
+      loadEngine(i + 1); // NIGDY NIE ZATRZYMUJ SYSTEMU
     };
 
     document.head.appendChild(script);
   }
 
-  console.log("🌌 Rozpoczynam sekwencyjne ładowanie silników ETERNIVERSE...");
-  loadEngine();
+  // POKAŻ BŁĄD NA EKRANIE (fallback)
+  function showError(msg) {
+    const app = document.getElementById('app');
+    if (app) {
+      app.innerHTML = `
+        <div id="error-message" style="
+          display: block; 
+          color: #ff6b6b; 
+          text-align: center; 
+          padding: 3rem; 
+          background: rgba(255,107,107,0.1);
+          border-radius: 12px;
+          border: 1px solid #ff6b6b;
+          max-width: 600px;
+          margin: 2rem auto;
+        ">
+          <h2>🚨 Błąd inicjalizacji</h2>
+          <p>${msg}</p>
+          <p><strong>F12 → Console → sprawdź błędy ładowania JS</strong></p>
+          <details>
+            <summary>Debug info</summary>
+            <pre>${ENGINES.map(s => `❌ ${s}`).join('\n')}</pre>
+          </details>
+        </div>
+      `;
+    }
+  }
+
+  // START AUTOMATYCZNY
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log("🌌 ETERNIVERSE v2.2 – MASTER LOADER START");
+      setTimeout(loadEngine, 50); // Lekkie opóźnienie dla stabilności
+    });
+  } else {
+    console.log("🌌 ETERNIVERSE v2.2 – MASTER LOADER START");
+    loadEngine();
+  }
 })();
