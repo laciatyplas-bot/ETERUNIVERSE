@@ -1,15 +1,23 @@
 /* =====================================
-   ETERNIVERSE — WORLD I: PSYCHE / INTERSEEKER v4.4
-   Architekt: Maciej Maciuszek
+   ETERNIVERSE — WORLD I: PSYCHE / INTERSEEKER v4.5
+   Architekt: Maciej Maciuszek + AI Assistant
+   PEŁNY POPRAWIONY – kompatybilny z engine_loader v2.2
    ===================================== */
 
-if (typeof window.WORLD_PSYCHE !== 'undefined') {
-  console.log("WORLD_PSYCHE już załadowany – pomijam ponowne wykonanie.");
-} else {
+(function() {
+  // Singleton IIFE – wykonuje się tylko raz
+  if (typeof window.WORLD_PSYCHE !== 'undefined') {
+    console.log("🌌 WORLD_PSYCHE v4.5 już załadowany – pomijam.");
+    return;
+  }
+
+  console.log("🌌 Ładowanie WORLD_PSYCHE v4.5 – 10 bram PSYCHE...");
+
   window.WORLD_PSYCHE = {
     id: 1,
     name: "ŚWIAT I — PSYCHE / INTERSEEKER",
     description: "Świat wejścia w psychikę. Przestrzeń prawdy o naturze jaźni. Kronika Cienia i Woli.",
+    version: "4.5",
     
     gates: [
       {
@@ -23,16 +31,17 @@ if (typeof window.WORLD_PSYCHE !== 'undefined') {
             title: "InterSeeker – Atlas Wewnętrzny",
             description: "Mapa wnętrza człowieka. Mechanizmy obronne, fałszywa tożsamość i pierwsze pęknięcie iluzji.",
             status: "published",
-            cover: "https://img.wattpad.com/cover/405617436-288-k446508.jpg", // Twój Wattpad – jedyny zewnętrzny link
+            cover: "https://img.wattpad.com/cover/405617436-288-k446508.jpg",
             audio: "media/audio/interseeker_ch1.mp3",
-            chapters: []
+            chapters: [],
+            created: "2026-01-10"
           },
           {
             title: "ShadowSeeker – Anatomia Cienia",
             description: "Praca z cieniem bez duchowej ściemy. Agresja i wstyd jako paliwo świadomości.",
             status: "ready",
             cover: "media/covers/shadowseeker.jpg",
-            audio: "media/audio/shadowseeker_ch1.mp3",
+            audio: "media/audio/shadowseeker_ch1.mp3", 
             chapters: []
           },
           {
@@ -63,7 +72,7 @@ if (typeof window.WORLD_PSYCHE !== 'undefined') {
           {
             title: "Custos: Kodeks Głębi",
             description: "System ochrony wewnętrznego rdzenia. Wiedza strażników.",
-            status: "idea",
+            status: "idea", 
             cover: "media/covers/default.jpg",
             audio: "",
             chapters: []
@@ -265,14 +274,28 @@ if (typeof window.WORLD_PSYCHE !== 'undefined') {
     ]
   };
 
-  // Automatyczna naprawa okładek – zawsze działa
-  window.WORLD_PSYCHE.gates.forEach(gate => {
-    gate.books.forEach(book => {
-      if (!book.cover || book.cover.trim() === "") {
-        book.cover = "media/covers/default.jpg";
-      }
+  // AUTOMATYCZNA NAPRAWA DANYCH (bezpiecznik)
+  function fixDataIntegrity() {
+    window.WORLD_PSYCHE.gates.forEach(gate => {
+      if (!Array.isArray(gate.books)) gate.books = [];
+      gate.books.forEach(book => {
+        if (!book.cover || book.cover.trim() === "") {
+          book.cover = "media/covers/default.jpg";
+        }
+        if (!book.chapters) book.chapters = [];
+        if (!book.status) book.status = "idea";
+        if (!book.description) book.description = "";
+      });
     });
-  });
+  }
 
-  console.log("WORLD_PSYCHE v4.4 załadowany – zero Amazon, tylko Wattpad + lokalne pliki.");
-}
+  fixDataIntegrity();
+  
+  // STATYSTYKI dla debug
+  const totalBooks = window.WORLD_PSYCHE.gates.reduce((sum, gate) => sum + gate.books.length, 0);
+  
+  console.log(`✅ WORLD_PSYCHE v4.5 załadowany!`);
+  console.log(`📊 10 bram | ${totalBooks} książek | 1 Wattpad + lokalne pliki`);
+  console.log(`🎨 Kolory: teal→gold→red→purple→green→orange→blue→pink→violet→gold`);
+
+})();
