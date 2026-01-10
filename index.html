@@ -3,258 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ŚWIAT I — PSYCHE / INTERSEEKER | ETERNIVERSE</title>
-  <meta name="description" content="Świat I — PSYCHE / INTERSEEKER. Kronika świadomości, architektura Woli i Cienia.">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <title>ETERNIVERSE — Redakcja Świata I</title>
   <link rel="stylesheet" href="css/style.css">
-  <style>
-    body {
-      background: radial-gradient(circle at center, #0a0f1c, #02040a 80%);
-      color: #e8f0ff;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 30px;
-    }
-
-    .world-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    .world-header h1 {
-      color: #28D3C6;
-      font-size: 2.5rem;
-      letter-spacing: 1px;
-    }
-
-    .gate-box {
-      border-left: 5px solid;
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 30px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-    }
-
-    .book-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 16px;
-      margin-top: 15px;
-    }
-
-    .book-card {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
-      padding: 10px;
-      text-align: center;
-      transition: transform 0.2s;
-    }
-
-    .book-card:hover {
-      transform: scale(1.03);
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    .book-cover {
-      width: 100%;
-      height: 300px;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
-
-    .book-info h3 {
-      color: #fff;
-      margin: 5px 0;
-    }
-
-    .status {
-      font-size: 0.9em;
-      color: #aaa;
-    }
-
-    .footer {
-      text-align: center;
-      padding: 20px;
-      font-size: 0.8em;
-      color: #888;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      margin-top: 40px;
-    }
-
-    /* PANEL DODAWANIA */
-    #addPanel {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 20px;
-      margin: 30px 0;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    #addPanel input, #addPanel select, #addPanel textarea {
-      width: 100%;
-      background: rgba(0,0,0,0.4);
-      color: #e8f0ff;
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 8px;
-      padding: 8px;
-      margin-bottom: 10px;
-    }
-
-    #addPanel button {
-      background: #28D3C6;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 16px;
-      cursor: pointer;
-      color: #000;
-      font-weight: bold;
-      transition: background 0.2s;
-    }
-
-    #addPanel button:hover {
-      background: #1bb3a5;
-    }
-  </style>
+  <link rel="icon" href="favicon.ico">
 </head>
 
 <body>
-  <div class="container">
-    <header class="world-header">
-      <h1>🌌 ŚWIAT I — PSYCHE / INTERSEEKER</h1>
-      <p>Centralna Mapa Wnętrza. Wejście w świadomość, pamięć, cień i wolę.</p>
-    </header>
+  <header>
+    <h1>🌌 ETERNIVERSE — REDAKCJA ŚWIATA I</h1>
+    <p>Panel Architekta: dodawaj, edytuj i zarządzaj książkami w swoim świecie.</p>
+    <button id="addBookBtn">+ Dodaj nową książkę</button>
+    <button id="exportBtn">💾 Eksportuj świat</button>
+  </header>
 
-    <!-- PANEL DODAWANIA -->
-    <section id="addPanel">
-      <h2>➕ Dodaj nową księgę</h2>
-      <label>Brama:</label>
-      <select id="gateSelect"></select>
+  <main id="app"></main>
 
+  <!-- Modal: Dodaj / Edytuj książkę -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <h2 id="modalTitle">Nowa książka</h2>
       <label>Tytuł:</label>
-      <input type="text" id="bookTitle" placeholder="np. InterSeeker — Atlas Wewnętrzny">
-
+      <input type="text" id="bookTitle" placeholder="Tytuł książki">
       <label>Opis:</label>
-      <textarea id="bookDesc" rows="3" placeholder="Opis książki..."></textarea>
-
-      <label>URL okładki:</label>
-      <input type="text" id="bookCover" placeholder="media/covers/nazwa.jpg">
-
-      <label>URL audio (mp3):</label>
-      <input type="text" id="bookAudio" placeholder="media/audio/nazwa.mp3">
-
-      <label>Status:</label>
-      <select id="bookStatus">
-        <option value="idea">Idea</option>
-        <option value="draft">Szkic</option>
-        <option value="writing">W trakcie pisania</option>
-        <option value="ready">Gotowe</option>
-        <option value="published">Opublikowane</option>
-      </select>
-
-      <button id="addBookBtn">Dodaj księgę</button>
-    </section>
-
-    <main id="gates-container"></main>
-
-    <footer class="footer">
-      <p>© 2026 Architekt Woli — Maciej Maciuszek | ETERNIVERSE</p>
-    </footer>
+      <textarea id="bookDesc" placeholder="Opis książki..."></textarea>
+      <label>Ścieżka okładki:</label>
+      <input type="text" id="bookCover" placeholder="media/covers/example.jpg">
+      <label>Ścieżka audio:</label>
+      <input type="text" id="bookAudio" placeholder="media/audio/example.mp3">
+      <div class="modal-actions">
+        <button id="cancelBtn">Anuluj</button>
+        <button id="saveBtn">Zapisz</button>
+      </div>
+    </div>
   </div>
 
-  <!-- SKRYPTY -->
   <script src="js/world_psyche.js"></script>
-  <script>
-    const container = document.getElementById("gates-container");
-    const data = window.DATA;
-
-    const gateSelect = document.getElementById("gateSelect");
-    const addBookBtn = document.getElementById("addBookBtn");
-
-    // Załaduj listę bram
-    data.gates.forEach(gate => {
-      const opt = document.createElement("option");
-      opt.value = gate.id;
-      opt.textContent = gate.name;
-      gateSelect.appendChild(opt);
-    });
-
-    function renderWorld(world) {
-      container.innerHTML = "";
-      world.gates.forEach(gate => {
-        const gateBox = document.createElement("section");
-        gateBox.classList.add("gate-box");
-        gateBox.style.borderColor = gate.color;
-
-        gateBox.innerHTML = `
-          <h2 style="color:${gate.color}">${gate.name}</h2>
-          <p class="gate-sub">${gate.sub}</p>
-        `;
-
-        const bookList = document.createElement("div");
-        bookList.classList.add("book-list");
-
-        gate.books.forEach(book => {
-          const bookEl = document.createElement("div");
-          bookEl.classList.add("book-card");
-          bookEl.innerHTML = `
-          <img src="${book.cover || 'https://img.wattpad.com/cover/405617436-144-k446508.jpg'}" alt="${book.title}"
-            <div class="book-info">
-              <h3>${book.title}</h3>
-              <p>${book.description || "Brak opisu"}</p>
-              <p class="status"><strong>Status:</strong> ${book.status}</p>
-              ${book.audio ? `
-              <audio controls class="audio-player">
-                <source src="${book.audio}" type="audio/mpeg">
-                Twoja przeglądarka nie obsługuje audio.
-              </audio>` : ""}
-            </div>
-          `;
-          bookList.appendChild(bookEl);
-        });
-
-        gateBox.appendChild(bookList);
-        container.appendChild(gateBox);
-      });
-    }
-
-    // Dodawanie nowej książki
-    addBookBtn.onclick = () => {
-      const gateId = gateSelect.value;
-      const title = document.getElementById("bookTitle").value.trim();
-      const desc = document.getElementById("bookDesc").value.trim();
-      const cover = document.getElementById("bookCover").value.trim();
-      const audio = document.getElementById("bookAudio").value.trim();
-      const status = document.getElementById("bookStatus").value;
-
-      if (!title) return alert("Podaj tytuł książki!");
-
-      const gate = data.gates.find(g => g.id == gateId);
-      if (!gate) return alert("Nie znaleziono bramy!");
-
-      gate.books.push({ title, description: desc, cover, audio, status });
-
-      renderWorld(data);
-
-      document.getElementById("bookTitle").value = "";
-      document.getElementById("bookDesc").value = "";
-      document.getElementById("bookCover").value = "";
-      document.getElementById("bookAudio").value = "";
-      document.getElementById("bookStatus").value = "idea";
-
-      alert("Nowa księga dodana do " + gate.name + "!");
-    };
-
-    document.addEventListener("DOMContentLoaded", () => {
-      renderWorld(data);
-    });
-  </script>
+  <script src="js/core.js"></script>
 </body>
 </html>
