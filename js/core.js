@@ -1,6 +1,5 @@
 /* =====================================
-   ETERNIVERSE — CORE ENGINE v3
-   AUTO FIX: OKŁADKI + DANE
+   ETERNIVERSE — CORE ENGINE v4
    Architekt: Maciej Maciuszek
    ===================================== */
 
@@ -12,17 +11,19 @@ let WORLD = null;
 function initEterniverse() {
   console.log("🌌 Uruchamiam ETERNIVERSE: PSYCHE / INTERSEEKER...");
 
-  // załaduj dane lub domyślny świat
+  // Załaduj dane z pamięci lub domyślny świat
   WORLD = loadWorldData() || WORLD_PSYCHE;
 
-  // sprawdź i napraw brakujące okładki
+  // Napraw brakujące okładki
   fixMissingCovers(WORLD);
 
-  // zapisz z powrotem poprawne dane
+  // Zapisz stan do localStorage
   saveWorldData();
 
+  // Uruchom rendering
   renderWorld(WORLD);
   setupUI();
+
   belleSpeak("System Kroniki Woli aktywowany.");
 }
 
@@ -52,18 +53,28 @@ function renderWorld(world) {
     gateBox.appendChild(gateTitle);
 
     const gateSub = document.createElement("p");
-    gateSub.textContent = gate.sub;
+    gateSub.textContent = gate.sub || gate.theme || "";
     gateBox.appendChild(gateSub);
 
     gate.books.forEach((book) => {
       const bookBox = document.createElement("div");
       bookBox.className = "book";
 
+      // ====== OBRAZEK OKŁADKI ======
       const left = document.createElement("div");
       left.className = "book-left";
 
       const img = document.createElement("img");
-      img.src = book.cover || "media/covers/default.jpg";
+
+      // Obsługuje linki zewnętrzne i lokalne pliki
+      if (book.cover && (book.cover.startsWith("http://") || book.cover.startsWith("https://"))) {
+        img.src = book.cover;
+      } else if (book.cover && book.cover.trim() !== "") {
+        img.src = book.cover;
+      } else {
+        img.src = "media/covers/default.jpg";
+      }
+
       img.alt = book.title;
       img.onerror = () => (img.src = "media/covers/default.jpg");
 
@@ -80,7 +91,10 @@ function renderWorld(world) {
       left.appendChild(img);
       left.appendChild(info);
 
+      // ====== AUDIO + EDYCJA ======
       const right = document.createElement("div");
+      right.className = "book-right";
+
       if (book.audio) {
         const audio = document.createElement("audio");
         audio.controls = true;
@@ -120,7 +134,7 @@ function setupUI() {
   const saveBtn = document.getElementById("saveBtn");
   const select = document.getElementById("gateSelect");
 
-  // Załaduj bramy
+  // Załaduj listę bram
   select.innerHTML = "";
   WORLD.gates.forEach((g) => {
     const opt = document.createElement("option");
@@ -132,6 +146,10 @@ function setupUI() {
   addBtn.onclick = () => {
     currentEdit = null;
     document.getElementById("modalTitle").textContent = "Nowa książka";
+    document.getElementById("bookTitle").value = "";
+    document.getElementById("bookDesc").value = "";
+    document.getElementById("bookCover").value = "";
+    document.getElementById("bookAudio").value = "";
     modal.classList.remove("hidden");
     belleSpeak("Nowa księga pojawia się w świadomości...");
   };
@@ -248,3 +266,6 @@ function belleSpeak(msg) {
     el.textContent = "Czekam na Twoje intencje...";
   }, 6000);
 }
+
+// Automatyczny start po załadowaniu strony
+document.addEventListener("DOMContentLoaded", initEterniverse);
