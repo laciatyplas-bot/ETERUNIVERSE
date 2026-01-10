@@ -1,35 +1,54 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ETERNIVERSE — Redakcja Świata I</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="favicon.ico">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ETERNIVERSE — Świat I: PSYCHE / INTERSEEKER</title>
+
+  <!-- Styl -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="favicon.ico" />
+
+  <!-- Info meta -->
+  <meta name="author" content="Architekt: Maciej Maciuszek" />
+  <meta name="description" content="ETERNIVERSE — Interaktywny wszechświat literacki, stworzony przez Macieja Maciuszka." />
 </head>
 
 <body>
   <header>
-    <h1>🌌 ETERNIVERSE — REDAKCJA ŚWIATA I</h1>
-    <p>Panel Architekta: dodawaj, edytuj i zarządzaj książkami w swoim świecie.</p>
-    <button id="addBookBtn">+ Dodaj nową książkę</button>
-    <button id="exportBtn">💾 Eksportuj świat</button>
+    <h1>🌌 ETERNIVERSE — ŚWIAT I: PSYCHE / INTERSEEKER</h1>
+    <p>System redakcyjny — zarządzanie książkami, bramami i światem eteru.</p>
+    <div class="header-buttons">
+      <button id="addBookBtn">+ Dodaj książkę</button>
+      <button id="exportBtn">💾 Eksport JSON</button>
+      <button id="openConsoleBtn">🪐 Konsola ETERU</button>
+    </div>
   </header>
 
-  <main id="app"></main>
+  <main id="app">
+    <p class="loading">Ładowanie systemu ETERNIVERSE...</p>
+  </main>
 
-  <!-- Modal: Dodaj / Edytuj książkę -->
+  <!-- Modal dodawania książki -->
   <div id="modal" class="modal hidden">
     <div class="modal-content">
       <h2 id="modalTitle">Nowa książka</h2>
+
+      <label>Brama:</label>
+      <select id="gateSelect"></select>
+
       <label>Tytuł:</label>
       <input type="text" id="bookTitle" placeholder="Tytuł książki">
+
       <label>Opis:</label>
       <textarea id="bookDesc" placeholder="Opis książki..."></textarea>
-      <label>Ścieżka okładki:</label>
+
+      <label>Okładka (ścieżka):</label>
       <input type="text" id="bookCover" placeholder="media/covers/example.jpg">
-      <label>Ścieżka audio:</label>
+
+      <label>Plik audio (ścieżka):</label>
       <input type="text" id="bookAudio" placeholder="media/audio/example.mp3">
+
       <div class="modal-actions">
         <button id="cancelBtn">Anuluj</button>
         <button id="saveBtn">Zapisz</button>
@@ -37,7 +56,7 @@
     </div>
   </div>
 
-  <script src="js/world_psyche.js"></script>
-  <script src="js/core.js"></script>
+  <!-- Loader wszystkich silników -->
+  <script src="js/engine_loader.js"></script>
 </body>
 </html>
