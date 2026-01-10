@@ -1,5 +1,5 @@
 /* =====================================
-   ETERNIVERSE — WORLD I: PSYCHE / INTERSEEKER v4.3
+   ETERNIVERSE — WORLD I: PSYCHE / INTERSEEKER v4.4
    Architekt: Maciej Maciuszek
    ===================================== */
 
@@ -23,7 +23,7 @@ if (typeof window.WORLD_PSYCHE !== 'undefined') {
             title: "InterSeeker – Atlas Wewnętrzny",
             description: "Mapa wnętrza człowieka. Mechanizmy obronne, fałszywa tożsamość i pierwsze pęknięcie iluzji.",
             status: "published",
-            cover: "https://img.wattpad.com/cover/405617436-288-k446508.jpg", // Twoja nowa okładka z Wattpada
+            cover: "https://img.wattpad.com/cover/405617436-288-k446508.jpg", // Twoja okładka z Wattpada
             audio: "media/audio/interseeker_ch1.mp3",
             chapters: []
           },
@@ -274,5 +274,5 @@ if (typeof window.WORLD_PSYCHE !== 'undefined') {
     });
   });
 
-  console.log("WORLD_PSYCHE v4.3 załadowany pomyślnie – wszystkie 10 bram + okładka z Wattpada.");
+  console.log("WORLD_PSYCHE v4.4 załadowany pomyślnie – wszystkie 10 bram + okładka z Wattpada.");
 }
