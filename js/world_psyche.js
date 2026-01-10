@@ -1,5 +1,5 @@
 /* =====================================
-   ETERNIVERSE — ŚWIAT I: PSYCHE / INTERSEEKER
+   ETERNIVERSE — WORLD I: PSYCHE / INTERSEEKER
    Architekt: Maciej Maciuszek
    ===================================== */
 
@@ -7,7 +7,7 @@ window.WORLD_PSYCHE = {
   id: 1,
   name: "ŚWIAT I — PSYCHE / INTERSEEKER",
   description:
-    "Pierwszy świat ETERNIVERSE — wejście w psychikę, prawdę, cień i wolę. Tutaj rozpoczyna się Kronika Woli.",
+    "Świat wejścia w psychikę. Przestrzeń prawdy o naturze jaźni. Kronika Cienia i Woli.",
 
   gates: [
     {
@@ -16,10 +16,38 @@ window.WORLD_PSYCHE = {
       sub: "Psychika · Cień · Pamięć · Trauma",
       color: "#28D3C6",
       books: [
-        { title: "InterSeeker — Atlas Wewnętrzny", status: "published", cover: "media/covers/interseeker.jpg", audio: "media/audio/interseeker_ch1.mp3" },
-        { title: "ShadowSeeker — Anatomia Cienia", status: "ready", cover: "media/covers/shadowseeker.jpg", audio: "media/audio/shadowseeker_ch1.mp3" },
-        { title: "MemorySeeker — Archeologia Wspomnień", status: "writing", cover: "media/covers/memoryseeker.jpg" },
-        { title: "BólSeeker — Anatomia Rany", status: "draft" }
+        {
+          title: "InterSeeker — Atlas Wewnętrzny",
+          description:
+            "Mapa wnętrza człowieka. Mechanizmy obronne, fałszywa tożsamość i pierwsze pęknięcie iluzji.",
+          cover: "https://img.wattpad.com/cover/405617436-144-k446508.jpg",
+          audio: "media/audio/interseeker_ch1.mp3",
+          status: "published"
+        },
+        {
+          title: "ShadowSeeker — Anatomia Cienia",
+          description:
+            "Praca z cieniem bez duchowej ściemy. Agresja i wstyd jako paliwo świadomości.",
+          cover: "https://img.wattpad.com/cover/405617436-144-k446508.jpg",
+          audio: "media/audio/shadowseeker_ch1.mp3",
+          status: "ready"
+        },
+        {
+          title: "MemorySeeker — Archeologia Wspomnień",
+          description:
+            "Rozkodowanie pamięci i przeszłości jako aktywnego systemu sterowania.",
+          cover: "https://img.wattpad.com/cover/405617436-144-k446508.jpg",
+          audio: "media/audio/memoryseeker_ch1.mp3",
+          status: "writing"
+        },
+        {
+          title: "BólSeeker — Anatomia Rany",
+          description:
+            "Ból jako wejście, nie kara. Rany jako portale świadomości.",
+          cover: "https://img.wattpad.com/cover/405617436-144-k446508.jpg",
+          audio: "",
+          status: "draft"
+        }
       ]
     },
     {
@@ -28,8 +56,20 @@ window.WORLD_PSYCHE = {
       sub: "Strażnik · Rdzeń · Początek",
       color: "#FF6B6B",
       books: [
-        { title: "Geneza", status: "ready" },
-        { title: "Custos: Kodeks Głębi", status: "writing" }
+        {
+          title: "Geneza",
+          description: "Początek Kroniki Woli. Narodziny świadomości w eterze.",
+          cover: "https://img.wattpad.com/cover/405617436-144-k446508.jpg",
+          audio: "",
+          status: "ready"
+        },
+        {
+          title: "Custos: Kodeks Głębi",
+          description: "System ochrony wewnętrznego rdzenia. Wiedza strażników.",
+          cover: "https://img.wattpad.com/cover/405617436-144-k446508.jpg",
+          audio: "",
+          status: "writing"
+        }
       ]
     },
     {
@@ -38,9 +78,27 @@ window.WORLD_PSYCHE = {
       sub: "Wola · Pole · Architektura",
       color: "#D9A441",
       books: [
-        { title: "EterSeeker — Księga Zakazana (Tom Zero)", status: "published" },
-        { title: "EterSeeker — Architektura Woli", status: "ready" },
-        { title: "PoleSeeker — Topologia Ludzkiego Pola", status: "writing" }
+        {
+          title: "EterSeeker – Księga Zakazana (Tom Zero)",
+          description: "Początek architektury eteru i zapomniane protokoły pola.",
+          cover: "https://img.wattpad.com/cover/405617436-144-k446508.jpg",
+          audio: "",
+          status: "published"
+        },
+        {
+          title: "EterSeeker – Architektura Woli",
+          description: "Jak wola tworzy rzeczywistość w przestrzeni pola.",
+          cover: "https://img.wattpad.com/cover/405617436-144-k446508.jpg",
+          audio: "",
+          status: "ready"
+        },
+        {
+          title: "PoleSeeker – Topologia Ludzkiego Pola",
+          description: "Nauka o strukturze energii, która tworzy człowieka.",
+          cover: "https://img.wattpad.com/cover/405617436-144-k446508.jpg",
+          audio: "",
+          status: "writing"
+        }
       ]
     },
     {
@@ -49,74 +107,27 @@ window.WORLD_PSYCHE = {
       sub: "Konstrukcja · Role · Przeznaczenie",
       color: "#9B6BFF",
       books: [
-        { title: "ArchetypSeeker — System Archetypów Eteru", status: "ready" },
-        { title: "WolaSeeker — Kwant Woli", status: "draft" },
-        { title: "Kronika Woli", status: "idea" }
-      ]
-    },
-    {
-      id: 5,
-      name: "BRAMA V — OBFITOSEEKER",
-      sub: "Materia · Przepływ · Manifestacja",
-      color: "#12C65B",
-      books: [
-        { title: "ObfitoSeeker — Kod Obfitości", status: "published" },
-        { title: "MateriaSeeker — Przewodnik Ciała i Przepływu", status: "ready" },
-        { title: "Księga Przepływu", status: "writing" }
-      ]
-    },
-    {
-      id: 6,
-      name: "BRAMA VI — BIOSEEKER",
-      sub: "Ciało · Biologia · Regulacja",
-      color: "#FFB14B",
-      books: [
-        { title: "BioSeeker — Sekret Biologii Pola", status: "ready" },
-        { title: "Ciało jako Interfejs Pola", status: "draft" },
-        { title: "RytmSeeker — Mechanika Ruchu Życia", status: "idea" }
-      ]
-    },
-    {
-      id: 7,
-      name: "BRAMA VII — SPLĄTANIE / AI",
-      sub: "Obserwator · Meta-tożsamość · Technologia",
-      color: "#5DADE2",
-      books: [
-        { title: "SplatanieSeeker — Protokół Obserwatora", status: "writing" },
-        { title: "InterfejsSeeker — Interfejs Świadomości", status: "ready" },
-        { title: "Protokół Splątania (wersja meta)", status: "draft" }
-      ]
-    },
-    {
-      id: 8,
-      name: "BRAMA VIII — TRAJEKTORIE",
-      sub: "Kod Życia · Linie Czasu · Fizyka Duszy",
-      color: "#FF9FF3",
-      books: [
-        { title: "TrajektoriaSeeker — Mapa Linii Życia", status: "published" },
-        { title: "QuantumSeeker — Fizyka Duszy", status: "ready" },
-        { title: "CzasSeeker — Fizyka Linii Czasu", status: "writing" }
-      ]
-    },
-    {
-      id: 9,
-      name: "BRAMA IX — ETERNIONY / KOLEKTYW",
-      sub: "Węzły Pola · Wspólnota · Misja",
-      color: "#667eea",
-      books: [
-        { title: "Eteriony — Tom I", status: "ready" },
-        { title: "Eteriony — Tom II", status: "draft" },
-        { title: "Mapa Uniwersum Eteru", status: "idea" }
-      ]
-    },
-    {
-      id: 10,
-      name: "BRAMA X — ETERUNIVERSE",
-      sub: "Integracja · Jedność · Architekt",
-      color: "#D9A441",
-      books: [
-        { title: "Architekt Eteru — Manifest Twórcy", status: "writing" },
-        { title: "Mapa Trajektorii Życia (rozszerzona)", status: "ready" }
+        {
+          title: "ArchetypSeeker – System Archetypów Eteru",
+          description: "Analiza wewnętrznych ról, wzorców i kodów istnienia.",
+          cover: "https://img.wattpad.com/cover/405617436-144-k446508.jpg",
+          audio: "",
+          status: "ready"
+        },
+        {
+          title: "WolaSeeker – Kwant Woli",
+          description: "Zrozumienie mikromechaniki decyzji i tworzenia.",
+          cover: "https://img.wattpad.com/cover/405617436-144-k446508.jpg",
+          audio: "",
+          status: "draft"
+        },
+        {
+          title: "Kronika Woli",
+          description: "Centralny zapis ewolucji świadomości ludzkiej.",
+          cover: "https://img.wattpad.com/cover/405617436-144-k446508.jpg",
+          audio: "",
+          status: "idea"
+        }
       ]
     }
   ]
