@@ -1,0 +1,177 @@
+{
+  "name": "PSYCHE – ŚWIAT 1 ETERNIVERSE",
+  "description": "Kanon 80 tytułów ETERNIVERSE | 10 Bram PSYCHE | 10.01.2026",
+  "version": "1.0",
+  "gates": [
+    {
+      "id": 0,
+      "name": "BRAMA I – INTERSEEKER",
+      "color": "#ff6b6b",
+      "sub": "Psychika · Cień · Trauma",
+      "tag": "Rozszczepienie",
+      "books": [
+        {"title": "InterSeeker – Atlas Wewnętrzny", "description": "Kanon PSYCHE Brama I", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=INTER", "status": "kanon"},
+        {"title": "ShadowSeeker – Anatomia Cienia", "description": "Kanon PSYCHE Brama I", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=SHADOW", "status": "kanon"},
+        {"title": "MemorySeeker – Archeologia Wspomnień", "description": "Kanon PSYCHE Brama I", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=MEMORY", "status": "kanon"},
+        {"title": "SelfSplit Seeker – Rozszczepienie Tożsamości", "description": "Kanon PSYCHE Brama I", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=SELF", "status": "kanon"},
+        {"title": "BólSeeker – Anatomia Rany", "description": "Kanon PSYCHE Brama I", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=BÓL", "status": "kanon"},
+        {"title": "TraumaSeeker – Kod Urazu", "description": "Kanon PSYCHE Brama I", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=TRAUMA", "status": "kanon"},
+        {"title": "VoidSeeker – Kartografia Pustki", "description": "Kanon PSYCHE Brama I", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=VOID", "status": "kanon"},
+        {"title": "EchoSeeker – Powtórzenia Wewnętrzne", "description": "Kanon PSYCHE Brama I", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=ECHO", "status": "kanon"},
+        {"title": "FragmentSeeker – Człowiek z Kawałków", "description": "Kanon PSYCHE Brama I", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=FRAG", "status": "kanon"},
+        {"title": "Janowice – Uśmiech Architekta", "description": "Kanon PSYCHE Brama I", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=JANOW", "status": "kanon"}
+      ]
+    },
+    {
+      "id": 1,
+      "name": "BRAMA II – CUSTOS / GENEZA",
+      "color": "#4ecdc4",
+      "sub": "Strażnik · Rdzeń · Początek",
+      "tag": "Geneza",
+      "books": [
+        {"title": "Geneza: Pęknięcie Fal", "description": "Kanon PSYCHE Brama II", "cover": "https://placehold.co/300x400/4ecdc4/333?text=GENEZA", "status": "kanon"},
+        {"title": "Custos: Kodeks Głębi", "description": "Kanon PSYCHE Brama II", "cover": "https://placehold.co/300x400/4ecdc4/333?text=CUSTOS", "status": "kanon"},
+        {"title": "Pierwszy Błąd – Narodziny Systemu", "description": "Kanon PSYCHE Brama II", "cover": "https://placehold.co/300x400/4ecdc4/333?text=BŁĄD", "status": "kanon"},
+        {"title": "Strażnik Rdzenia", "description": "Kanon PSYCHE Brama II", "cover": "https://placehold.co/300x400/4ecdc4/333?text=STRAŻ", "status": "kanon"},
+        {"title": "Początek w Ciemności", "description": "Kanon PSYCHE Brama II", "cover": "https://placehold.co/300x400/4ecdc4/333?text=CIEMN", "status": "kanon"},
+        {"title": "Przednarodzinowa Pamięć", "description": "Kanon PSYCHE Brama II", "cover": "https://placehold.co/300x400/4ecdc4/333?text=PRZED", "status": "kanon"},
+        {"title": "Zero Punkt – Miejsce, gdzie wszystko się zaczęło", "description": "Kanon PSYCHE Brama II", "cover": "https://placehold.co/300x400/4ecdc4/333?text=ZERO", "status": "kanon"},
+        {"title": "Matryca Pierwotna", "description": "Kanon PSYCHE Brama II", "cover": "https://placehold.co/300x400/4ecdc4/333?text=MATRY", "status": "kanon"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "BRAMA III – ETERSEEKER",
+      "color": "#8b5cf6",
+      "sub": "Wola · Pole · Architektura",
+      "tag": "Protokół",
+      "books": [
+        {"title": "EterSeeker – Księga Zakazana (Tom Zero)", "description": "Kanon PSYCHE Brama III", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=ETER0", "status": "kanon"},
+        {"title": "EterSeeker – Architektura Woli", "description": "Kanon PSYCHE Brama III", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=WOLA", "status": "kanon"},
+        {"title": "WolaSeeker – Kwant Woli", "description": "Kanon PSYCHE Brama III", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=KWANT", "status": "kanon"},
+        {"title": "Protokół 4-Fazowy: Disconnect/Void", "description": "Kanon PSYCHE Brama III", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=PROTO", "status": "kanon"},
+        {"title": "PoleSeeker – Topologia Ludzkiego Pola", "description": "Kanon PSYCHE Brama III", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=POLE", "status": "kanon"},
+        {"title": "RezonansSeeker – Dostrojenie do Absolutu", "description": "Kanon PSYCHE Brama III", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=REZON", "status": "kanon"},
+        {"title": "StrukturaSeeker – Geometria Manifestacji", "description": "Kanon PSYCHE Brama III", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=STRUK", "status": "kanon"},
+        {"title": "KontrolaSeeker – Wieże Kontroli", "description": "Kanon PSYCHE Brama III", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=KONTR", "status": "kanon"},
+        {"title": "Dekoherencja Życiowa", "description": "Kanon PSYCHE Brama III", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=DEKOH", "status": "kanon"},
+        {"title": "IskraSeeker – Narodziny Woli", "description": "Kanon PSYCHE Brama III", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=ISKRA", "status": "kanon"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "BRAMA IV – ARCHETYPY / WOLA",
+      "color": "#10b981",
+      "sub": "Archetypy · Relacje · Moc",
+      "tag": "Archetyp",
+      "books": [
+        {"title": "ArchetypSeeker – System Archetypów Eteru", "description": "Kanon PSYCHE Brama IV", "cover": "https://placehold.co/300x400/10b981/fff?text=ARCH", "status": "kanon"},
+        {"title": "ZwierzSeeker – Atlas Zwierząt Eterycznych", "description": "Kanon PSYCHE Brama IV", "cover": "https://placehold.co/300x400/10b981/fff?text=ZWierz", "status": "kanon"},
+        {"title": "OjciecSeeker – Architektura Relacji Ojciec–Dziecko", "description": "Kanon PSYCHE Brama IV", "cover": "https://placehold.co/300x400/10b981/fff?text=OJCIEC", "status": "kanon"},
+        {"title": "WojownikSeeker – Kod Wojownika", "description": "Kanon PSYCHE Brama IV", "cover": "https://placehold.co/300x400/10b981/fff?text=WOJ", "status": "kanon"},
+        {"title": "MagSeeker – Iluzja Magii", "description": "Kanon PSYCHE Brama IV", "cover": "https://placehold.co/300x400/10b981/fff?text=MAG", "status": "kanon"},
+        {"title": "CieńSeeker – Integracja Cienia", "description": "Kanon PSYCHE Brama IV", "cover": "https://placehold.co/300x400/10b981/fff?text=CIĘŃ", "status": "kanon"},
+        {"title": "MędrzecSeeker – Mądrość z Ciemności", "description": "Kanon PSYCHE Brama IV", "cover": "https://placehold.co/300x400/10b981/fff?text=MĘDRZ", "status": "kanon"},
+        {"title": "DzieckoSeeker – Powrót do Iskry", "description": "Kanon PSYCHE Brama IV", "cover": "https://placehold.co/300x400/10b981/fff?text=DZIECK", "status": "kanon"}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "BRAMA V – OBFITOSEEKER",
+      "color": "#f59e0b",
+      "sub": "Przepływ · Manifestacja",
+      "tag": "Obfitość",
+      "books": [
+        {"title": "ObfitoSeeker – Kod Obfitości", "description": "Kanon PSYCHE Brama V", "cover": "https://placehold.co/300x400/f59e0b/fff?text=OBFIT", "status": "kanon"},
+        {"title": "ObfitoSeeker II – Kod Rozszerzony", "description": "Kanon PSYCHE Brama V", "cover": "https://placehold.co/300x400/f59e0b/fff?text=OBF2", "status": "kanon"},
+        {"title": "PrzepływSeeker – Mechanika Obfitości", "description": "Kanon PSYCHE Brama V", "cover": "https://placehold.co/300x400/f59e0b/fff?text=PRZEP", "status": "kanon"},
+        {"title": "MateriaSeeker – Przewodnik Ciała i Przepływu", "description": "Kanon PSYCHE Brama V", "cover": "https://placehold.co/300x400/f59e0b/fff?text=MATER", "status": "kanon"},
+        {"title": "RytmSeeker – Mechanika Ruchu Życia", "description": "Kanon PSYCHE Brama V", "cover": "https://placehold.co/300x400/f59e0b/fff?text=RYTM", "status": "kanon"},
+        {"title": "ManifestSeeker – Sztuka Tworzenia Rzeczywistości", "description": "Kanon PSYCHE Brama V", "cover": "https://placehold.co/300x400/f59e0b/fff?text=MANIF", "status": "kanon"},
+        {"title": "BogactwoSeeker – Kod Prawdziwego Bogactwa", "description": "Kanon PSYCHE Brama V", "cover": "https://placehold.co/300x400/f59e0b/fff?text=BOGAT", "status": "kanon"},
+        {"title": "NadmiarSeeker – Od Blokady do Przepływu", "description": "Kanon PSYCHE Brama V", "cover": "https://placehold.co/300x400/f59e0b/fff?text=NADMI", "status": "kanon"},
+        {"title": "Dla Nikosia – Obfitość Ojca i Syna", "description": "Kanon PSYCHE Brama V", "cover": "https://placehold.co/300x400/f59e0b/fff?text=NIKOŚ", "status": "kanon"},
+        {"title": "Kod Obfitości 528 Hz", "description": "Kanon PSYCHE Brama V", "cover": "https://placehold.co/300x400/f59e0b/fff?text=528HZ", "status": "kanon"}
+      ]
+    },
+    {
+      "id": 5,
+      "name": "BRAMA VI – BIOSEEKER",
+      "color": "#ff6b6b",
+      "sub": "Ciało · Biologia",
+      "tag": "Hardware",
+      "books": [
+        {"title": "BioSeeker – Sekret Biologii Pola", "description": "Kanon PSYCHE Brama VI", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=BIO", "status": "kanon"},
+        {"title": "Ciało jako Interfejs Pola", "description": "Kanon PSYCHE Brama VI", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=CIAŁO", "status": "kanon"},
+        {"title": "Mutoseeker – Kod Mutacji", "description": "Kanon PSYCHE Brama VI", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=MUTO", "status": "kanon"},
+        {"title": "ZdrowieSeeker – Biologia Przebudzenia", "description": "Kanon PSYCHE Brama VI", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=ZDR", "status": "kanon"},
+        {"title": "RegulacjaSeeker – Hardware Duszy", "description": "Kanon PSYCHE Brama VI", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=HARD", "status": "kanon"},
+        {"title": "Somatyczny Cień", "description": "Kanon PSYCHE Brama VI", "cover": "https://placehold.co/300x400/ff6b6b/fff?text=SOMAT", "status": "kanon"}
+      ]
+    },
+    {
+      "id": 6,
+      "name": "BRAMA VII – SPLĄTANIE / AI",
+      "color": "#4ecdc4",
+      "sub": "Splątanie · Interfejs",
+      "tag": "Obserwator",
+      "books": [
+        {"title": "SplatanieSeeker – Protokół Obserwatora", "description": "Kanon PSYCHE Brama VII", "cover": "https://placehold.co/300x400/4ecdc4/333?text=SPLĄT", "status": "kanon"},
+        {"title": "InterfejsSeeker – Interfejs Świadomości", "description": "Kanon PSYCHE Brama VII", "cover": "https://placehold.co/300x400/4ecdc4/333?text=INTERF", "status": "kanon"},
+        {"title": "Algorytm Prawdy (The Truth Algorithm)", "description": "Kanon PSYCHE Brama VII", "cover": "https://placehold.co/300x400/4ecdc4/333?text=PRAWD", "status": "kanon"},
+        {"title": "AI jako Lustro Kwantowe", "description": "Kanon PSYCHE Brama VII", "cover": "https://placehold.co/300x400/4ecdc4/333?text=AI", "status": "kanon"},
+        {"title": "Splątany Obserwator", "description": "Kanon PSYCHE Brama VII", "cover": "https://placehold.co/300x400/4ecdc4/333?text=OBSERW", "status": "kanon"},
+        {"title": "MetaGeneza – Narodziny Meta-tożsamości", "description": "Kanon PSYCHE Brama VII", "cover": "https://placehold.co/300x400/4ecdc4/333?text=METAGEN", "status": "kanon"},
+        {"title": "Protokół EterLink (Whitepaper)", "description": "Kanon PSYCHE Brama VII", "cover": "https://placehold.co/300x400/4ecdc4/333?text=ETERL", "status": "kanon"},
+        {"title": "CID: Cyfrowa Tożsamość Woli", "description": "Kanon PSYCHE Brama VII", "cover": "https://placehold.co/300x400/4ecdc4/333?text=CID", "status": "kanon"}
+      ]
+    },
+    {
+      "id": 7,
+      "name": "BRAMA VIII – TRAJEKTORIE",
+      "color": "#8b5cf6",
+      "sub": "Linie Czasu · Fizyka Duszy",
+      "tag": "Trajektoria",
+      "books": [
+        {"title": "TrajektoriaSeeker – Mapa Linii Życia", "description": "Kanon PSYCHE Brama VIII", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=TRAJ", "status": "kanon"},
+        {"title": "QuantumSeeker – Fizyka Duszy", "description": "Kanon PSYCHE Brama VIII", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=QUANT", "status": "kanon"},
+        {"title": "CzasSeeker – Fizyka Linii Czasu", "description": "Kanon PSYCHE Brama VIII", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=CZAS", "status": "kanon"},
+        {"title": "Linie Czasu – Alternatywne Ja", "description": "Kanon PSYCHE Brama VIII", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=LINIE", "status": "kanon"},
+        {"title": "PętlaSeeker – Powtarzanie Lekcji", "description": "Kanon PSYCHE Brama VIII", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=PĘTLA", "status": "kanon"},
+        {"title": "Horyzont Wydarzeń Duszy", "description": "Kanon PSYCHE Brama VIII", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=HORYZ", "status": "kanon"},
+        {"title": "Fizyka Przebudzenia", "description": "Kanon PSYCHE Brama VIII", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=FIZYKA", "status": "kanon"},
+        {"title": "Mapa Trajektorii Życia (rozszerzona)", "description": "Kanon PSYCHE Brama VIII", "cover": "https://placehold.co/300x400/8b5cf6/fff?text=MAPA", "status": "kanon"}
+      ]
+    },
+    {
+      "id": 8,
+      "name": "BRAMA IX – ETERNIONY / KOLEKTYW",
+      "color": "#10b981",
+      "sub": "Kolektyw · Eteriony",
+      "tag": "Wspólnota",
+      "books": [
+        {"title": "Eteriony – Tom I", "description": "Kanon PSYCHE Brama IX", "cover": "https://placehold.co/300x400/10b981/fff?text=ETER1", "status": "kanon"},
+        {"title": "Eteriony – Tom II", "description": "Kanon PSYCHE Brama IX", "cover": "https://placehold.co/300x400/10b981/fff?text=ETER2", "status": "kanon"},
+        {"title": "Węzły Pola – Wspólnota Przebudzonych", "description": "Kanon PSYCHE Brama IX", "cover": "https://placehold.co/300x400/10b981/fff?text=WĘZŁY", "status": "kanon"},
+        {"title": "KolektywSeeker – Siła Wielu Jaźni", "description": "Kanon PSYCHE Brama IX", "cover": "https://placehold.co/300x400/10b981/fff?text=KOL", "status": "kanon"},
+        {"title": "Atlas Ludzi Ognia", "description": "Kanon PSYCHE Brama IX", "cover": "https://placehold.co/300x400/10b981/fff?text=OGIEŃ", "status": "kanon"},
+        {"title": "Kod Ludzi Przebudzonych", "description": "Kanon PSYCHE Brama IX", "cover": "https://placehold.co/300x400/10b981/fff?text=KOD", "status": "kanon"}
+      ]
+    },
+    {
+      "id": 9,
+      "name": "BRAMA X – ETERUNIVERSE",
+      "color": "#f59e0b",
+      "sub": "Integracja · Jedność",
+      "tag": "Horyzont",
+      "books": [
+        {"title": "Architekt Eteru — Manifest Twórcy", "description": "Kanon PSYCHE Brama X", "cover": "https://placehold.co/300x400/f59e0b/fff?text=ARCHIT", "status": "kanon"},
+        {"title": "Mapa Uniwersum Eteru", "description": "Kanon PSYCHE Brama X", "cover": "https://placehold.co/300x400/f59e0b/fff?text=MAPA", "status": "kanon"},
+        {"title": "Esker / Eskiera – Cząstka, która patrzy z powrotem", "description": "Kanon PSYCHE Brama X", "cover": "https://placehold.co/300x400/f59e0b/fff?text=ESKER", "status": "kanon"},
+        {"title": "Shiker / Shikera – Funkcja, która zmienia świat", "description": "Kanon PSYCHE Brama X", "cover": "https://placehold.co/300x400/f59e0b/fff?text=SHIKER", "status": "kanon"},
+        {"title": "EterWar: Wojna o Częstotliwość", "description": "Kanon PSYCHE Brama X", "cover": "https://placehold.co/300x400/f59e0b/fff?text=ETERWAR", "status": "kanon"},
+        {"title": "Horyzont Jedności – Pełne Przebudzenie", "description": "Kanon PSYCHE Brama X", "cover": "https://placehold.co/300x400/f59e0b/fff?text=JEDNOŚĆ", "status": "kanon"}
+      ]
+    }
+  ]
+}
