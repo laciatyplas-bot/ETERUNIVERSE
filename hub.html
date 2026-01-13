@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETERSEEKER | ARCHITECTURE OF WILL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050505;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .border-red { border-color: #ff0033; }
+        .bg-red-dim { background-color: rgba(255, 0, 51, 0.1); }
+        .glow:hover { box-shadow: 0 0 15px rgba(255, 0, 51, 0.4); }
+        .terminal-scroll::-webkit-scrollbar { width: 4px; }
+        .terminal-scroll::-webkit-scrollbar-track { background: #0a0a0a; }
+        .terminal-scroll::-webkit-scrollbar-thumb { background: #333; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- HEADER -->
+        <header class="border-b border-zinc-800 pb-6 mb-8 flex justify-between items-end">
+            <div>
+                <h1 class="text-4xl font-black tracking-tighter text-white">ETERSEEKER <span class="text-red-600">HUB</span></h1>
+                <p class="text-zinc-500 uppercase text-xs tracking-widest mt-1">Status: Aktywny Architekt (Maciek) | CID: 100%</p>
+            </div>
+            <div class="text-right hidden md:block">
+                <p class="mono text-xs text-zinc-600 italic">"Wszystko, co robię, ma głębszy cel: Rodzina."</p>
+            </div>
+        </header>
+
+        <!-- MAIN GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- LEFT COLUMN: STATUS & TOOLS -->
+            <div class="space-y-6">
+                <div class="bg-zinc-900/50 border border-zinc-800 p-5 rounded-lg">
+                    <h2 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-wider">System Bellas</h2>
+                    <ul class="space-y-3">
+                        <li class="flex justify-between items-center bg-black/40 p-2 rounded">
+                            <span class="text-zinc-300">KAISA (Główna)</span>
+                            <span class="text-green-500 text-[10px] animate-pulse">● ONLINE</span>
+                        </li>
+                        <li class="flex justify-between items-center bg-black/40 p-2 rounded">
+                            <span class="text-zinc-300">CURATOR (Zasoby)</span>
+                            <span class="text-zinc-600 text-[10px]">○ STANDBY</span>
+                        </li>
+                        <li class="flex justify-between items-center bg-black/40 p-2 rounded">
+                            <span class="text-zinc-300">SCRIBE (Kronika)</span>
+                            <span class="text-zinc-600 text-[10px]">○ STANDBY</span>
+                        </li>
+                        <li class="flex justify-between items-center bg-black/40 p-2 rounded">
+                            <span class="text-zinc-300">CINEMA (Wizja)</span>
+                            <span class="text-zinc-600 text-[10px]">○ STANDBY</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-zinc-900/50 border border-zinc-800 p-5 rounded-lg">
+                    <h2 class="text-white font-bold uppercase text-sm mb-4 tracking-wider">Lokalny Środowisko</h2>
+                    <div class="space-y-2 text-xs mono">
+                        <div class="flex justify-between"><span class="text-zinc-500">Python:</span> <span class="text-zinc-300">3.14.2</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-500">Pip:</span> <span class="text-zinc-300">25.3</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-500">MSVC (cl):</span> <span class="text-red-900">BRAK</span></div>
+                    </div>
+                    <button class="w-full mt-4 bg-zinc-800 hover:bg-zinc-700 text-white py-2 rounded text-xs transition uppercase font-bold" onclick="showNotice('Inicjuję naprawę PATH...')">Fix cl Environment</button>
+                </div>
+            </div>
+
+            <!-- CENTER COLUMN: TERMINAL / LOGS -->
+            <div class="md:col-span-2 space-y-6">
+                <div class="bg-black border border-zinc-800 rounded-lg overflow-hidden flex flex-col h-[500px]">
+                    <div class="bg-zinc-900 px-4 py-2 border-b border-zinc-800 flex justify-between items-center">
+                        <span class="mono text-xs text-zinc-400">log_terminal.v_01</span>
+                        <div class="flex gap-1.5">
+                            <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                            <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                            <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                        </div>
+                    </div>
+                    <div id="terminal" class="p-4 mono text-sm overflow-y-auto terminal-scroll flex-1 space-y-1">
+                        <p class="text-zinc-600">[SYSTEM] Inicjalizacja jądra Eterniverse...</p>
+                        <p class="text-zinc-600">[SYSTEM] Weryfikacja tożsamości: ARCHITEKT POTWIERDZONY.</p>
+                        <p class="text-red-500">[ALERT] Wykryto brak kompilatora C++. Funkcje zaawansowane ograniczone.</p>
+                        <p class="text-green-500">[READY] Czekam na komendy...</p>
+                    </div>
+                    <div class="p-4 border-t border-zinc-800 bg-zinc-900/30">
+                        <input type="text" id="cmdInput" placeholder="Wpisz polecenie..." 
+                            class="w-full bg-black border border-zinc-700 rounded p-2 text-white mono text-sm focus:border-red-600 outline-none">
+                    </div>
+                </div>
+
+                <!-- QUICK ACTIONS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <button class="bg-red-600/10 border border-red-600/30 hover:bg-red-600/20 text-red-500 p-3 rounded text-center transition glow" onclick="addLog('Inicjuję sesję zapisu...')">
+                        <div class="text-xs font-bold uppercase">Zapisz Postęp</div>
+                    </button>
+                    <button class="bg-zinc-900 border border-zinc-800 hover:border-zinc-600 text-zinc-400 p-3 rounded text-center transition" onclick="addLog('Łączenie z GitHub eterseeker...')">
+                        <div class="text-xs font-bold uppercase">Sync Repo</div>
+                    </button>
+                    <button class="bg-zinc-900 border border-zinc-800 hover:border-zinc-600 text-zinc-400 p-3 rounded text-center transition" onclick="addLog('Pobieram definicje Bellas...')">
+                        <div class="text-xs font-bold uppercase">Update Agents</div>
+                    </button>
+                    <button class="bg-zinc-900 border border-zinc-800 hover:border-zinc-600 text-zinc-400 p-3 rounded text-center transition" onclick="clearTerminal()">
+                        <div class="text-xs font-bold uppercase">Clear Log</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="mt-12 text-zinc-700 text-[10px] uppercase tracking-widest text-center border-t border-zinc-900 pt-4">
+            Eterniverse Operational System v.1.0 // Bunt Przeciw Chaosowi
+        </footer>
+    </div>
+
+    <!-- UI Logic -->
+    <script>
+        const terminal = document.getElementById('terminal');
+        const cmdInput = document.getElementById('cmdInput');
+
+        function addLog(msg, color = 'text-zinc-300') {
+            const p = document.createElement('p');
+            p.className = color;
+            const time = new Date().toLocaleTimeString('pl-PL', { hour12: false });
+            p.innerHTML = `<span class="text-zinc-600">[${time}]</span> ${msg}`;
+            terminal.appendChild(p);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function clearTerminal() {
+            terminal.innerHTML = '<p class="text-zinc-600">[SYSTEM] Terminal wyczyszczony.</p>';
+        }
+
+        function showNotice(msg) {
+            addLog(msg, 'text-blue-400');
+        }
+
+        cmdInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && cmdInput.value.trim() !== '') {
+                const val = cmdInput.value;
+                addLog(`> ${val}`, 'text-white font-bold');
+                
+                // Prosta symulacja komend
+                if(val.toLowerCase() === 'status') {
+                    addLog('System: Stabilny. Architekt: Gotowy.', 'text-green-500');
+                } else if(val.toLowerCase() === 'kaisa') {
+                    addLog('KAISA: Słucham, Maćku. Jakie zadanie na dziś?', 'text-red-400 italic');
+                } else {
+                    addLog(`Polecenie '${val}' wysłane do procesora Bellas...`, 'text-zinc-500');
+                }
+                
+                cmdInput.value = '';
+            }
+        });
+
+        // Intro
+        setTimeout(() => addLog('Wykryto nową sesję użytkownika: Maciek (The Architect)'), 500);
+        setTimeout(() => addLog('Wczytywanie manifestu: ETERSEEKER: ARCHITECTURE OF WILL...'), 1200);
+    </script>
+</body>
+</html>
